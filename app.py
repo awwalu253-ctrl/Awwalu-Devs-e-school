@@ -37,37 +37,6 @@ print("MAIL_SERVER =", os.getenv('MAIL_SERVER'))
 app = Flask(__name__)
 app.secret_key = os.getenv('SECRET_KEY', 'awwalu-devs-super-secret-key-change-in-production')
 
-# ========================
-# AUTO-INITIALIZE DATABASE ON FIRST RUN
-# ========================
-def init_db_if_needed():
-    """Create database tables if they don't exist."""
-    try:
-        from sqlalchemy import text
-        conn = get_db()
-        # Check if users table exists
-        result = conn.execute(text("SELECT name FROM sqlite_master WHERE type='table' AND name='users'"))
-        if not result.fetchone():
-            print("⚠️ Database not found. Creating tables...")
-            import init_db
-            init_db.init_db()
-            print("✅ Database created successfully!")
-        else:
-            print("✅ Database already exists.")
-    except Exception as e:
-        print(f"⚠️ Database check failed: {e}")
-        # Try to initialize anyway
-        try:
-            import init_db
-            init_db.init_db()
-            print("✅ Database created via fallback!")
-        except Exception as init_error:
-            print(f"❌ Failed to create database: {init_error}")
-
-# Run initialization
-with app.app_context():
-    init_db_if_needed()
-
 # --- Custom Jinja2 filter for JSON parsing ---
 @app.template_filter('from_json')
 def from_json(value):
@@ -88,7 +57,7 @@ def allowed_file(filename):
 
 # --- Email Config ---
 MAIL_SERVER = os.getenv('MAIL_SERVER', 'smtp.gmail.com')
-MAIL_PORT = int(os.getenv('MAIL_PORT', 587))
+MAIL_PORT = int(os.getenv('MAIL_PORT', 465))  # SSL port
 MAIL_USERNAME = os.getenv('MAIL_USERNAME', '')
 MAIL_PASSWORD = os.getenv('MAIL_PASSWORD', '')
 MAIL_DEFAULT_SENDER = os.getenv('MAIL_DEFAULT_SENDER', 'noreply@awwaludevs.com')
@@ -97,7 +66,7 @@ APP_BASE_URL = os.getenv('APP_BASE_URL', 'http://localhost:5000')
 def send_email(to_email, subject, body):
     # Read from environment variables
     mail_server = os.getenv('MAIL_SERVER', 'smtp.gmail.com')
-    mail_port = int(os.getenv('MAIL_PORT', 465))  # SSL port
+    mail_port = int(os.getenv('MAIL_PORT', 465))
     mail_username = os.getenv('MAIL_USERNAME', '')
     mail_password = os.getenv('MAIL_PASSWORD', '')
     mail_default_sender = os.getenv('MAIL_DEFAULT_SENDER', 'noreply@awwaludevs.com')
@@ -113,7 +82,7 @@ def send_email(to_email, subject, body):
         msg['Subject'] = subject
         msg.attach(MIMEText(body, 'plain'))
         
-        # Use SSL instead of STARTTLS (port 465)
+        # Use SSL for port 465
         server = smtplib.SMTP_SSL(mail_server, mail_port)
         server.login(mail_username, mail_password)
         server.send_message(msg)
@@ -124,9 +93,15 @@ def send_email(to_email, subject, body):
         print(f"❌ Email send error: {e}")
         return False
 
-# --- Database Setup ---
-DATABASE_URL = os.getenv('DATABASE_URL', 'sqlite:///portal.db')
-connect_args = {"check_same_thread": False} if 'sqlite' in DATABASE_URL else {}
+# --- Database Setup (Supports both SQLite and PostgreSQL) ---
+DATABASE_URL = os.getenv('DATABASE_URL')
+if not DATABASE_URL:
+    # Fallback to SQLite for local development
+    DATABASE_URL = 'sqlite:///portal.db'
+    connect_args = {"check_same_thread": False}
+else:
+    connect_args = {}
+
 engine = create_engine(DATABASE_URL, connect_args=connect_args)
 
 def get_db():
@@ -158,6 +133,37 @@ def close_db(exception):
     db = g.pop('db', None)
     if db is not None:
         db.close()
+
+# ========================
+# AUTO-INITIALIZE DATABASE ON FIRST RUN
+# ========================
+def init_db_if_needed():
+    """Create database tables if they don't exist."""
+    try:
+        from sqlalchemy import text
+        conn = get_db()
+        # Check if users table exists
+        result = conn.execute(text("SELECT name FROM sqlite_master WHERE type='table' AND name='users'"))
+        if not result.fetchone():
+            print("⚠️ Database not found. Creating tables...")
+            import init_db
+            init_db.init_db()
+            print("✅ Database created successfully!")
+        else:
+            print("✅ Database already exists.")
+    except Exception as e:
+        print(f"⚠️ Database check failed: {e}")
+        # Try to initialize anyway
+        try:
+            import init_db
+            init_db.init_db()
+            print("✅ Database created via fallback!")
+        except Exception as init_error:
+            print(f"❌ Failed to create database: {init_error}")
+
+# Run initialization (after database setup)
+with app.app_context():
+    init_db_if_needed()
 
 @app.route('/init_db')
 def init_db_route():

@@ -1,6 +1,5 @@
 # init_db.py
 import os
-import json
 from sqlalchemy import create_engine, text
 from werkzeug.security import generate_password_hash
 
@@ -9,45 +8,46 @@ engine = create_engine(DATABASE_URL, connect_args={"check_same_thread": False} i
 
 def init_db():
     with engine.connect() as conn:
+        # Drop tables in correct order (cascade for PostgreSQL)
         print("Dropping existing tables...")
-        conn.execute(text("DROP TABLE IF EXISTS note_tags"))
-        conn.execute(text("DROP TABLE IF EXISTS tags"))
-        conn.execute(text("DROP TABLE IF EXISTS student_notes"))
-        conn.execute(text("DROP TABLE IF EXISTS messages"))
-        conn.execute(text("DROP TABLE IF EXISTS activity_logs"))
-        conn.execute(text("DROP TABLE IF EXISTS badges"))
-        conn.execute(text("DROP TABLE IF EXISTS discussions"))
-        conn.execute(text("DROP TABLE IF EXISTS note_templates"))
-        conn.execute(text("DROP TABLE IF EXISTS notifications"))
-        conn.execute(text("DROP TABLE IF EXISTS quiz_attempts"))
-        conn.execute(text("DROP TABLE IF EXISTS quiz_questions"))
-        conn.execute(text("DROP TABLE IF EXISTS quizzes"))
-        conn.execute(text("DROP TABLE IF EXISTS certificates"))
-        conn.execute(text("DROP TABLE IF EXISTS read_notes"))
-        conn.execute(text("DROP TABLE IF EXISTS submissions"))
-        conn.execute(text("DROP TABLE IF EXISTS assignments"))
-        conn.execute(text("DROP TABLE IF EXISTS notes"))
-        conn.execute(text("DROP TABLE IF EXISTS users"))
-        conn.execute(text("DROP TABLE IF EXISTS courses"))
-        conn.execute(text("DROP TABLE IF EXISTS announcements"))
+        conn.execute(text("DROP TABLE IF EXISTS note_tags CASCADE"))
+        conn.execute(text("DROP TABLE IF EXISTS tags CASCADE"))
+        conn.execute(text("DROP TABLE IF EXISTS student_notes CASCADE"))
+        conn.execute(text("DROP TABLE IF EXISTS messages CASCADE"))
+        conn.execute(text("DROP TABLE IF EXISTS activity_logs CASCADE"))
+        conn.execute(text("DROP TABLE IF EXISTS badges CASCADE"))
+        conn.execute(text("DROP TABLE IF EXISTS discussions CASCADE"))
+        conn.execute(text("DROP TABLE IF EXISTS note_templates CASCADE"))
+        conn.execute(text("DROP TABLE IF EXISTS notifications CASCADE"))
+        conn.execute(text("DROP TABLE IF EXISTS quiz_attempts CASCADE"))
+        conn.execute(text("DROP TABLE IF EXISTS quiz_questions CASCADE"))
+        conn.execute(text("DROP TABLE IF EXISTS quizzes CASCADE"))
+        conn.execute(text("DROP TABLE IF EXISTS certificates CASCADE"))
+        conn.execute(text("DROP TABLE IF EXISTS read_notes CASCADE"))
+        conn.execute(text("DROP TABLE IF EXISTS submissions CASCADE"))
+        conn.execute(text("DROP TABLE IF EXISTS assignments CASCADE"))
+        conn.execute(text("DROP TABLE IF EXISTS notes CASCADE"))
+        conn.execute(text("DROP TABLE IF EXISTS users CASCADE"))
+        conn.execute(text("DROP TABLE IF EXISTS courses CASCADE"))
+        conn.execute(text("DROP TABLE IF EXISTS announcements CASCADE"))
         conn.commit()
 
-        # --- 1. Courses ---
+        # 1. Courses
         print("Creating courses...")
         conn.execute(text("""
             CREATE TABLE courses (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                id SERIAL PRIMARY KEY,
                 name TEXT UNIQUE NOT NULL,
                 description TEXT,
                 color TEXT DEFAULT '#6c63ff'
             )
         """))
 
-        # --- 2. Users (with new columns: phone, dob, bio) ---
+        # 2. Users
         print("Creating users...")
         conn.execute(text("""
             CREATE TABLE users (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                id SERIAL PRIMARY KEY,
                 username TEXT UNIQUE NOT NULL,
                 password TEXT NOT NULL,
                 full_name TEXT NOT NULL,
@@ -68,11 +68,11 @@ def init_db():
             )
         """))
 
-        # --- 3. Notes (NEW: publish_at, sort_order, cohort) ---
+        # 3. Notes
         print("Creating notes...")
         conn.execute(text("""
             CREATE TABLE notes (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                id SERIAL PRIMARY KEY,
                 title TEXT NOT NULL,
                 content TEXT NOT NULL,
                 course_id INTEGER NOT NULL,
@@ -85,11 +85,11 @@ def init_db():
             )
         """))
 
-        # --- 4. Assignments (NEW: publish_at, cohort) ---
+        # 4. Assignments
         print("Creating assignments...")
         conn.execute(text("""
             CREATE TABLE assignments (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                id SERIAL PRIMARY KEY,
                 title TEXT NOT NULL,
                 description TEXT NOT NULL,
                 due_date TEXT NOT NULL,
@@ -100,11 +100,11 @@ def init_db():
             )
         """))
 
-        # --- 5. Submissions (NEW: grade, feedback) ---
+        # 5. Submissions
         print("Creating submissions...")
         conn.execute(text("""
             CREATE TABLE submissions (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                id SERIAL PRIMARY KEY,
                 student_id INTEGER NOT NULL,
                 assignment_id INTEGER NOT NULL,
                 file_path TEXT,
@@ -117,11 +117,11 @@ def init_db():
             )
         """))
 
-        # --- 6. Read Notes ---
+        # 6. Read Notes
         print("Creating read_notes...")
         conn.execute(text("""
             CREATE TABLE read_notes (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                id SERIAL PRIMARY KEY,
                 user_id INTEGER NOT NULL,
                 note_id INTEGER NOT NULL,
                 read_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -131,11 +131,11 @@ def init_db():
             )
         """))
 
-        # --- 7. Announcements ---
+        # 7. Announcements
         print("Creating announcements...")
         conn.execute(text("""
             CREATE TABLE announcements (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                id SERIAL PRIMARY KEY,
                 title TEXT NOT NULL,
                 content TEXT NOT NULL,
                 course_id INTEGER,
@@ -144,11 +144,11 @@ def init_db():
             )
         """))
 
-        # --- 8. Quizzes ---
+        # 8. Quizzes
         print("Creating quizzes...")
         conn.execute(text("""
             CREATE TABLE quizzes (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                id SERIAL PRIMARY KEY,
                 title TEXT NOT NULL,
                 description TEXT,
                 course_id INTEGER NOT NULL,
@@ -157,11 +157,11 @@ def init_db():
             )
         """))
 
-        # --- 9. Quiz Questions ---
+        # 9. Quiz Questions
         print("Creating quiz_questions...")
         conn.execute(text("""
             CREATE TABLE quiz_questions (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                id SERIAL PRIMARY KEY,
                 quiz_id INTEGER NOT NULL,
                 question_text TEXT NOT NULL,
                 options TEXT NOT NULL,
@@ -170,11 +170,11 @@ def init_db():
             )
         """))
 
-        # --- 10. Quiz Attempts ---
+        # 10. Quiz Attempts
         print("Creating quiz_attempts...")
         conn.execute(text("""
             CREATE TABLE quiz_attempts (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                id SERIAL PRIMARY KEY,
                 student_id INTEGER NOT NULL,
                 quiz_id INTEGER NOT NULL,
                 score INTEGER,
@@ -187,11 +187,11 @@ def init_db():
             )
         """))
 
-        # --- 11. Certificates ---
+        # 11. Certificates
         print("Creating certificates...")
         conn.execute(text("""
             CREATE TABLE certificates (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                id SERIAL PRIMARY KEY,
                 student_id INTEGER NOT NULL,
                 course_id INTEGER NOT NULL,
                 certificate_code TEXT UNIQUE NOT NULL,
@@ -201,11 +201,11 @@ def init_db():
             )
         """))
 
-        # --- 12. Notifications ---
+        # 12. Notifications
         print("Creating notifications...")
         conn.execute(text("""
             CREATE TABLE notifications (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                id SERIAL PRIMARY KEY,
                 user_id INTEGER NOT NULL,
                 message TEXT NOT NULL,
                 link TEXT,
@@ -215,11 +215,11 @@ def init_db():
             )
         """))
 
-        # --- 13. Note Templates ---
+        # 13. Note Templates
         print("Creating note_templates...")
         conn.execute(text("""
             CREATE TABLE note_templates (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                id SERIAL PRIMARY KEY,
                 name TEXT NOT NULL,
                 title TEXT NOT NULL,
                 content TEXT NOT NULL,
@@ -227,11 +227,11 @@ def init_db():
             )
         """))
 
-        # --- 14. Discussions (NEW: upvotes, is_resolved) ---
+        # 14. Discussions
         print("Creating discussions...")
         conn.execute(text("""
             CREATE TABLE discussions (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                id SERIAL PRIMARY KEY,
                 note_id INTEGER NOT NULL,
                 user_id INTEGER NOT NULL,
                 parent_id INTEGER,
@@ -245,11 +245,11 @@ def init_db():
             )
         """))
 
-        # --- 15. Messages (Private inbox) ---
+        # 15. Messages
         print("Creating messages...")
         conn.execute(text("""
             CREATE TABLE messages (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                id SERIAL PRIMARY KEY,
                 sender_id INTEGER NOT NULL,
                 receiver_id INTEGER NOT NULL,
                 message TEXT NOT NULL,
@@ -260,11 +260,11 @@ def init_db():
             )
         """))
 
-        # --- 16. Activity Logs ---
+        # 16. Activity Logs
         print("Creating activity_logs...")
         conn.execute(text("""
             CREATE TABLE activity_logs (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                id SERIAL PRIMARY KEY,
                 user_id INTEGER NOT NULL,
                 action TEXT NOT NULL,
                 details TEXT,
@@ -274,11 +274,11 @@ def init_db():
             )
         """))
 
-        # --- 17. Badges ---
+        # 17. Badges
         print("Creating badges...")
         conn.execute(text("""
             CREATE TABLE badges (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                id SERIAL PRIMARY KEY,
                 user_id INTEGER NOT NULL,
                 course_id INTEGER NOT NULL,
                 badge_name TEXT NOT NULL,
@@ -290,11 +290,11 @@ def init_db():
             )
         """))
 
-        # --- 18. Student Private Notes ---
+        # 18. Student Private Notes
         print("Creating student_notes...")
         conn.execute(text("""
             CREATE TABLE student_notes (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                id SERIAL PRIMARY KEY,
                 user_id INTEGER NOT NULL,
                 note_id INTEGER NOT NULL,
                 content TEXT,
@@ -306,18 +306,18 @@ def init_db():
             )
         """))
 
-        # --- 19. Tags ---
+        # 19. Tags
         print("Creating tags...")
         conn.execute(text("""
             CREATE TABLE tags (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                id SERIAL PRIMARY KEY,
                 name TEXT UNIQUE NOT NULL,
                 color TEXT DEFAULT '#6c63ff',
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             )
         """))
 
-        # --- 20. Note Tags ---
+        # 20. Note Tags
         print("Creating note_tags...")
         conn.execute(text("""
             CREATE TABLE note_tags (
@@ -364,7 +364,7 @@ def init_db():
                          {"name": name, "color": color})
         conn.commit()
 
-        # --- Insert Pre-Made Notes (with sort_order) ---
+        # --- Insert Pre-Made Notes ---
         print("Inserting 30 pre-made notes (drafts)...")
         python_notes = [
             ("1. Intro to Python", "```python\nprint('Hello World')\n```\nPython is a high-level, interpreted language."),
@@ -436,14 +436,13 @@ def init_db():
         """), {"u": "alice", "p": student_pass, "f": "Alice Student", "e": "alice@example.com", "a": 0, "cid": python_id})
         conn.commit()
 
-        # --- Insert sample note template ---
+        # --- Sample template and announcement ---
         print("Inserting sample note template...")
         conn.execute(text("""
             INSERT INTO note_templates (name, title, content)
             VALUES ('Lesson Template', 'Lesson Title', 'Write your lesson content here.\n\n```python\n# Example code\nprint("Hello")\n```')
         """))
 
-        # --- Insert sample announcement ---
         print("Inserting sample announcement...")
         conn.execute(text("""
             INSERT INTO announcements (title, content, course_id)
@@ -453,7 +452,7 @@ def init_db():
         conn.commit()
 
         print("\n" + "=" * 70)
-        print("✅ DATABASE FULLY UPGRADED WITH ALL TABLES!")
+        print("✅ DATABASE FULLY UPGRADED WITH ALL TABLES (PostgreSQL compatible)!")
         print("   - Courses, Users, Notes, Assignments, Submissions")
         print("   - Quizzes, Quiz Questions, Quiz Attempts")
         print("   - Certificates, Notifications, Announcements")
@@ -465,9 +464,6 @@ def init_db():
         print("=" * 70)
         print("👤 Admin: admin | Pass: admin123")
         print("👤 Student: alice | Pass: student123 (enrolled in Python 101)")
-        print("📁 Don't forget to create an 'uploads/' folder!")
-        print("📧 For password reset, set SMTP env variables.")
-        print("🏷️ Sample tags created: Python, JavaScript, HTML/CSS, Functions, Loops, Variables, OOP")
         print("=" * 70)
 
 if __name__ == "__main__":

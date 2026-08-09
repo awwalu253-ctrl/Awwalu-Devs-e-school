@@ -32,6 +32,37 @@ load_dotenv()
 app = Flask(__name__)
 app.secret_key = os.getenv('SECRET_KEY', 'awwalu-devs-super-secret-key-change-in-production')
 
+# ========================
+# AUTO-INITIALIZE DATABASE ON FIRST RUN
+# ========================
+def init_db_if_needed():
+    """Create database tables if they don't exist."""
+    try:
+        from sqlalchemy import text
+        conn = get_db()
+        # Check if users table exists
+        result = conn.execute(text("SELECT name FROM sqlite_master WHERE type='table' AND name='users'"))
+        if not result.fetchone():
+            print("⚠️ Database not found. Creating tables...")
+            import init_db
+            init_db.init_db()
+            print("✅ Database created successfully!")
+        else:
+            print("✅ Database already exists.")
+    except Exception as e:
+        print(f"⚠️ Database check failed: {e}")
+        # Try to initialize anyway
+        try:
+            import init_db
+            init_db.init_db()
+            print("✅ Database created via fallback!")
+        except Exception as init_error:
+            print(f"❌ Failed to create database: {init_error}")
+
+# Run initialization
+with app.app_context():
+    init_db_if_needed()
+
 # --- Custom Jinja2 filter for JSON parsing ---
 @app.template_filter('from_json')
 def from_json(value):
@@ -112,6 +143,16 @@ def close_db(exception):
     db = g.pop('db', None)
     if db is not None:
         db.close()
+
+@app.route('/init_db')
+def init_db_route():
+    """Manual database initialization (for Render deployment)."""
+    try:
+        import init_db
+        init_db.init_db()
+        return "✅ Database initialized successfully! <a href='/'>Go to Home</a>"
+    except Exception as e:
+        return f"❌ Error: {str(e)}"
 
 # --- Helper functions ---
 def get_admin_id():

@@ -103,6 +103,7 @@ def send_email(to_email, subject, body):
     if not mail_username or not mail_password:
         print("⚠️ Email credentials not set. Check your environment variables.")
         return False
+    
     try:
         msg = MIMEMultipart()
         msg['From'] = mail_default_sender
@@ -114,6 +115,7 @@ def send_email(to_email, subject, body):
         server.login(mail_username, mail_password)
         server.send_message(msg)
         server.quit()
+        print(f"✅ Email sent to {to_email}")
         return True
     except Exception as e:
         print(f"❌ Email send error: {e}")
@@ -161,6 +163,18 @@ def init_db_route():
         import init_db
         init_db.init_db()
         return "✅ Database initialized successfully! <a href='/'>Go to Home</a>"
+    except Exception as e:
+        return f"❌ Error: {str(e)}"
+
+@app.route('/test_email')
+def test_email():
+    """Test email sending (no login required for testing)."""
+    try:
+        success = send_email("awwalu253@gmail.com", "Test Email from Awwalu Devs", "This is a test email.")
+        if success:
+            return "✅ Email sent successfully!"
+        else:
+            return "❌ Email failed. Check logs."
     except Exception as e:
         return f"❌ Error: {str(e)}"
 
@@ -420,20 +434,43 @@ def register():
 @app.route('/forgot_password', methods=['GET', 'POST'])
 def forgot_password():
     if request.method == 'POST':
-        email = request.form.get('email', '').strip().lower()
-        if not email:
-            flash('Please enter your email address.', 'danger')
+        try:
+            email = request.form.get('email', '').strip().lower()
+            if not email:
+                flash('Please enter your email address.', 'danger')
+                return redirect(url_for('forgot_password'))
+            user = execute_query("SELECT * FROM users WHERE LOWER(email) = LOWER(:email)", {"email": email}, fetch_one=True)
+            if not user:
+                flash('No account found with that email address.', 'danger')
+                return redirect(url_for('forgot_password'))
+            token = secrets.token_urlsafe(32)
+            expiry = datetime.utcnow() + timedelta(hours=24)
+            execute_query("UPDATE users SET reset_token = :t, reset_token_expiry = :e WHERE id = :id",
+                          {"t": token, "e": expiry.isoformat(), "id": user['id']}, commit=True)
+            reset_link = f"{APP_BASE_URL}/reset_password/{token}"
+            body = f"""Hello {user['full_name']},
+
+You requested to reset your password for your Awwalu Devs account.
+
+Click the link below to reset your password (valid for 24 hours):
+{reset_link}
+
+If you did not request this, please ignore this email.
+
+Regards,
+Awwalu Devs Team
+"""
+            success = send_email(user['email'], "Password Reset Request", body)
+            if success:
+                flash('Password reset link sent to your email!', 'success')
+            else:
+                flash(f'Email could not be sent. Use this link to reset your password: <a href="{reset_link}" target="_blank">{reset_link}</a>', 'warning')
+            return redirect(url_for('login'))
+        except Exception as e:
+            print(f"❌ Forgot password error: {e}")
+            flash('An error occurred. Please try again.', 'danger')
             return redirect(url_for('forgot_password'))
-        user = execute_query("SELECT * FROM users WHERE LOWER(email) = LOWER(:email)", {"email": email}, fetch_one=True)
-        if not user:
-            flash('No account found with that email address.', 'danger')
-            return redirect(url_for('forgot_password'))
-        token = secrets.token_urlsafe(32)
-        expiry = datetime.utcnow() + timedelta(hours=24)
-        execute_query("UPDATE users SET reset_token = :t, reset_token_expiry = :e WHERE id = :id",
-                      {"t": token, "e": expiry.isoformat(), "id": user['id']}, commit=True)
-        reset_link = f"{APP_BASE_URL}/reset_password/{token}"
-        body = f"""Hello {user['full_name']},
+    return render_template('forgot_password.html')
 
 You requested to reset your password for your Awwalu Devs account.
 

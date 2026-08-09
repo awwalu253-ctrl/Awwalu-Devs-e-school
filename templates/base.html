@@ -1,0 +1,1578 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Awwalu Devs — Class Portal</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&family=Space+Grotesk:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+    <link rel="icon" href="{{ url_for('static', filename='images/logo.png') }}" type="image/png">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+
+    <style>
+        /* ============================================================
+               NAVY + ELECTRIC BLUE THEME — PREMIUM REDESIGN
+               ============================================================ */
+
+        /* ---------- ROOT VARIABLES ---------- */
+        :root {
+            --navy: #0F172A;
+            --blue: #2563EB;
+            --cyan: #22D3EE;
+            --bg: #F8FAFC;
+            --text: #1E293B;
+            --text-light: #64748B;
+            --white: #FFFFFF;
+            --shadow-sm: 0 2px 12px rgba(15, 23, 42, 0.06);
+            --shadow-md: 0 8px 32px rgba(15, 23, 42, 0.10);
+            --shadow-lg: 0 20px 60px rgba(15, 23, 42, 0.14);
+            --radius: 20px;
+            --radius-sm: 12px;
+            --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+            /* Sidebar */
+            --sidebar-width: 260px;
+            --sidebar-bg: var(--navy);
+            --sidebar-hover: rgba(37, 99, 235, 0.15);
+            --sidebar-active: var(--blue);
+            --sidebar-text: #94A3B8;
+            --sidebar-active-text: #FFFFFF;
+        }
+
+        /* ---------- GLOBAL RESET / BASE ---------- */
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
+            color: var(--text);
+            background: var(--bg);
+            transition: background 0.3s ease, color 0.3s ease;
+        }
+
+        /* ---------- ANIMATIONS ---------- */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px) scale(0.96);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        @keyframes pulse-glow {
+
+            0%,
+            100% {
+                box-shadow: 0 0 0 0 rgba(37, 99, 235, 0.3);
+            }
+
+            50% {
+                box-shadow: 0 0 0 12px rgba(37, 99, 235, 0);
+            }
+        }
+
+        .animate-fade {
+            animation: fadeInUp 0.6s ease forwards;
+            opacity: 0;
+        }
+
+        /* ---------- FLASH MESSAGES ---------- */
+        .flash-container {
+            position: fixed;
+            top: 80px;
+            right: 20px;
+            z-index: 9999;
+            min-width: 300px;
+            max-width: 420px;
+        }
+
+        .flash-container .alert {
+            border: none;
+            border-radius: var(--radius-sm);
+            box-shadow: var(--shadow-lg);
+            backdrop-filter: blur(12px);
+            background: rgba(255, 255, 255, 0.92);
+            border-left: 4px solid var(--blue);
+            padding: 14px 20px;
+            font-weight: 500;
+            animation: fadeInUp 0.4s ease;
+        }
+
+        .flash-container .alert-success {
+            border-left-color: #10B981;
+        }
+
+        .flash-container .alert-danger {
+            border-left-color: #EF4444;
+        }
+
+        .flash-container .alert-warning {
+            border-left-color: #F59E0B;
+        }
+
+        .flash-container .alert-info {
+            border-left-color: var(--blue);
+        }
+
+        .flash-container .btn-close {
+            filter: grayscale(0.5);
+            opacity: 0.6;
+            transition: var(--transition);
+        }
+
+        .flash-container .btn-close:hover {
+            opacity: 1;
+            transform: rotate(90deg);
+        }
+
+        /* ---------- CARDS ---------- */
+        .card {
+            border: none;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-md);
+            transition: var(--transition);
+            background: rgba(255, 255, 255, 0.92);
+            backdrop-filter: blur(2px);
+            border: 1px solid rgba(37, 99, 235, 0.06);
+        }
+
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-lg), 0 0 0 1px rgba(37, 99, 235, 0.08);
+        }
+
+        /* ---------- BUTTONS ---------- */
+        .btn-primary {
+            background: linear-gradient(135deg, var(--blue), #1D4ED8);
+            border: none;
+            color: white;
+            font-weight: 600;
+            padding: 10px 24px;
+            border-radius: 50px;
+            box-shadow: 0 4px 14px rgba(37, 99, 235, 0.30);
+            transition: var(--transition);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px) scale(1.02);
+            box-shadow: 0 8px 28px rgba(37, 99, 235, 0.40);
+            background: linear-gradient(135deg, var(--blue), var(--cyan));
+            color: white;
+        }
+
+        .btn-outline-primary {
+            border: 1.5px solid var(--blue);
+            color: var(--blue);
+            background: transparent;
+            font-weight: 600;
+            border-radius: 50px;
+            padding: 8px 20px;
+            transition: var(--transition);
+        }
+
+        .btn-outline-primary:hover {
+            background: var(--blue);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 14px rgba(37, 99, 235, 0.25);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #10B981, #059669);
+            border: none;
+            color: white;
+            font-weight: 600;
+            border-radius: 50px;
+            padding: 8px 20px;
+            box-shadow: 0 4px 14px rgba(16, 185, 129, 0.25);
+            transition: var(--transition);
+        }
+
+        .btn-success:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(16, 185, 129, 0.35);
+            background: linear-gradient(135deg, #34D399, #10B981);
+            color: white;
+        }
+
+        .btn-outline-secondary {
+            border: 1.5px solid #CBD5E1;
+            color: var(--text-light);
+            background: transparent;
+            font-weight: 500;
+            border-radius: 50px;
+            padding: 8px 20px;
+            transition: var(--transition);
+        }
+
+        .btn-outline-secondary:hover {
+            border-color: var(--blue);
+            color: var(--blue);
+            background: rgba(37, 99, 235, 0.04);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.08);
+        }
+
+        .btn-outline-danger {
+            border: 1.5px solid #EF4444;
+            color: #EF4444;
+            background: transparent;
+            font-weight: 500;
+            border-radius: 50px;
+            padding: 8px 20px;
+            transition: var(--transition);
+        }
+
+        .btn-outline-danger:hover {
+            background: #EF4444;
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 14px rgba(239, 68, 68, 0.25);
+        }
+
+        .btn-outline-light {
+            border: 1.5px solid rgba(255, 255, 255, 0.2);
+            color: rgba(255, 255, 255, 0.8);
+            background: transparent;
+            border-radius: 50px;
+            padding: 6px 14px;
+            transition: var(--transition);
+            font-size: 0.85rem;
+        }
+
+        .btn-outline-light:hover {
+            background: rgba(255, 255, 255, 0.10);
+            color: #fff;
+            transform: scale(1.04);
+            border-color: rgba(255, 255, 255, 0.4);
+        }
+
+        /* ---------- BADGE ---------- */
+        .badge {
+            font-weight: 600;
+            padding: 4px 12px;
+            border-radius: 50px;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+
+        .badge.bg-primary {
+            background: var(--blue) !important;
+        }
+
+        .badge.bg-success {
+            background: #10B981 !important;
+        }
+
+        .badge.bg-danger {
+            background: #EF4444 !important;
+        }
+
+        .badge.bg-warning {
+            background: #F59E0B !important;
+            color: #78350F;
+        }
+
+        .course-badge {
+            background: linear-gradient(135deg, var(--blue), var(--cyan));
+            color: white;
+            padding: 6px 18px;
+            border-radius: 50px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.20);
+            display: inline-block;
+        }
+
+        /* ---------- FORM CONTROLS ---------- */
+        .form-control {
+            border: 1.5px solid #E2E8F0;
+            border-radius: var(--radius-sm);
+            padding: 10px 16px;
+            font-size: 0.95rem;
+            transition: var(--transition);
+            background: var(--bg);
+            color: var(--text);
+        }
+
+        .form-control:focus {
+            border-color: var(--blue);
+            box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.10);
+            background: white;
+            outline: none;
+        }
+
+        .form-label {
+            font-weight: 600;
+            color: var(--navy);
+            font-size: 0.9rem;
+            margin-bottom: 4px;
+        }
+
+        /* ============================================================
+               PUBLIC PAGE
+               ============================================================ */
+        body.public-page {
+            background: linear-gradient(145deg, var(--navy) 0%, #0B1124 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        body.public-page::before {
+            content: '';
+            position: absolute;
+            top: -40%;
+            right: -20%;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(37, 99, 235, 0.12) 0%, transparent 70%);
+            border-radius: 50%;
+            animation: pulse-glow 6s ease-in-out infinite alternate;
+            pointer-events: none;
+        }
+
+        body.public-page::after {
+            content: '';
+            position: absolute;
+            bottom: -30%;
+            left: -15%;
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, rgba(34, 211, 238, 0.08) 0%, transparent 70%);
+            border-radius: 50%;
+            animation: pulse-glow 8s ease-in-out infinite alternate-reverse;
+            pointer-events: none;
+        }
+
+        .public-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: var(--radius);
+            padding: 40px 34px;
+            max-width: 450px;
+            width: 100%;
+            box-shadow: var(--shadow-lg), 0 0 0 1px rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            position: relative;
+            z-index: 1;
+            animation: fadeInUp 0.7s ease;
+        }
+
+        .public-card .logo {
+            text-align: center;
+            margin-bottom: 28px;
+        }
+
+        .public-card .logo img {
+            height: 72px;
+            width: auto;
+            max-width: 200px;
+            filter: drop-shadow(0 4px 12px rgba(37, 99, 235, 0.20));
+        }
+
+        .public-card .logo h1 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--navy);
+            margin-top: 10px;
+            letter-spacing: -0.5px;
+            font-family: 'Space Grotesk', sans-serif;
+        }
+
+        .public-card .logo h1 span {
+            background: linear-gradient(135deg, var(--blue), var(--cyan));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .public-card .logo p {
+            color: var(--text-light);
+            font-size: 0.95rem;
+            margin-top: 2px;
+        }
+
+        .public-card .form-control {
+            background: var(--bg);
+            border-color: #E2E8F0;
+        }
+
+        .public-card .form-control:focus {
+            background: white;
+            border-color: var(--blue);
+        }
+
+        .public-card a {
+            color: var(--blue);
+            text-decoration: none;
+            font-weight: 500;
+            transition: var(--transition);
+        }
+
+        .public-card a:hover {
+            color: var(--cyan);
+            text-decoration: underline;
+        }
+
+        /* public-card dark mode */
+        body.public-page.dark-mode .public-card {
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(20px);
+            border-color: rgba(37, 99, 235, 0.15);
+        }
+
+        body.public-page.dark-mode .public-card .logo h1 {
+            color: white;
+            -webkit-text-fill-color: white;
+        }
+
+        body.public-page.dark-mode .public-card .logo h1 span {
+            background: linear-gradient(135deg, var(--blue), var(--cyan));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        body.public-page.dark-mode .public-card .logo p {
+            color: #94A3B8;
+        }
+
+        body.public-page.dark-mode .public-card .form-control {
+            background: #1E293B;
+            color: #E2E8F0;
+            border-color: #334155;
+        }
+
+        body.public-page.dark-mode .public-card .form-control:focus {
+            background: #1E293B;
+            border-color: var(--blue);
+            box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.15);
+        }
+
+        body.public-page.dark-mode .public-card a {
+            color: #60A5FA;
+        }
+
+        body.public-page.dark-mode .public-card a:hover {
+            color: var(--cyan);
+        }
+
+        /* ============================================================
+               LOGGED-IN LAYOUT (Sidebar + Main)
+               ============================================================ */
+        body.logged-in {
+            display: flex;
+            min-height: 100vh;
+            background: var(--bg);
+        }
+
+        /* ---------- SIDEBAR ---------- */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100vh;
+            width: var(--sidebar-width);
+            background: var(--sidebar-bg);
+            color: var(--sidebar-text);
+            transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 1050;
+            overflow-y: auto;
+            padding: 0 0 20px 0;
+            display: flex;
+            flex-direction: column;
+            border-right: 1px solid rgba(37, 99, 235, 0.06);
+        }
+
+        .sidebar::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .sidebar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .sidebar::-webkit-scrollbar-thumb {
+            background: rgba(37, 99, 235, 0.3);
+            border-radius: 10px;
+        }
+
+        .sidebar::-webkit-scrollbar-thumb:hover {
+            background: var(--blue);
+        }
+
+        .sidebar-brand {
+            padding: 20px 16px 16px 16px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+            text-align: center;
+            flex-shrink: 0;
+        }
+
+        .sidebar-brand img {
+            height: 105px;
+            width: 200px;
+            max-width: 100%;
+            object-fit: contain;
+            filter: drop-shadow(0 2px 8px rgba(37, 99, 235, 0.20));
+        }
+
+        .sidebar-brand span {
+            display: block;
+            color: #fff;
+            font-weight: 700;
+            font-size: 1.2rem;
+            margin-top: 6px;
+            letter-spacing: -0.3px;
+            font-family: 'Space Grotesk', sans-serif;
+        }
+
+        .sidebar-brand span small {
+            font-weight: 400;
+            font-size: 0.65rem;
+            color: #64748B;
+            display: block;
+            letter-spacing: 1px;
+            margin-top: 2px;
+        }
+
+        .sidebar .nav {
+            padding: 8px 0;
+            flex: 1;
+        }
+
+        .sidebar .nav-section {
+            padding: 16px 20px 6px 20px;
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            color: #64748B;
+            font-weight: 600;
+            opacity: 0.6;
+        }
+
+        .sidebar .nav-link {
+            color: var(--sidebar-text);
+            padding: 10px 20px;
+            border-radius: 0;
+            border-left: 3px solid transparent;
+            transition: var(--transition);
+            font-weight: 500;
+            font-size: 0.9rem;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .sidebar .nav-link i {
+            width: 22px;
+            text-align: center;
+            font-size: 1.05rem;
+            flex-shrink: 0;
+            color: #64748B;
+            transition: var(--transition);
+        }
+
+        .sidebar .nav-link:hover {
+            background: var(--sidebar-hover);
+            color: #fff;
+            border-left-color: var(--sidebar-active);
+        }
+
+        .sidebar .nav-link:hover i {
+            color: var(--blue);
+        }
+
+        .sidebar .nav-link.active {
+            background: var(--sidebar-hover);
+            color: var(--sidebar-active-text);
+            border-left-color: var(--sidebar-active);
+        }
+
+        .sidebar .nav-link.active i {
+            color: var(--cyan);
+        }
+
+        .sidebar .nav-link .badge {
+            margin-left: auto;
+            font-size: 0.65rem;
+            padding: 2px 10px;
+            background: var(--blue) !important;
+            color: white;
+        }
+
+        .sidebar-footer {
+            margin-top: auto;
+            padding: 16px 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.04);
+            text-align: center;
+            font-size: 0.75rem;
+            color: #64748B;
+            flex-shrink: 0;
+            line-height: 1.5;
+        }
+
+        .sidebar-footer strong {
+            color: #94A3B8;
+        }
+
+        /* ---------- MAIN CONTENT ---------- */
+        .main-content {
+            margin-left: var(--sidebar-width);
+            flex: 1;
+            min-height: 100vh;
+            padding: 20px 24px 24px 24px;
+            transition: margin 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* ============================================================
+               REDESIGNED TOP NAVBAR (logged-in)
+               ============================================================ */
+        .navbar-top {
+            background: rgba(255, 255, 255, 0.72);
+            backdrop-filter: blur(16px) saturate(1.2);
+            -webkit-backdrop-filter: blur(16px) saturate(1.2);
+            border-radius: var(--radius);
+            padding: 10px 20px;
+            margin-bottom: 28px;
+            border: 1px solid rgba(37, 99, 235, 0.06);
+            box-shadow: var(--shadow-sm);
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .navbar-top:hover {
+            box-shadow: var(--shadow-md);
+            border-color: rgba(37, 99, 235, 0.10);
+        }
+
+        .navbar-top .brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+            flex-shrink: 0;
+        }
+
+        /* --- NAVBAR LOGO SIZE (width 200px) --- */
+        .navbar-top .brand img {
+            height: 95px;
+            width: 200px;
+            max-width: 100%;
+            object-fit: contain;
+            transition: var(--transition);
+        }
+
+        .navbar-top .brand:hover img {
+            transform: scale(1.05) rotate(-2deg);
+        }
+
+        .navbar-top .brand .brand-text {
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 700;
+            font-size: 1.05rem;
+            color: var(--navy);
+            letter-spacing: -0.3px;
+            transition: var(--transition);
+        }
+
+        .navbar-top .brand .brand-text span {
+            color: var(--blue);
+        }
+
+        .navbar-top .brand .brand-text small {
+            font-weight: 400;
+            font-size: 0.6rem;
+            color: var(--text-light);
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            margin-left: 4px;
+        }
+
+        .navbar-top .brand:hover .brand-text {
+            color: var(--blue);
+        }
+
+        /* Navbar right section */
+        .navbar-top .nav-actions {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+
+        .navbar-top .nav-actions .btn-icon {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            border: none;
+            background: transparent;
+            color: var(--text-light);
+            font-size: 1.15rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
+            position: relative;
+            cursor: pointer;
+            text-decoration: none;
+        }
+
+        .navbar-top .nav-actions .btn-icon:hover {
+            background: rgba(37, 99, 235, 0.08);
+            color: var(--blue);
+            transform: translateY(-1px);
+        }
+
+        .navbar-top .nav-actions .btn-icon .badge-dot {
+            position: absolute;
+            top: 4px;
+            right: 4px;
+            width: 18px;
+            height: 18px;
+            background: #EF4444;
+            color: white;
+            font-size: 0.55rem;
+            font-weight: 700;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid rgba(255, 255, 255, 0.9);
+        }
+
+        /* User avatar & dropdown */
+        .navbar-top .user-menu {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 4px 12px 4px 4px;
+            border-radius: 50px;
+            transition: var(--transition);
+            cursor: pointer;
+            text-decoration: none;
+            border: 1.5px solid transparent;
+        }
+
+        .navbar-top .user-menu:hover {
+            background: rgba(37, 99, 235, 0.04);
+            border-color: rgba(37, 99, 235, 0.10);
+        }
+
+        .navbar-top .user-menu .avatar {
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid var(--blue);
+            flex-shrink: 0;
+            transition: var(--transition);
+        }
+
+        .navbar-top .user-menu .avatar-placeholder {
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--blue), var(--cyan));
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            flex-shrink: 0;
+            border: 2px solid var(--blue);
+        }
+
+        .navbar-top .user-menu .user-name {
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: var(--text);
+            transition: var(--transition);
+            white-space: nowrap;
+        }
+
+        .navbar-top .user-menu:hover .user-name {
+            color: var(--blue);
+        }
+
+        .navbar-top .user-menu .user-chevron {
+            color: var(--text-light);
+            font-size: 0.7rem;
+            transition: var(--transition);
+        }
+
+        .navbar-top .user-menu:hover .user-chevron {
+            color: var(--blue);
+            transform: rotate(180deg);
+        }
+
+        /* Dark mode toggle in navbar */
+        .navbar-top .dark-toggle {
+            border: 1.5px solid #CBD5E1;
+            background: transparent;
+            color: var(--text-light);
+            border-radius: 50px;
+            padding: 6px 12px;
+            font-size: 0.85rem;
+            transition: var(--transition);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .navbar-top .dark-toggle:hover {
+            border-color: var(--blue);
+            color: var(--blue);
+            background: rgba(37, 99, 235, 0.04);
+            transform: scale(1.04);
+        }
+
+        /* Mobile sidebar toggle inside navbar */
+        .navbar-top .sidebar-toggle-btn {
+            display: none;
+            background: none;
+            border: none;
+            color: var(--text);
+            font-size: 1.3rem;
+            padding: 4px 8px;
+            cursor: pointer;
+            transition: var(--transition);
+            border-radius: 8px;
+        }
+
+        .navbar-top .sidebar-toggle-btn:hover {
+            background: rgba(37, 99, 235, 0.08);
+            color: var(--blue);
+        }
+
+        /* ============================================================
+               DARK MODE OVERRIDES FOR NAVBAR
+               ============================================================ */
+        body.dark-mode .navbar-top {
+            background: rgba(15, 23, 42, 0.85);
+            backdrop-filter: blur(16px) saturate(1.2);
+            -webkit-backdrop-filter: blur(16px) saturate(1.2);
+            border-color: rgba(37, 99, 235, 0.10);
+        }
+
+        body.dark-mode .navbar-top .brand .brand-text {
+            color: #E2E8F0;
+        }
+
+        body.dark-mode .navbar-top .brand .brand-text span {
+            color: var(--cyan);
+        }
+
+        body.dark-mode .navbar-top .brand .brand-text small {
+            color: #64748B;
+        }
+
+        body.dark-mode .navbar-top .nav-actions .btn-icon {
+            color: #94A3B8;
+        }
+
+        body.dark-mode .navbar-top .nav-actions .btn-icon:hover {
+            background: rgba(37, 99, 235, 0.12);
+            color: var(--cyan);
+        }
+
+        body.dark-mode .navbar-top .user-menu .user-name {
+            color: #E2E8F0;
+        }
+
+        body.dark-mode .navbar-top .user-menu:hover .user-name {
+            color: var(--cyan);
+        }
+
+        body.dark-mode .navbar-top .user-menu:hover {
+            background: rgba(37, 99, 235, 0.08);
+            border-color: rgba(37, 99, 235, 0.15);
+        }
+
+        body.dark-mode .navbar-top .dark-toggle {
+            border-color: #334155;
+            color: #94A3B8;
+        }
+
+        body.dark-mode .navbar-top .dark-toggle:hover {
+            border-color: var(--cyan);
+            color: var(--cyan);
+            background: rgba(37, 99, 235, 0.08);
+        }
+
+        body.dark-mode .navbar-top .sidebar-toggle-btn {
+            color: #94A3B8;
+        }
+
+        body.dark-mode .navbar-top .sidebar-toggle-btn:hover {
+            background: rgba(37, 99, 235, 0.12);
+            color: var(--cyan);
+        }
+
+        /* ---------- MOBILE OVERLAY ---------- */
+        .overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            z-index: 1040;
+            backdrop-filter: blur(4px);
+            transition: opacity 0.3s ease;
+        }
+
+        .overlay.show {
+            display: block;
+        }
+
+        /* ---------- FOOTER ---------- */
+        footer {
+            background: rgba(255, 255, 255, 0.6);
+            backdrop-filter: blur(8px);
+            padding: 16px 0;
+            text-align: center;
+            color: var(--text-light);
+            border-top: 1px solid rgba(37, 99, 235, 0.04);
+            margin-top: 30px;
+            border-radius: var(--radius);
+            font-size: 0.85rem;
+        }
+
+        footer strong {
+            color: var(--navy);
+        }
+
+        /* ============================================================
+               DARK MODE (global)
+               ============================================================ */
+        body.dark-mode {
+            background: #0F172A;
+            color: #E2E8F0;
+        }
+
+        body.dark-mode .card {
+            background: rgba(15, 23, 42, 0.92);
+            backdrop-filter: blur(12px);
+            border-color: rgba(37, 99, 235, 0.08);
+            color: #E2E8F0;
+        }
+
+        body.dark-mode .card .text-muted {
+            color: #94A3B8 !important;
+        }
+
+        body.dark-mode .form-control {
+            background: #1E293B;
+            color: #E2E8F0;
+            border-color: #334155;
+        }
+
+        body.dark-mode .form-control:focus {
+            background: #1E293B;
+            border-color: var(--blue);
+            box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.12);
+        }
+
+        body.dark-mode .form-label {
+            color: #CBD5E1;
+        }
+
+        body.dark-mode .sidebar {
+            background: #0B1124;
+            border-right-color: rgba(37, 99, 235, 0.06);
+        }
+
+        body.dark-mode .sidebar .nav-link:hover {
+            background: rgba(37, 99, 235, 0.10);
+        }
+
+        body.dark-mode .sidebar .nav-link.active {
+            background: rgba(37, 99, 235, 0.12);
+        }
+
+        body.dark-mode footer {
+            background: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(8px);
+            border-color: rgba(37, 99, 235, 0.04);
+            color: #94A3B8;
+        }
+
+        body.dark-mode footer strong {
+            color: #CBD5E1;
+        }
+
+        body.dark-mode .flash-container .alert {
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(12px);
+            color: #E2E8F0;
+            border-left-color: var(--blue);
+        }
+
+        body.dark-mode .flash-container .alert-success {
+            border-left-color: #10B981;
+        }
+
+        body.dark-mode .flash-container .alert-danger {
+            border-left-color: #EF4444;
+        }
+
+        body.dark-mode .flash-container .alert-warning {
+            border-left-color: #F59E0B;
+        }
+
+        /* ============================================================
+               RESPONSIVE LOGO SIZING
+               ============================================================ */
+
+        /* Tablet & small laptops */
+        @media (max-width: 991.98px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+
+            .sidebar.open {
+                transform: translateX(0);
+            }
+
+            .main-content {
+                margin-left: 0;
+                padding: 16px;
+            }
+
+            .navbar-top .sidebar-toggle-btn {
+                display: inline-block;
+            }
+
+            .public-card {
+                padding: 30px 22px;
+            }
+
+            /* Shrink navbar logo on tablet */
+            .navbar-top .brand img {
+                height: 65px;
+                width: 140px;
+            }
+
+            /* Shrink sidebar logo */
+            .sidebar-brand img {
+                height: 80px;
+                width: 160px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .navbar-top {
+                padding: 8px 14px;
+                border-radius: var(--radius-sm);
+                margin-bottom: 20px;
+            }
+
+            .navbar-top .brand .brand-text {
+                font-size: 0.9rem;
+            }
+
+            .navbar-top .brand .brand-text small {
+                font-size: 0.5rem;
+                display: none;
+            }
+
+            /* Smaller navbar logo on mobile */
+            .navbar-top .brand img {
+                height: 50px;
+                width: 110px;
+            }
+
+            .navbar-top .user-menu .user-name {
+                display: none;
+            }
+
+            .navbar-top .user-menu {
+                padding: 4px;
+            }
+
+            .navbar-top .nav-actions .btn-icon {
+                width: 34px;
+                height: 34px;
+                font-size: 1rem;
+            }
+
+            .navbar-top .dark-toggle span {
+                display: none;
+            }
+
+            .navbar-top .dark-toggle {
+                padding: 6px 10px;
+            }
+
+            .flash-container {
+                min-width: auto;
+                right: 10px;
+                left: 10px;
+                top: 70px;
+            }
+
+            .public-card {
+                padding: 24px 18px;
+                border-radius: var(--radius-sm);
+            }
+
+            .public-card .logo img {
+                height: 56px;
+                max-width: 160px;
+            }
+
+            /* Sidebar logo smaller on tablet/mobile */
+            .sidebar-brand img {
+                height: 65px;
+                width: 130px;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .main-content {
+                padding: 10px 10px 14px 10px;
+            }
+
+            .navbar-top {
+                padding: 6px 10px;
+                border-radius: 10px;
+                margin-bottom: 14px;
+            }
+
+            .navbar-top .brand .brand-text {
+                font-size: 0.8rem;
+            }
+
+            /* Smallest navbar logo on phones */
+            .navbar-top .brand img {
+                height: 38px;
+                width: 85px;
+            }
+
+            .navbar-top .nav-actions {
+                gap: 2px;
+            }
+
+            .navbar-top .nav-actions .btn-icon {
+                width: 30px;
+                height: 30px;
+                font-size: 0.9rem;
+            }
+
+            .public-card .logo img {
+                height: 44px;
+                max-width: 130px;
+            }
+
+            .sidebar-brand img {
+                height: 50px;
+                width: 100px;
+            }
+
+            .sidebar-brand span {
+                font-size: 1rem;
+            }
+        }
+
+        /* ============================================================
+               UTILITY HELPERS
+               ============================================================ */
+        .text-gradient {
+            background: linear-gradient(135deg, var(--blue), var(--cyan));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .bg-gradient-primary {
+            background: linear-gradient(135deg, var(--blue), var(--cyan));
+        }
+
+        .shadow-glow {
+            box-shadow: 0 0 30px rgba(37, 99, 235, 0.08);
+        }
+
+        /* ---------- LOGOUT MODAL STYLES ---------- */
+        .modal-content.bg-dark {
+            background: rgba(15, 23, 42, 0.98) !important;
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(37, 99, 235, 0.10);
+        }
+
+        .modal-content.bg-dark .modal-header {
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+        }
+
+        .modal-content.bg-dark .modal-footer {
+            border-top: 1px solid rgba(255, 255, 255, 0.04);
+        }
+
+        .modal-content.bg-dark .btn-secondary {
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            color: #94A3B8;
+        }
+
+        .modal-content.bg-dark .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.12);
+            color: #fff;
+        }
+    </style>
+</head>
+
+<body class="{% if session.user_id %}logged-in{% else %}public-page{% endif %}">
+
+    <!-- ========== FLASH MESSAGES ========== -->
+    <div class="flash-container">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% for category, message in messages %}
+        <div class="alert alert-{{ category }} alert-dismissible fade show shadow" role="alert">
+            <i
+                class="bi bi-{% if category == 'success' %}check-circle{% elif category == 'danger' %}x-circle{% elif category == 'warning' %}exclamation-triangle{% else %}info-circle{% endif %} me-2"></i>
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        {% endfor %}
+        {% endwith %}
+    </div>
+
+    <!-- ========== SIDEBAR (logged-in only) ========== -->
+    {% if session.user_id %}
+    <div class="overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
+
+    <nav class="sidebar" id="sidebar">
+        <div class="sidebar-brand">
+            <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Awwalu Devs">
+            <span>
+                Awwalu Devs
+                <small>CODE · LEARN · BUILD</small>
+            </span>
+        </div>
+
+        <div class="nav flex-column nav-pills">
+            {% if session.is_admin %}
+            <!-- Admin Sidebar -->
+            <div class="nav-section">Admin</div>
+            <a class="nav-link {% if request.endpoint == 'admin_panel' %}active{% endif %}"
+                href="{{ url_for('admin_panel') }}">
+                <i class="bi bi-speedometer2"></i> Dashboard
+            </a>
+            <a class="nav-link {% if request.endpoint == 'admin_courses' %}active{% endif %}"
+                href="{{ url_for('admin_courses') }}">
+                <i class="bi bi-book"></i> Courses
+            </a>
+            <a class="nav-link {% if request.endpoint == 'view_students' %}active{% endif %}"
+                href="{{ url_for('view_students') }}">
+                <i class="bi bi-people"></i> Students
+            </a>
+            <a class="nav-link {% if request.endpoint == 'admin_certificates' %}active{% endif %}"
+                href="{{ url_for('admin_certificates') }}">
+                <i class="bi bi-award"></i> Certificates
+            </a>
+            <a class="nav-link {% if request.endpoint == 'admin_quizzes' %}active{% endif %}"
+                href="{{ url_for('admin_quizzes') }}">
+                <i class="bi bi-question-circle"></i> Quizzes
+            </a>
+            <a class="nav-link {% if request.endpoint == 'admin_discussions' %}active{% endif %}"
+                href="{{ url_for('admin_discussions') }}">
+                <i class="bi bi-chat-dots"></i> Discussions
+            </a>
+            <a class="nav-link {% if request.endpoint == 'admin_scheduled' %}active{% endif %}"
+                href="{{ url_for('admin_scheduled') }}">
+                <i class="bi bi-clock-history"></i> Scheduled
+            </a>
+            <a class="nav-link {% if request.endpoint == 'admin_analytics' %}active{% endif %}"
+                href="{{ url_for('admin_analytics') }}">
+                <i class="bi bi-graph-up-arrow"></i> Analytics
+            </a>
+            <a class="nav-link {% if request.endpoint == 'admin_bulk_email' %}active{% endif %}"
+                href="{{ url_for('admin_bulk_email') }}">
+                <i class="bi bi-envelope-paper"></i> Bulk Email
+            </a>
+            <a class="nav-link {% if request.endpoint == 'admin_cohorts' %}active{% endif %}"
+                href="{{ url_for('admin_cohorts') }}">
+                <i class="bi bi-layers"></i> Cohorts
+            </a>
+            <a class="nav-link {% if request.endpoint == 'admin_tags' %}active{% endif %}"
+                href="{{ url_for('admin_tags') }}">
+                <i class="bi bi-tags"></i> Tags
+            </a>
+            <a class="nav-link {% if request.endpoint == 'export_all_data' %}active{% endif %}"
+                href="{{ url_for('export_all_data') }}">
+                <i class="bi bi-download"></i> Export All
+            </a>
+            <a class="nav-link {% if request.endpoint == 'activity_logs' %}active{% endif %}"
+                href="{{ url_for('activity_logs') }}">
+                <i class="bi bi-clock-history"></i> Activity Log
+            </a>
+            <div class="nav-section">Account</div>
+            <a class="nav-link logout-trigger" href="{{ url_for('logout') }}">
+                <i class="bi bi-box-arrow-right"></i> Logout
+            </a>
+            {% else %}
+            <!-- Student Sidebar -->
+            <div class="nav-section">Student</div>
+            <a class="nav-link {% if request.endpoint == 'dashboard' %}active{% endif %}"
+                href="{{ url_for('dashboard') }}">
+                <i class="bi bi-house"></i> Dashboard
+            </a>
+            <a class="nav-link {% if request.endpoint == 'schedule' %}active{% endif %}"
+                href="{{ url_for('schedule') }}">
+                <i class="bi bi-calendar"></i> Schedule
+            </a>
+            <a class="nav-link {% if request.endpoint == 'assignments' %}active{% endif %}"
+                href="{{ url_for('assignments') }}">
+                <i class="bi bi-list-check"></i> Assignments
+            </a>
+            <a class="nav-link {% if request.endpoint == 'assignment_history' %}active{% endif %}"
+                href="{{ url_for('assignment_history') }}">
+                <i class="bi bi-archive"></i> Portfolio
+            </a>
+            <a class="nav-link {% if request.endpoint == 'classmates' %}active{% endif %}"
+                href="{{ url_for('classmates') }}">
+                <i class="bi bi-people"></i> Classmates
+            </a>
+            <a class="nav-link {% if request.endpoint == 'my_notes' %}active{% endif %}"
+                href="{{ url_for('my_notes') }}">
+                <i class="bi bi-journal-text"></i> My Notes
+            </a>
+            <a class="nav-link {% if request.endpoint == 'student_messages' %}active{% endif %}"
+                href="{{ url_for('student_messages') }}">
+                <i class="bi bi-envelope"></i> Messages
+            </a>
+            <a class="nav-link {% if request.endpoint == 'profile' %}active{% endif %}" href="{{ url_for('profile') }}">
+                <i class="bi bi-person"></i> Profile
+            </a>
+            <a class="nav-link {% if request.endpoint == 'leaderboard' %}active{% endif %}"
+                href="{{ url_for('leaderboard') }}">
+                <i class="bi bi-trophy"></i> Leaderboard
+            </a>
+            <div class="nav-section">Account</div>
+            <a class="nav-link logout-trigger" href="{{ url_for('logout') }}">
+                <i class="bi bi-box-arrow-right"></i> Logout
+            </a>
+            {% endif %}
+        </div>
+
+        <div class="sidebar-footer">
+            &copy; 2026 <strong>Awwalu Devs</strong><br>
+            <span style="font-size:0.65rem; opacity:0.6;">CODE · LEARN · BUILD · SUCCEED</span>
+        </div>
+    </nav>
+    {% endif %}
+
+    <!-- ========== MAIN CONTENT WRAPPER ========== -->
+    <div class="main-content {% if not session.user_id %}public-wrapper{% endif %}">
+
+        {% if session.user_id %}
+        <!-- ==========================================================
+        REDESIGNED TOP NAVBAR (logged-in)
+        ========================================================== -->
+        <nav class="navbar-top" role="navigation" aria-label="Main navigation">
+
+            <!-- Left: Sidebar toggle (mobile) + Brand -->
+            <div class="d-flex align-items-center gap-2">
+                <button class="sidebar-toggle-btn" type="button" onclick="toggleSidebar()" aria-label="Toggle sidebar">
+                    <i class="bi bi-list"></i>
+                </button>
+
+                <a class="brand" href="{{ url_for('dashboard') }}">
+                    <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Awwalu Devs">
+                    <span class="brand-text">
+                        Awwalu<span>Devs</span>
+                        <small>portal</small>
+                    </span>
+                </a>
+            </div>
+
+            <!-- Right: Actions -->
+            <div class="nav-actions">
+
+                <!-- Dark mode toggle -->
+                <button class="dark-toggle" id="darkModeToggle" aria-label="Toggle dark mode">
+                    <i class="bi bi-moon-fill"></i>
+                    <span>Dark</span>
+                </button>
+
+                <!-- Notifications -->
+                {% if session.is_admin %}
+                <a href="{{ url_for('view_notifications') }}" class="btn-icon" aria-label="Notifications">
+                    <i class="bi bi-bell"></i>
+                    {% if unread_count > 0 %}
+                    <span class="badge-dot">{{ unread_count }}</span>
+                    {% endif %}
+                </a>
+                {% else %}
+                <a href="{{ url_for('student_notifications') }}" class="btn-icon" aria-label="Notifications">
+                    <i class="bi bi-bell"></i>
+                    {% if unread_count > 0 %}
+                    <span class="badge-dot">{{ unread_count }}</span>
+                    {% endif %}
+                </a>
+                {% endif %}
+
+                <!-- User menu -->
+                <a href="{{ url_for('profile') }}" class="user-menu" aria-label="Profile">
+                    {% if user_avatar %}
+                    <img src="{{ user_avatar }}" alt="{{ session.full_name }}" class="avatar">
+                    {% else %}
+                    <span class="avatar-placeholder">
+                        <i class="bi bi-person"></i>
+                    </span>
+                    {% endif %}
+                    <span class="user-name">{{ session.full_name }}</span>
+                    <i class="bi bi-chevron-down user-chevron"></i>
+                </a>
+
+            </div>
+        </nav>
+        {% endif %}
+
+        <!-- ===== SINGLE CONTENT BLOCK ===== -->
+        {% block content %}{% endblock %}
+
+        <!-- Footer (logged-in only) -->
+        {% if session.user_id %}
+        <footer>
+            &copy; 2026 <strong>Awwalu Devs</strong> &mdash; CODE · LEARN · BUILD · SUCCEED
+        </footer>
+
+        <!-- ===== LOGOUT CONFIRMATION MODAL ===== -->
+        <div class="modal fade" id="logoutModal" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content bg-dark text-light border-0">
+                    <div class="modal-header border-0">
+                        <h5 class="modal-title"><i class="bi bi-box-arrow-right text-danger"></i> Confirm Logout</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                            aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p>Are you sure you want to log out?</p>
+                        <p class="text-muted small">You will need to log in again to access your courses.</p>
+                    </div>
+                    <div class="modal-footer border-0">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <a href="{{ url_for('logout') }}" class="btn btn-danger" id="confirmLogoutBtn">
+                            <i class="bi bi-box-arrow-right"></i> Yes, Logout
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {% endif %}
+    </div> <!-- end .main-content -->
+
+    <!-- ========== SCRIPTS ========== -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js">
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js">
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js">
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-javascript.min.js">
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-css.min.js">
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-markup.min.js">
+    </script>
+    <script src="{{ url_for('static', filename='js/main.js') }}">
+    </script>
+
+    <script>
+        // ---------- SIDEBAR TOGGLE (mobile) ----------
+        function toggleSidebar() {
+            var sidebar = document.getElementById('sidebar');
+            var overlay = document.getElementById('sidebarOverlay');
+            if (sidebar) {
+                sidebar.classList.toggle('open');
+                if (overlay) overlay.classList.toggle('show');
+            }
+        }
+
+        function closeSidebar() {
+            var sidebar = document.getElementById('sidebar');
+            var overlay = document.getElementById('sidebarOverlay');
+            if (sidebar) sidebar.classList.remove('open');
+            if (overlay) overlay.classList.remove('show');
+        }
+
+        // Close sidebar on resize to desktop
+        window.addEventListener('resize', function() {
+            if (window.innerWidth > 991) {
+                closeSidebar();
+            }
+        });
+
+        // ---------- DARK MODE TOGGLE (persistent) ----------
+        document.addEventListener('DOMContentLoaded', function() {
+            var toggle = document.getElementById('darkModeToggle');
+            if (toggle) {
+                // Restore state
+                if (localStorage.getItem('darkMode') === 'enabled') {
+                    document.body.classList.add('dark-mode');
+                    toggle.innerHTML = '<i class="bi bi-sun-fill"></i><span>Light</span>';
+                }
+
+                toggle.addEventListener('click', function() {
+                    document.body.classList.toggle('dark-mode');
+                    if (document.body.classList.contains('dark-mode')) {
+                        localStorage.setItem('darkMode', 'enabled');
+                        toggle.innerHTML = '<i class="bi bi-sun-fill"></i><span>Light</span>';
+                    } else {
+                        localStorage.removeItem('darkMode');
+                        toggle.innerHTML = '<i class="bi bi-moon-fill"></i><span>Dark</span>';
+                    }
+                });
+            }
+
+            // Auto-close flash messages after 5s
+            document.querySelectorAll('.flash-container .alert').forEach(function(el) {
+                setTimeout(function() {
+                    var bsAlert = new bootstrap.Alert(el);
+                    bsAlert.close();
+                }, 5000);
+            });
+
+            // ---------- LOGOUT CONFIRMATION MODAL ----------
+            var logoutLinks = document.querySelectorAll('.logout-trigger');
+            var logoutModalElement = document.getElementById('logoutModal');
+            if (logoutModalElement) {
+                var logoutModal = new bootstrap.Modal(logoutModalElement);
+                logoutLinks.forEach(function(link) {
+                    link.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        logoutModal.show();
+                    });
+                });
+            }
+        });
+    </script>
+</body>
+
+</html>

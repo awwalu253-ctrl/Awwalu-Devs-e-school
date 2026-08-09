@@ -1,0 +1,1403 @@
+{% extends "base.html" %}
+
+{% block content %}
+<style>
+    /* ============================================================
+       ADMIN DASHBOARD — NAVY + ELECTRIC BLUE THEME
+       ============================================================ */
+
+    /* ---------- ANIMATIONS ---------- */
+    @keyframes fadeInUp {
+        from { opacity: 0; transform: translateY(30px) scale(0.96); }
+        to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    @keyframes pulse-glow {
+        0%, 100% { box-shadow: 0 0 0 0 rgba(37, 99, 235, 0.2); }
+        50% { box-shadow: 0 0 0 8px rgba(37, 99, 235, 0); }
+    }
+
+    @keyframes shimmer {
+        0% { background-position: -200% 0; }
+        100% { background-position: 200% 0; }
+    }
+
+    .animate-card {
+        animation: fadeInUp 0.6s ease forwards;
+        opacity: 0;
+    }
+    .animate-card:nth-child(1) { animation-delay: 0.05s; }
+    .animate-card:nth-child(2) { animation-delay: 0.10s; }
+    .animate-card:nth-child(3) { animation-delay: 0.15s; }
+    .animate-card:nth-child(4) { animation-delay: 0.20s; }
+    .animate-card:nth-child(5) { animation-delay: 0.25s; }
+    .animate-card:nth-child(6) { animation-delay: 0.30s; }
+    .animate-card:nth-child(7) { animation-delay: 0.35s; }
+    .animate-card:nth-child(8) { animation-delay: 0.40s; }
+
+    /* ---------- HEADER ---------- */
+    .admin-header {
+        animation: fadeInUp 0.6s ease forwards;
+        opacity: 0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin-bottom: 28px;
+    }
+
+    .admin-header h2 {
+        font-weight: 700;
+        color: var(--navy);
+        letter-spacing: -0.3px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-size: 1.8rem;
+    }
+
+    .admin-header h2 i {
+        color: var(--blue);
+        font-size: 1.8rem;
+    }
+
+    .admin-header .header-actions {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+
+    /* ---------- STATS CARDS ---------- */
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 16px;
+        margin-bottom: 28px;
+    }
+
+    .stat-card {
+        background: rgba(255, 255, 255, 0.92);
+        backdrop-filter: blur(8px);
+        border-radius: var(--radius);
+        padding: 20px 24px;
+        border: 1px solid rgba(37, 99, 235, 0.06);
+        box-shadow: var(--shadow-sm);
+        transition: var(--transition);
+        position: relative;
+        overflow: hidden;
+        animation: fadeInUp 0.6s ease forwards;
+        opacity: 0;
+    }
+
+    .stat-card:nth-child(1) { animation-delay: 0.05s; }
+    .stat-card:nth-child(2) { animation-delay: 0.10s; }
+    .stat-card:nth-child(3) { animation-delay: 0.15s; }
+    .stat-card:nth-child(4) { animation-delay: 0.20s; }
+
+    .stat-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 3px;
+        background: linear-gradient(90deg, var(--stat-color, var(--blue)), var(--cyan));
+        opacity: 0.6;
+        transition: var(--transition);
+    }
+
+    .stat-card:hover {
+        transform: translateY(-4px);
+        box-shadow: var(--shadow-lg), 0 0 0 1px rgba(37, 99, 235, 0.06);
+    }
+
+    .stat-card:hover::before {
+        opacity: 1;
+        height: 4px;
+    }
+
+    .stat-card .stat-icon {
+        width: 44px;
+        height: 44px;
+        border-radius: var(--radius-sm);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.3rem;
+        color: white;
+        margin-bottom: 10px;
+        background: linear-gradient(135deg, var(--stat-color, var(--blue)), var(--cyan));
+        box-shadow: 0 4px 12px rgba(37, 99, 235, 0.15);
+    }
+
+    .stat-card .stat-label {
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: var(--text-light);
+        font-weight: 600;
+    }
+
+    .stat-card .stat-value {
+        font-size: 2rem;
+        font-weight: 700;
+        color: var(--navy);
+        line-height: 1.2;
+        margin-top: 2px;
+    }
+
+    .stat-card .stat-sub {
+        font-size: 0.75rem;
+        color: var(--text-light);
+        margin-top: 4px;
+    }
+
+    /* ---------- BUTTONS ---------- */
+    .btn-outline-secondary {
+        border: 1.5px solid #CBD5E1;
+        color: var(--text-light);
+        background: transparent;
+        font-weight: 500;
+        border-radius: 50px;
+        padding: 6px 16px;
+        transition: var(--transition);
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        text-decoration: none;
+        font-size: 0.85rem;
+    }
+
+    .btn-outline-secondary:hover {
+        border-color: var(--blue);
+        color: var(--blue);
+        background: rgba(37, 99, 235, 0.04);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(37, 99, 235, 0.08);
+    }
+
+    .btn-outline-secondary .badge {
+        background: #EF4444;
+        color: white;
+        font-size: 0.6rem;
+        padding: 1px 8px;
+        border-radius: 50px;
+        margin-left: 2px;
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, var(--blue), #1D4ED8);
+        border: none;
+        color: white;
+        font-weight: 600;
+        padding: 8px 20px;
+        border-radius: 50px;
+        box-shadow: 0 4px 14px rgba(37, 99, 235, 0.25);
+        transition: var(--transition);
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 0.85rem;
+        cursor: pointer;
+        text-decoration: none;
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-2px) scale(1.02);
+        box-shadow: 0 8px 24px rgba(37, 99, 235, 0.35);
+        background: linear-gradient(135deg, var(--blue), var(--cyan));
+        color: white;
+    }
+
+    .btn-outline-primary {
+        border: 1.5px solid var(--blue);
+        color: var(--blue);
+        background: transparent;
+        font-weight: 500;
+        border-radius: 50px;
+        padding: 6px 16px;
+        transition: var(--transition);
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 0.85rem;
+        text-decoration: none;
+    }
+
+    .btn-outline-primary:hover {
+        background: var(--blue);
+        color: white;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 14px rgba(37, 99, 235, 0.20);
+    }
+
+    .btn-success {
+        background: linear-gradient(135deg, #10B981, #059669);
+        border: none;
+        color: white;
+        font-weight: 600;
+        padding: 6px 16px;
+        border-radius: 50px;
+        box-shadow: 0 4px 14px rgba(16, 185, 129, 0.20);
+        transition: var(--transition);
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 0.8rem;
+        cursor: pointer;
+        text-decoration: none;
+    }
+
+    .btn-success:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 24px rgba(16, 185, 129, 0.30);
+        background: linear-gradient(135deg, #34D399, #10B981);
+        color: white;
+    }
+
+    .btn-danger {
+        background: linear-gradient(135deg, #EF4444, #DC2626);
+        border: none;
+        color: white;
+        font-weight: 600;
+        padding: 6px 16px;
+        border-radius: 50px;
+        box-shadow: 0 4px 14px rgba(239, 68, 68, 0.20);
+        transition: var(--transition);
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 0.8rem;
+        cursor: pointer;
+        text-decoration: none;
+    }
+
+    .btn-danger:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 24px rgba(239, 68, 68, 0.30);
+        background: linear-gradient(135deg, #F87171, #EF4444);
+        color: white;
+    }
+
+    .btn-info {
+        background: linear-gradient(135deg, var(--blue), var(--cyan));
+        border: none;
+        color: white;
+        font-weight: 600;
+        padding: 6px 16px;
+        border-radius: 50px;
+        box-shadow: 0 4px 14px rgba(37, 99, 235, 0.20);
+        transition: var(--transition);
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 0.8rem;
+        cursor: pointer;
+        text-decoration: none;
+    }
+
+    .btn-info:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 24px rgba(37, 99, 235, 0.30);
+        background: linear-gradient(135deg, var(--blue), var(--cyan));
+        color: white;
+        opacity: 0.9;
+    }
+
+    .btn-warning {
+        background: linear-gradient(135deg, #F59E0B, #D97706);
+        border: none;
+        color: white;
+        font-weight: 600;
+        padding: 6px 16px;
+        border-radius: 50px;
+        box-shadow: 0 4px 14px rgba(245, 158, 11, 0.20);
+        transition: var(--transition);
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 0.8rem;
+        cursor: pointer;
+        text-decoration: none;
+    }
+
+    .btn-warning:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 24px rgba(245, 158, 11, 0.30);
+        background: linear-gradient(135deg, #FBBF24, #F59E0B);
+        color: white;
+    }
+
+    .btn-sm {
+        padding: 4px 12px;
+        font-size: 0.75rem;
+    }
+
+    .btn-block {
+        width: 100%;
+        justify-content: center;
+    }
+
+    /* ---------- CARDS ---------- */
+    .card {
+        border: none;
+        border-radius: var(--radius);
+        box-shadow: var(--shadow-md);
+        transition: var(--transition);
+        background: rgba(255, 255, 255, 0.92);
+        backdrop-filter: blur(2px);
+        border: 1px solid rgba(37, 99, 235, 0.06);
+    }
+
+    .card:hover {
+        box-shadow: var(--shadow-lg), 0 0 0 1px rgba(37, 99, 235, 0.06);
+        transform: translateY(-2px);
+    }
+
+    .card-header-custom {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 16px 20px 12px 20px;
+        border-bottom: 1px solid rgba(37, 99, 235, 0.06);
+    }
+
+    .card-header-custom h5 {
+        font-weight: 700;
+        color: var(--navy);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 1rem;
+        margin: 0;
+    }
+
+    .card-header-custom h5 i {
+        color: var(--blue);
+    }
+
+    .card-body-custom {
+        padding: 20px;
+    }
+
+    /* ---------- FILTER BAR ---------- */
+    .filter-bar {
+        background: rgba(255, 255, 255, 0.92);
+        backdrop-filter: blur(8px);
+        border-radius: var(--radius);
+        padding: 16px 20px;
+        border: 1px solid rgba(37, 99, 235, 0.06);
+        box-shadow: var(--shadow-sm);
+        margin-bottom: 24px;
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        flex-wrap: wrap;
+        animation: fadeInUp 0.6s ease forwards;
+        opacity: 0;
+        animation-delay: 0.1s;
+    }
+
+    .filter-bar label {
+        font-weight: 600;
+        color: var(--navy);
+        font-size: 0.8rem;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        margin: 0;
+    }
+
+    .filter-bar .form-select,
+    .filter-bar .form-control {
+        border: 1.5px solid #E2E8F0;
+        border-radius: var(--radius-sm);
+        padding: 8px 14px;
+        font-size: 0.85rem;
+        transition: var(--transition);
+        background: var(--bg);
+        color: var(--text);
+        min-width: 180px;
+    }
+
+    .filter-bar .form-select:focus,
+    .filter-bar .form-control:focus {
+        border-color: var(--blue);
+        box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.08);
+        background: white;
+        outline: none;
+    }
+
+    /* ---------- QUICK ACTION GRID ---------- */
+    .action-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+        gap: 10px;
+        margin-bottom: 24px;
+        animation: fadeInUp 0.6s ease forwards;
+        opacity: 0;
+        animation-delay: 0.15s;
+    }
+
+    .action-grid .btn {
+        padding: 10px 14px;
+        font-size: 0.8rem;
+        justify-content: center;
+        border-radius: var(--radius-sm);
+        font-weight: 600;
+        transition: var(--transition);
+        text-align: center;
+        white-space: nowrap;
+    }
+
+    .action-grid .btn:hover {
+        transform: translateY(-3px);
+    }
+
+    /* ---------- TABLE ---------- */
+    .table-wrap {
+        overflow-x: auto;
+    }
+
+    .table {
+        margin-bottom: 0;
+        border-collapse: separate;
+        border-spacing: 0 4px;
+        width: 100%;
+    }
+
+    .table thead th {
+        background: rgba(15, 23, 42, 0.04);
+        color: var(--navy);
+        font-weight: 600;
+        font-size: 0.7rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        padding: 10px 14px;
+        border: none;
+        white-space: nowrap;
+    }
+
+    .table tbody tr {
+        background: rgba(255, 255, 255, 0.6);
+        transition: var(--transition);
+        border-radius: var(--radius-sm);
+    }
+
+    .table tbody tr:hover {
+        background: rgba(37, 99, 235, 0.04);
+        transform: scale(1.01);
+        box-shadow: var(--shadow-sm);
+    }
+
+    .table tbody td {
+        padding: 10px 14px;
+        border: none;
+        vertical-align: middle;
+        font-size: 0.85rem;
+        color: var(--text);
+    }
+
+    .table tbody td .badge {
+        font-weight: 600;
+        padding: 3px 12px;
+        border-radius: 50px;
+        font-size: 0.65rem;
+        text-transform: uppercase;
+        letter-spacing: 0.03em;
+    }
+
+    .badge.bg-success { background: #10B981 !important; color: white; }
+    .badge.bg-secondary { background: #CBD5E1 !important; color: #475569; }
+    .badge.bg-warning { background: #F59E0B !important; color: #78350F; }
+    .badge.bg-danger { background: #EF4444 !important; color: white; }
+    .badge.bg-info { background: var(--blue) !important; color: white; }
+
+    /* ---------- FORM ELEMENTS ---------- */
+    .form-label {
+        font-weight: 600;
+        color: var(--navy);
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        margin-bottom: 4px;
+    }
+
+    .form-control,
+    .form-select {
+        border: 1.5px solid #E2E8F0;
+        border-radius: var(--radius-sm);
+        padding: 8px 14px;
+        font-size: 0.85rem;
+        transition: var(--transition);
+        background: var(--bg);
+        color: var(--text);
+        width: 100%;
+    }
+
+    .form-control:focus,
+    .form-select:focus {
+        border-color: var(--blue);
+        box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.08);
+        background: white;
+        outline: none;
+    }
+
+    .form-control-sm {
+        padding: 6px 12px;
+        font-size: 0.8rem;
+    }
+
+    .form-select-sm {
+        padding: 6px 12px;
+        font-size: 0.8rem;
+    }
+
+    textarea.form-control {
+        resize: vertical;
+    }
+
+    /* ---------- CHECKBOX ---------- */
+    .form-check-input {
+        width: 16px;
+        height: 16px;
+        accent-color: var(--blue);
+        cursor: pointer;
+        transition: var(--transition);
+    }
+
+    .form-check-input:checked {
+        transform: scale(1.1);
+    }
+
+    /* ---------- COLLAPSE ---------- */
+    .collapse-card {
+        border-radius: var(--radius);
+        overflow: hidden;
+        margin-bottom: 20px;
+        animation: fadeInUp 0.6s ease forwards;
+        opacity: 0;
+        animation-delay: 0.2s;
+    }
+
+    .collapse-card .card {
+        border-radius: 0;
+    }
+
+    /* ---------- CHART CONTAINER ---------- */
+    .chart-container {
+        padding: 20px;
+        animation: fadeInUp 0.6s ease forwards;
+        opacity: 0;
+        animation-delay: 0.4s;
+    }
+
+    .chart-container canvas {
+        max-height: 200px;
+        width: 100% !important;
+    }
+
+    /* ---------- RESPONSIVE ---------- */
+    @media (max-width: 768px) {
+        .stats-grid {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+
+        .stat-card {
+            padding: 14px 16px;
+        }
+
+        .stat-card .stat-value {
+            font-size: 1.5rem;
+        }
+
+        .stat-card .stat-icon {
+            width: 36px;
+            height: 36px;
+            font-size: 1rem;
+        }
+
+        .admin-header h2 {
+            font-size: 1.4rem;
+        }
+
+        .admin-header h2 i {
+            font-size: 1.4rem;
+        }
+
+        .filter-bar {
+            flex-direction: column;
+            align-items: stretch;
+            gap: 10px;
+        }
+
+        .filter-bar .form-select,
+        .filter-bar .form-control {
+            min-width: 100%;
+        }
+
+        .action-grid {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+        }
+
+        .action-grid .btn {
+            font-size: 0.7rem;
+            padding: 8px 10px;
+            white-space: normal;
+        }
+
+        .card-header-custom {
+            flex-direction: column;
+            align-items: stretch;
+            gap: 10px;
+        }
+
+        .card-body-custom {
+            padding: 14px;
+        }
+
+        .table thead th,
+        .table tbody td {
+            padding: 8px 10px;
+            font-size: 0.75rem;
+        }
+
+        .btn-sm {
+            font-size: 0.65rem;
+            padding: 3px 8px;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .stats-grid {
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+        }
+
+        .stat-card {
+            padding: 12px 14px;
+        }
+
+        .stat-card .stat-value {
+            font-size: 1.2rem;
+        }
+
+        .stat-card .stat-label {
+            font-size: 0.6rem;
+        }
+
+        .stat-card .stat-icon {
+            width: 30px;
+            height: 30px;
+            font-size: 0.85rem;
+        }
+
+        .admin-header h2 {
+            font-size: 1.1rem;
+        }
+
+        .action-grid {
+            grid-template-columns: 1fr 1fr;
+            gap: 6px;
+        }
+
+        .action-grid .btn {
+            font-size: 0.65rem;
+            padding: 6px 8px;
+        }
+    }
+
+    /* ---------- DARK MODE ---------- */
+    body.dark-mode .stat-card {
+        background: rgba(15, 23, 42, 0.9);
+        border-color: rgba(37, 99, 235, 0.08);
+    }
+
+    body.dark-mode .stat-card .stat-value {
+        color: #E2E8F0;
+    }
+
+    body.dark-mode .stat-card .stat-label {
+        color: #94A3B8;
+    }
+
+    body.dark-mode .card {
+        background: rgba(15, 23, 42, 0.9);
+        border-color: rgba(37, 99, 235, 0.08);
+        color: #E2E8F0;
+    }
+
+    body.dark-mode .card-header-custom h5 {
+        color: #E2E8F0;
+    }
+
+    body.dark-mode .filter-bar {
+        background: rgba(15, 23, 42, 0.9);
+        border-color: rgba(37, 99, 235, 0.08);
+    }
+
+    body.dark-mode .filter-bar label {
+        color: #CBD5E1;
+    }
+
+    body.dark-mode .filter-bar .form-select,
+    body.dark-mode .filter-bar .form-control {
+        background: #1E293B;
+        color: #E2E8F0;
+        border-color: #334155;
+    }
+
+    body.dark-mode .filter-bar .form-select:focus,
+    body.dark-mode .filter-bar .form-control:focus {
+        background: #1E293B;
+        border-color: var(--blue);
+        box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.12);
+    }
+
+    body.dark-mode .table thead th {
+        background: rgba(37, 99, 235, 0.08);
+        color: #CBD5E1;
+    }
+
+    body.dark-mode .table tbody tr {
+        background: rgba(15, 23, 42, 0.6);
+    }
+
+    body.dark-mode .table tbody tr:hover {
+        background: rgba(37, 99, 235, 0.08);
+    }
+
+    body.dark-mode .table tbody td {
+        color: #E2E8F0;
+    }
+
+    body.dark-mode .form-label {
+        color: #CBD5E1;
+    }
+
+    body.dark-mode .form-control,
+    body.dark-mode .form-select {
+        background: #1E293B;
+        color: #E2E8F0;
+        border-color: #334155;
+    }
+
+    body.dark-mode .form-control:focus,
+    body.dark-mode .form-select:focus {
+        background: #1E293B;
+        border-color: var(--blue);
+        box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.12);
+    }
+
+    body.dark-mode .btn-outline-secondary {
+        border-color: #334155;
+        color: #94A3B8;
+    }
+
+    body.dark-mode .btn-outline-secondary:hover {
+        border-color: var(--blue);
+        color: var(--cyan);
+        background: rgba(37, 99, 235, 0.08);
+    }
+
+    body.dark-mode .btn-outline-primary {
+        border-color: var(--blue);
+        color: var(--blue);
+    }
+
+    body.dark-mode .btn-outline-primary:hover {
+        background: var(--blue);
+        color: white;
+    }
+
+    body.dark-mode .collapse-card .card {
+        background: rgba(15, 23, 42, 0.9);
+        border-color: rgba(37, 99, 235, 0.08);
+        color: #E2E8F0;
+    }
+</style>
+
+<!-- ============================================================
+     HEADER
+     ============================================================ -->
+<div class="admin-header">
+    <h2>
+        <i class="bi bi-shield-lock-fill"></i>
+        Admin Dashboard
+    </h2>
+    <div class="header-actions">
+        <a href="{{ url_for('view_notifications') }}" class="btn btn-outline-secondary position-relative">
+            <i class="bi bi-bell"></i> Notifications
+            {% if unread_count > 0 %}
+            <span class="badge">{{ unread_count }}</span>
+            {% endif %}
+        </a>
+    </div>
+</div>
+
+<!-- ============================================================
+     STATS CARDS
+     ============================================================ -->
+<div class="stats-grid">
+    <div class="stat-card" style="--stat-color: var(--blue);">
+        <div class="stat-icon"><i class="bi bi-people"></i></div>
+        <div class="stat-label">Total Students</div>
+        <div class="stat-value">{{ total_students }}</div>
+        <div class="stat-sub">Active learners</div>
+    </div>
+    <div class="stat-card" style="--stat-color: #10B981;">
+        <div class="stat-icon"><i class="bi bi-journal-text"></i></div>
+        <div class="stat-label">Published Notes</div>
+        <div class="stat-value">{{ total_notes }}</div>
+        <div class="stat-sub">Learning materials</div>
+    </div>
+    <div class="stat-card" style="--stat-color: #F59E0B;">
+        <div class="stat-icon"><i class="bi bi-list-task"></i></div>
+        <div class="stat-label">Assignments</div>
+        <div class="stat-value">{{ total_assignments }}</div>
+        <div class="stat-sub">Active tasks</div>
+    </div>
+    <div class="stat-card" style="--stat-color: #EF4444;">
+        <div class="stat-icon"><i class="bi bi-clock-history"></i></div>
+        <div class="stat-label">Pending Submissions</div>
+        <div class="stat-value">{{ pending_submissions }}</div>
+        <div class="stat-sub">Awaiting review</div>
+    </div>
+</div>
+
+<!-- ============================================================
+     FILTER BAR
+     ============================================================ -->
+<div class="filter-bar">
+    <label for="courseFilter"><i class="bi bi-funnel"></i> Filter:</label>
+    <form method="GET" action="{{ url_for('admin_panel') }}" class="d-flex align-items-center gap-2 flex-wrap" id="filterForm">
+        <select name="course_id" id="courseFilter" class="form-select" onchange="this.form.submit()">
+            <option value="all" {% if course_filter=='all' or not course_filter %}selected{% endif %}>All Courses</option>
+            {% for c in courses %}
+            <option value="{{ c.id }}" {% if course_filter|string==c.id|string %}selected{% endif %}>
+                {{ c.name }}
+            </option>
+            {% endfor %}
+        </select>
+        <a href="{{ url_for('admin_panel', course_id='all') }}" class="btn btn-outline-secondary btn-sm">Reset</a>
+    </form>
+</div>
+
+<!-- ============================================================
+     QUICK ACTIONS
+     ============================================================ -->
+<div class="action-grid">
+    <a href="{{ url_for('admin_courses') }}" class="btn btn-outline-primary"><i class="bi bi-book"></i> Courses</a>
+    <a href="{{ url_for('view_students') }}" class="btn btn-outline-success"><i class="bi bi-people"></i> Students</a>
+    <a href="{{ url_for('admin_certificates') }}" class="btn btn-outline-info"><i class="bi bi-award"></i> Certificates</a>
+    <a href="{{ url_for('admin_discussions') }}" class="btn btn-outline-warning"><i class="bi bi-chat-dots"></i> Q&A</a>
+    <a href="{{ url_for('admin_scheduled') }}" class="btn btn-outline-secondary"><i class="bi bi-clock-history"></i> Scheduled</a>
+    <a href="{{ url_for('admin_progress') }}" class="btn btn-outline-success"><i class="bi bi-graph-up-arrow"></i> Progress</a>
+    <a href="{{ url_for('admin_tags') }}" class="btn btn-outline-info"><i class="bi bi-tags"></i> Tags</a>
+    <a href="{{ url_for('admin_analytics') }}" class="btn btn-outline-primary"><i class="bi bi-graph-up-arrow"></i> Analytics</a>
+    <a href="{{ url_for('admin_cohorts') }}" class="btn btn-outline-secondary"><i class="bi bi-layers"></i> Cohorts</a>
+    <a href="{{ url_for('send_digest') }}" class="btn btn-outline-primary"><i class="bi bi-envelope-paper"></i> Digest</a>
+    <a href="{{ url_for('export_all_data') }}" class="btn btn-outline-secondary"><i class="bi bi-download"></i> Export</a>
+    <a href="{{ url_for('admin_bulk_email') }}" class="btn btn-outline-info"><i class="bi bi-envelope-paper"></i> Bulk Email</a>
+    <a href="{{ url_for('admin_messages') }}" class="btn btn-outline-info"><i class="bi bi-envelope"></i> Messages</a>
+    <a href="{{ url_for('activity_logs') }}" class="btn btn-outline-secondary"><i class="bi bi-clock-history"></i> Activity Log</a>
+    <a href="{{ url_for('admin_quizzes') }}" class="btn btn-outline-danger"><i class="bi bi-question-circle"></i> Quizzes</a>
+</div>
+
+<!-- ============================================================
+     ANNOUNCEMENT SECTION
+     ============================================================ -->
+<div class="collapse-card">
+    <div class="card">
+        <div class="card-header-custom">
+            <h5><i class="bi bi-megaphone text-info"></i> Announcements</h5>
+            <button class="btn btn-outline-primary btn-sm" data-bs-toggle="collapse" data-bs-target="#announcementForm">
+                <i class="bi bi-plus-circle"></i> New Announcement
+            </button>
+        </div>
+
+        <!-- Collapsible Form -->
+        <div class="collapse" id="announcementForm">
+            <div class="card-body-custom" style="border-top: 1px solid rgba(37,99,235,0.06);">
+                <form method="POST" action="{{ url_for('add_announcement') }}">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Title</label>
+                            <input type="text" name="title" class="form-control" placeholder="Announcement Title" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Target Course</label>
+                            <select name="course_id" class="form-select">
+                                <option value="">🌍 All Courses (Global)</option>
+                                {% for c in courses %}
+                                <option value="{{ c.id }}" {% if course_filter|string==c.id|string %}selected{% endif %}>
+                                    {{ c.name }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Content</label>
+                            <textarea name="content" class="form-control" rows="3" placeholder="Announcement content..." required></textarea>
+                        </div>
+                        <div class="col-12">
+                            <button type="submit" class="btn btn-primary"><i class="bi bi-megaphone"></i> Post Announcement</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Existing Announcements -->
+        {% if announcements %}
+        <div class="card-body-custom" style="border-top: 1px solid rgba(37,99,235,0.06);">
+            <div class="table-wrap">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Title</th>
+                            <th>Target</th>
+                            <th>Date</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for a in announcements %}
+                        <tr>
+                            <td>{{ a.title }}</td>
+                            <td><span class="badge bg-info">{{ a.course_name if a.course_name else '🌍 Global' }}</span></td>
+                            <td>{{ a.created_at.split(' ')[0] }}</td>
+                            <td>
+                                <a href="{{ url_for('delete_announcement', announcement_id=a.id) }}"
+                                    class="btn btn-danger btn-sm" onclick="return confirm('Delete this announcement?')">
+                                    <i class="bi bi-trash"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- ============================================================
+     QUICK ADD: NOTE + ASSIGNMENT
+     ============================================================ -->
+<div class="row g-4 mb-4">
+    <!-- Quick Add Note -->
+    <div class="col-md-6 animate-card">
+        <div class="card">
+            <div class="card-header-custom">
+                <h5><i class="bi bi-pencil-square text-primary"></i> Quick Add Note</h5>
+            </div>
+            <div class="card-body-custom">
+                <form method="POST" action="{{ url_for('add_note') }}" id="addNoteForm">
+                    <div class="mb-3">
+                        <label class="form-label">Title</label>
+                        <input type="text" name="title" id="noteTitle" class="form-control" placeholder="Note title" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Content</label>
+                        <textarea name="content" id="noteContent" class="form-control" rows="3"
+                            placeholder="Content (use ```code``` for syntax highlighting)" required></textarea>
+                    </div>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Course</label>
+                            <select name="course_id" class="form-select" required>
+                                <option value="">Select course...</option>
+                                {% for c in courses %}
+                                <option value="{{ c.id }}" {% if course_filter|string==c.id|string %}selected{% endif %}>
+                                    {{ c.name }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Status</label>
+                            <select name="status" class="form-select" required>
+                                <option value="draft">📄 Draft</option>
+                                <option value="published">📢 Published (Send email)</option>
+                            </select>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Tags</label>
+                            <select name="tags" class="form-select" multiple size="3">
+                                {% for tag in tags %}
+                                <option value="{{ tag.id }}">{{ tag.name }}</option>
+                                {% endfor %}
+                            </select>
+                            <small class="text-muted">Hold Ctrl/Cmd to select multiple.</small>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-block mt-3">Post Note</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Add Assignment -->
+    <div class="col-md-6 animate-card" style="animation-delay: 0.1s;">
+        <div class="card">
+            <div class="card-header-custom">
+                <h5><i class="bi bi-calendar-plus text-danger"></i> Quick Add Assignment</h5>
+            </div>
+            <div class="card-body-custom">
+                <form method="POST" action="{{ url_for('add_assignment') }}">
+                    <div class="mb-3">
+                        <label class="form-label">Title</label>
+                        <input type="text" name="title" class="form-control" placeholder="Assignment title" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Description</label>
+                        <textarea name="description" class="form-control" rows="2" placeholder="Description" required></textarea>
+                    </div>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Due Date</label>
+                            <input type="date" name="due_date" class="form-control" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Course</label>
+                            <select name="course_id" class="form-select" required>
+                                <option value="">Select course...</option>
+                                {% for c in courses %}
+                                <option value="{{ c.id }}" {% if course_filter|string==c.id|string %}selected{% endif %}>
+                                    {{ c.name }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Cohort (optional)</label>
+                            <input type="text" name="cohort" class="form-control" placeholder="e.g., 2024A, 2024B">
+                            <small class="text-muted">Leave empty to show to all students.</small>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-danger btn-block mt-3">Create Assignment</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================
+     NOTE TEMPLATES
+     ============================================================ -->
+<div class="card mb-4 animate-card" style="animation-delay: 0.15s;">
+    <div class="card-header-custom">
+        <h5><i class="bi bi-file-earmark-text"></i> Note Templates</h5>
+    </div>
+    <div class="card-body-custom">
+        <div class="row g-4">
+            <div class="col-md-6">
+                <form method="POST" action="{{ url_for('add_template') }}">
+                    <div class="mb-3">
+                        <label class="form-label">Template Name</label>
+                        <input type="text" name="name" class="form-control" placeholder="e.g., Lesson Template" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Default Title</label>
+                        <input type="text" name="title" class="form-control" placeholder="Title" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Content Template</label>
+                        <textarea name="content" class="form-control" rows="3" placeholder="Content template..." required></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-info btn-block">Save Template</button>
+                </form>
+            </div>
+            <div class="col-md-6">
+                <h6 class="fw-bold" style="color: var(--navy);">Saved Templates</h6>
+                <ul class="list-group">
+                    {% for t in templates %}
+                    <li class="list-group-item d-flex justify-content-between align-items-center"
+                        style="background: rgba(255,255,255,0.4); border: 1px solid rgba(37,99,235,0.06); border-radius: 8px; margin-bottom: 4px;">
+                        <span>{{ t.name }}</span>
+                        <div>
+                            <button class="btn btn-sm btn-outline-primary" onclick="loadTemplate({{ t.id }})">
+                                <i class="bi bi-arrow-right"></i> Use
+                            </button>
+                            <a href="{{ url_for('delete_template', template_id=t.id) }}"
+                                class="btn btn-sm btn-danger" onclick="return confirm('Delete template?')">
+                                <i class="bi bi-trash"></i>
+                            </a>
+                        </div>
+                    </li>
+                    {% else %}
+                    <li class="list-group-item text-muted" style="background: transparent; border: none;">
+                        No templates saved.
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================
+     MANAGE NOTES (with Bulk Actions)
+     ============================================================ -->
+<div class="card mb-4 animate-card" style="animation-delay: 0.2s;">
+    <div class="card-header-custom">
+        <h5><i class="bi bi-journal-text"></i> Manage Notes</h5>
+        <div class="d-flex gap-2 flex-wrap">
+            <form method="POST" action="{{ url_for('bulk_publish_notes') }}" class="d-inline" id="bulkPublishForm">
+                <input type="hidden" name="course_id" value="{{ course_filter }}">
+                <input type="hidden" name="note_ids" id="bulkPublishIds" value="">
+                <button type="button" class="btn btn-success btn-sm" onclick="submitBulkAction('publish')">
+                    <i class="bi bi-check2-all"></i> Publish Selected
+                </button>
+            </form>
+            <form method="POST" action="{{ url_for('bulk_delete_notes') }}" class="d-inline" id="bulkDeleteForm"
+                onsubmit="return confirm('Delete selected notes?')">
+                <input type="hidden" name="course_id" value="{{ course_filter }}">
+                <input type="hidden" name="note_ids" id="bulkDeleteIds" value="">
+                <button type="button" class="btn btn-danger btn-sm" onclick="submitBulkAction('delete')">
+                    <i class="bi bi-trash"></i> Delete Selected
+                </button>
+            </form>
+            <div class="btn-group">
+                <button class="btn btn-outline-primary btn-sm dropdown-toggle" data-bs-toggle="dropdown">
+                    <i class="bi bi-upload"></i> Publish All
+                </button>
+                <ul class="dropdown-menu">
+                    {% for c in courses %}
+                    <li><a class="dropdown-item" href="{{ url_for('publish_all', course_id=c.id) }}">
+                            📢 Publish All — {{ c.name }}
+                        </a></li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="card-body-custom">
+        <div class="table-wrap">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th><input type="checkbox" id="selectAllNotes" class="form-check-input"></th>
+                        <th>Title</th>
+                        <th>Course</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for note in notes %}
+                    <tr>
+                        <td><input type="checkbox" name="note_ids" value="{{ note.id }}" class="note-checkbox form-check-input"></td>
+                        <td>{{ note.title }}</td>
+                        <td><span class="badge bg-secondary">{{ note.course_name }}</span></td>
+                        <td>
+                            {% if note.status == 'published' %}
+                            <span class="badge bg-success">Published</span>
+                            {% else %}
+                            <span class="badge bg-secondary">Draft</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <div class="d-flex gap-1 flex-wrap">
+                                <a href="{{ url_for('toggle_note', note_id=note.id, course_id=course_filter) }}"
+                                    class="btn btn-sm {% if note.status == 'published' %}btn-warning{% else %}btn-success{% endif %}"
+                                    title="Toggle status">
+                                    {% if note.status == 'published' %}<i class="bi bi-eye-slash"></i>{% else %}<i class="bi bi-eye"></i>{% endif %}
+                                </a>
+                                <a href="{{ url_for('edit_note', note_id=note.id, course_id=course_filter) }}"
+                                    class="btn btn-sm btn-info" title="Edit"><i class="bi bi-pencil"></i></a>
+                                <a href="{{ url_for('delete_note', note_id=note.id, course_id=course_filter) }}"
+                                    class="btn btn-sm btn-danger" onclick="return confirm('Delete this note?')" title="Delete">
+                                    <i class="bi bi-trash"></i>
+                                </a>
+                                <form method="POST" action="{{ url_for('clear_discussions', note_id=note.id) }}"
+                                    style="display:inline;"
+                                    onsubmit="return confirm('Delete ALL comments & replies for this note? This cannot be undone.')">
+                                    <button type="submit" class="btn btn-sm btn-outline-danger" title="Clear discussions">
+                                        <i class="bi bi-chat-dots"></i> Clear
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr><td colspan="5" class="text-muted text-center py-4">No notes found.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================
+     MANAGE ASSIGNMENTS
+     ============================================================ -->
+<div class="card mb-4 animate-card" style="animation-delay: 0.25s;">
+    <div class="card-header-custom">
+        <h5><i class="bi bi-list-task"></i> Manage Assignments</h5>
+    </div>
+    <div class="card-body-custom">
+        <div class="table-wrap">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Title</th>
+                        <th>Course</th>
+                        <th>Due</th>
+                        <th>Submissions</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for assignment in assignments %}
+                    <tr>
+                        <td>{{ assignment.title }}</td>
+                        <td><span class="badge bg-secondary">{{ assignment.course_name }}</span></td>
+                        <td>{{ assignment.due_date }}</td>
+                        <td>
+                            <a href="{{ url_for('view_submissions', assignment_id=assignment.id, course_id=course_filter) }}"
+                                class="btn btn-sm btn-outline-primary">
+                                <i class="bi bi-people"></i> View
+                            </a>
+                        </td>
+                        <td>
+                            <div class="d-flex gap-1 flex-wrap">
+                                <a href="{{ url_for('export_grades', assignment_id=assignment.id) }}"
+                                    class="btn btn-sm btn-outline-success" title="Export CSV">
+                                    <i class="bi bi-download"></i> CSV
+                                </a>
+                                <a href="{{ url_for('edit_assignment', assignment_id=assignment.id, course_id=course_filter) }}"
+                                    class="btn btn-sm btn-info" title="Edit"><i class="bi bi-pencil"></i></a>
+                                <a href="{{ url_for('delete_assignment', assignment_id=assignment.id, course_id=course_filter) }}"
+                                    class="btn btn-sm btn-danger" onclick="return confirm('Delete this assignment?')" title="Delete">
+                                    <i class="bi bi-trash"></i>
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr><td colspan="5" class="text-muted text-center py-4">No assignments found.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================
+     ENROLLMENT CHART
+     ============================================================ -->
+<div class="card animate-card" style="animation-delay: 0.3s;">
+    <div class="card-header-custom">
+        <h5><i class="bi bi-graph-up-arrow text-primary"></i> Course Enrollment</h5>
+    </div>
+    <div class="chart-container">
+        <canvas id="enrollmentChart" height="120"></canvas>
+    </div>
+</div>
+
+<!-- ============================================================
+     JAVASCRIPT
+     ============================================================ -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // ---------- LOAD TEMPLATE ----------
+    function loadTemplate(id) {
+        fetch('/admin/get_template/' + id)
+            .then(res => res.json())
+            .then(data => {
+                document.getElementById('noteTitle').value = data.title;
+                document.getElementById('noteContent').value = data.content;
+            })
+            .catch(err => alert('Error loading template.'));
+    }
+
+    // ---------- BULK ACTIONS ----------
+    document.addEventListener('DOMContentLoaded', function() {
+        const selectAll = document.getElementById('selectAllNotes');
+        if (selectAll) {
+            selectAll.addEventListener('change', function(e) {
+                document.querySelectorAll('.note-checkbox').forEach(cb => cb.checked = e.target.checked);
+            });
+        }
+    });
+
+    function submitBulkAction(action) {
+        var checkboxes = document.querySelectorAll('.note-checkbox:checked');
+        var ids = Array.from(checkboxes).map(cb => cb.value);
+        if (ids.length === 0) {
+            alert('Please select at least one note.');
+            return;
+        }
+        if (action === 'publish') {
+            document.getElementById('bulkPublishIds').value = ids.join(',');
+            document.getElementById('bulkPublishForm').submit();
+        } else if (action === 'delete') {
+            if (confirm('Delete selected notes?')) {
+                document.getElementById('bulkDeleteIds').value = ids.join(',');
+                document.getElementById('bulkDeleteForm').submit();
+            }
+        }
+    }
+
+    // ---------- ENROLLMENT CHART ----------
+    const ctx = document.getElementById('enrollmentChart').getContext('2d');
+    const enrollmentData = {{ enrollment|tojson }};
+
+    const colors = ['#2563EB', '#22D3EE', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6', '#EC4899'];
+
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: enrollmentData.map(c => c.name),
+            datasets: [{
+                label: 'Students Enrolled',
+                data: enrollmentData.map(c => c.count),
+                backgroundColor: enrollmentData.map((_, i) => colors[i % colors.length] + 'CC'),
+                borderColor: enrollmentData.map((_, i) => colors[i % colors.length]),
+                borderWidth: 2,
+                borderRadius: 6,
+                barPercentage: 0.6,
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            plugins: {
+                legend: {
+                    display: false,
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        stepSize: 1,
+                        font: { size: 11 }
+                    },
+                    grid: {
+                        color: 'rgba(15, 23, 42, 0.06)',
+                        drawBorder: false,
+                    }
+                },
+                x: {
+                    grid: {
+                        display: false,
+                    },
+                    ticks: {
+                        font: { size: 11, weight: '500' },
+                        maxRotation: 45,
+                        minRotation: 0,
+                    }
+                }
+            }
+        }
+    });
+</script>
+
+{% endblock %}

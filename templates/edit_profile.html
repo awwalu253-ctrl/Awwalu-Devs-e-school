@@ -1,0 +1,529 @@
+{% extends "base.html" %}
+
+{% block content %}
+<style>
+    /* ============================================================
+       EDIT PROFILE — TIKTOK‑INSPIRED LAYOUT
+       ============================================================ */
+
+    /* ---------- ANIMATIONS ---------- */
+    @keyframes fadeUp {
+        from { opacity: 0; transform: translateY(24px) scale(0.98); }
+        to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    .animate-card {
+        animation: fadeUp 0.55s ease forwards;
+        opacity: 0;
+    }
+
+    /* ---------- LAYOUT ---------- */
+    .edit-wrapper {
+        max-width: 600px;
+        margin: 0 auto;
+        padding: 0 12px;
+    }
+
+    /* ---------- GLASS CARD ---------- */
+    .glass-card {
+        background: rgba(255, 255, 255, 0.88);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border: 1px solid rgba(37, 99, 235, 0.06);
+        border-radius: var(--radius);
+        box-shadow: var(--shadow-md);
+        transition: var(--transition);
+        padding: 32px 36px;
+        margin-bottom: 24px;
+    }
+
+    .glass-card:hover {
+        box-shadow: var(--shadow-lg), 0 0 0 1px rgba(37, 99, 235, 0.06);
+        transform: translateY(-2px);
+    }
+
+    /* ---------- HEADER ---------- */
+    .edit-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin-bottom: 8px;
+    }
+
+    .edit-header h3 {
+        font-weight: 700;
+        color: var(--navy);
+        letter-spacing: -0.3px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-size: 1.6rem;
+        margin: 0;
+    }
+
+    .edit-header h3 i {
+        color: var(--blue);
+        font-size: 1.6rem;
+    }
+
+    .edit-divider {
+        border: none;
+        height: 2px;
+        background: linear-gradient(90deg, var(--blue), var(--cyan), transparent);
+        opacity: 0.25;
+        margin: 8px 0 24px;
+    }
+
+    /* ---------- BUTTONS ---------- */
+    .btn {
+        font-weight: 600;
+        padding: 10px 28px;
+        border-radius: 50px;
+        transition: var(--transition);
+        border: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 0.9rem;
+        cursor: pointer;
+        text-decoration: none;
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, var(--blue), #1D4ED8);
+        color: white;
+        box-shadow: 0 4px 14px rgba(37, 99, 235, 0.25);
+    }
+    .btn-primary:hover {
+        transform: translateY(-2px) scale(1.02);
+        box-shadow: 0 8px 24px rgba(37, 99, 235, 0.35);
+        background: linear-gradient(135deg, var(--blue), var(--cyan));
+        color: white;
+    }
+
+    .btn-outline-secondary {
+        border: 1.5px solid #CBD5E1;
+        color: var(--text-light);
+        background: transparent;
+    }
+    .btn-outline-secondary:hover {
+        border-color: var(--blue);
+        color: var(--blue);
+        background: rgba(37, 99, 235, 0.04);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(37, 99, 235, 0.08);
+    }
+
+    /* ---------- AVATAR UPLOAD ---------- */
+    .avatar-upload-section {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin-bottom: 24px;
+        padding: 20px;
+        background: rgba(37, 99, 235, 0.02);
+        border-radius: var(--radius-sm);
+        border: 1px dashed rgba(37, 99, 235, 0.10);
+        transition: var(--transition);
+    }
+
+    .avatar-upload-section:hover {
+        border-color: rgba(37, 99, 235, 0.20);
+        background: rgba(37, 99, 235, 0.04);
+    }
+
+    .avatar-upload-section .avatar-preview {
+        position: relative;
+        display: inline-block;
+        margin-bottom: 12px;
+    }
+
+    .avatar-upload-section .avatar-preview img,
+    .avatar-upload-section .avatar-preview .placeholder {
+        width: 100px;
+        height: 100px;
+        object-fit: cover;
+        border-radius: 50%;
+        border: 4px solid rgba(255, 255, 255, 0.9);
+        box-shadow: 0 4px 20px rgba(37, 99, 235, 0.15);
+        transition: var(--transition);
+        display: block;
+    }
+
+    .avatar-upload-section .avatar-preview .placeholder {
+        background: linear-gradient(135deg, var(--blue), var(--cyan));
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 2.8rem;
+        border: 4px solid rgba(255, 255, 255, 0.9);
+    }
+
+    .avatar-upload-section .avatar-preview .camera-icon {
+        position: absolute;
+        bottom: 0;
+        right: 0;
+        background: var(--blue);
+        color: white;
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.9rem;
+        border: 3px solid white;
+        box-shadow: 0 2px 8px rgba(37, 99, 235, 0.30);
+        pointer-events: none;
+    }
+
+    .avatar-upload-section .file-input-wrapper {
+        position: relative;
+        overflow: hidden;
+        display: inline-block;
+    }
+
+    .avatar-upload-section .file-input-wrapper input[type="file"] {
+        position: absolute;
+        left: 0;
+        top: 0;
+        opacity: 0;
+        width: 100%;
+        height: 100%;
+        cursor: pointer;
+    }
+
+    .avatar-upload-section .upload-hint {
+        font-size: 0.8rem;
+        color: var(--text-light);
+        margin-top: 4px;
+    }
+
+    /* ---------- FORM ---------- */
+    .form-group {
+        margin-bottom: 18px;
+    }
+
+    .form-label {
+        font-weight: 600;
+        color: var(--navy);
+        font-size: 0.85rem;
+        margin-bottom: 4px;
+        display: block;
+    }
+
+    .form-label .required {
+        color: var(--cyan);
+        font-weight: 700;
+    }
+
+    .form-control {
+        border: 1.5px solid #E2E8F0;
+        border-radius: var(--radius-sm);
+        padding: 10px 16px;
+        font-size: 0.95rem;
+        transition: var(--transition);
+        background: var(--bg);
+        color: var(--text);
+        width: 100%;
+    }
+
+    .form-control:focus {
+        border-color: var(--blue);
+        box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.08);
+        background: white;
+        outline: none;
+    }
+
+    .form-control::placeholder {
+        color: #94A3B8;
+    }
+
+    textarea.form-control {
+        resize: vertical;
+        min-height: 80px;
+        font-family: inherit;
+    }
+
+    /* ---------- FORM ACTIONS ---------- */
+    .form-actions {
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+        margin-top: 8px;
+        padding-top: 16px;
+        border-top: 1px solid rgba(37, 99, 235, 0.06);
+    }
+
+    /* ---------- RESPONSIVE ---------- */
+    @media (max-width: 768px) {
+        .glass-card {
+            padding: 20px 18px;
+        }
+        .edit-header h3 {
+            font-size: 1.3rem;
+        }
+        .edit-header h3 i {
+            font-size: 1.3rem;
+        }
+        .avatar-upload-section .avatar-preview img,
+        .avatar-upload-section .avatar-preview .placeholder {
+            width: 80px;
+            height: 80px;
+        }
+        .avatar-upload-section .avatar-preview .placeholder {
+            font-size: 2.2rem;
+        }
+        .form-actions {
+            flex-direction: column;
+        }
+        .form-actions .btn {
+            justify-content: center;
+        }
+        .btn {
+            font-size: 0.85rem;
+            padding: 8px 20px;
+        }
+    }
+
+    @media (max-width: 576px) {
+        .glass-card {
+            padding: 16px 14px;
+        }
+        .edit-header h3 {
+            font-size: 1.1rem;
+        }
+        .edit-header h3 i {
+            font-size: 1.1rem;
+        }
+        .avatar-upload-section {
+            padding: 14px;
+        }
+        .avatar-upload-section .avatar-preview img,
+        .avatar-upload-section .avatar-preview .placeholder {
+            width: 70px;
+            height: 70px;
+        }
+        .avatar-upload-section .avatar-preview .placeholder {
+            font-size: 1.8rem;
+        }
+        .avatar-upload-section .avatar-preview .camera-icon {
+            width: 26px;
+            height: 26px;
+            font-size: 0.7rem;
+        }
+        .form-label {
+            font-size: 0.8rem;
+        }
+        .form-control {
+            font-size: 0.85rem;
+            padding: 8px 12px;
+        }
+    }
+
+    /* ---------- DARK MODE ---------- */
+    body.dark-mode .glass-card {
+        background: rgba(15, 23, 42, 0.85);
+        border-color: rgba(37, 99, 235, 0.08);
+        color: #E2E8F0;
+    }
+
+    body.dark-mode .edit-header h3 {
+        color: #E2E8F0;
+    }
+
+    body.dark-mode .form-label {
+        color: #CBD5E1;
+    }
+    body.dark-mode .form-control {
+        background: #1E293B;
+        color: #E2E8F0;
+        border-color: #334155;
+    }
+    body.dark-mode .form-control:focus {
+        background: #1E293B;
+        border-color: var(--blue);
+        box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.12);
+    }
+    body.dark-mode .form-control::placeholder {
+        color: #64748B;
+    }
+
+    body.dark-mode .avatar-upload-section {
+        background: rgba(37, 99, 235, 0.04);
+        border-color: rgba(37, 99, 235, 0.08);
+    }
+    body.dark-mode .avatar-upload-section:hover {
+        border-color: rgba(37, 99, 235, 0.15);
+        background: rgba(37, 99, 235, 0.06);
+    }
+    body.dark-mode .avatar-upload-section .upload-hint {
+        color: #94A3B8;
+    }
+
+    body.dark-mode .btn-primary {
+        background: linear-gradient(135deg, #1D4ED8, #2563EB);
+    }
+    body.dark-mode .btn-primary:hover {
+        background: linear-gradient(135deg, var(--blue), var(--cyan));
+    }
+    body.dark-mode .btn-outline-secondary {
+        border-color: #334155;
+        color: #94A3B8;
+    }
+    body.dark-mode .btn-outline-secondary:hover {
+        border-color: var(--blue);
+        color: var(--cyan);
+        background: rgba(37, 99, 235, 0.08);
+    }
+</style>
+
+<div class="edit-wrapper">
+
+    <!-- ========== EDIT PROFILE CARD ========== -->
+    <div class="glass-card animate-card">
+
+        <!-- Header -->
+        <div class="edit-header">
+            <h3>
+                <i class="bi bi-pencil-square"></i> Edit Profile
+            </h3>
+            <a href="{{ url_for('profile') }}" class="btn btn-outline-secondary">
+                <i class="bi bi-x-lg"></i> Cancel
+            </a>
+        </div>
+        <hr class="edit-divider">
+
+        <!-- ========== AVATAR UPLOAD ========== -->
+        <div class="avatar-upload-section">
+            <div class="avatar-preview">
+                {% if user.avatar %}
+                    <img src="{{ user.avatar }}" alt="Avatar" id="avatarPreview">
+                {% else %}
+                    <div class="placeholder" id="avatarPreview">
+                        <i class="bi bi-person"></i>
+                    </div>
+                {% endif %}
+                <span class="camera-icon"><i class="bi bi-camera"></i></span>
+            </div>
+
+            <div class="file-input-wrapper">
+                <button class="btn btn-primary btn-sm" style="pointer-events: none;">
+                    <i class="bi bi-cloud-upload"></i> Change Photo
+                </button>
+                <input type="file" name="avatar" accept="image/*" id="avatarInput">
+            </div>
+            <span class="upload-hint">PNG, JPG or GIF · Max 2MB</span>
+        </div>
+
+        <!-- ========== EDIT FORM ========== -->
+        <form method="POST" enctype="multipart/form-data" id="editProfileForm">
+
+            <div class="form-group">
+                <label class="form-label">Full Name <span class="required">*</span></label>
+                <input type="text" name="full_name" class="form-control" value="{{ user.full_name }}" placeholder="Your full name" required>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Username <span class="required">*</span></label>
+                <input type="text" name="username" class="form-control" value="{{ user.username }}" placeholder="Unique username" required>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Email</label>
+                <input type="email" name="email" class="form-control" value="{{ user.email or '' }}" placeholder="your@email.com">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Bio</label>
+                <textarea name="bio" class="form-control" rows="4" placeholder="Tell us about yourself...">{{ user.bio or '' }}</textarea>
+                <small class="text-muted" style="display:block; margin-top:4px; font-size:0.75rem;">
+                    <i class="bi bi-info-circle"></i> A short bio that appears on your profile.
+                </small>
+            </div>
+
+            <!-- Hidden fields for other profile data (phone, dob, etc.) -->
+            <!-- These are kept from the original form but hidden -->
+            <input type="hidden" name="phone" value="{{ user.phone or '' }}">
+            <input type="hidden" name="dob" value="{{ user.dob or '' }}">
+            <input type="hidden" name="email_notifications" value="{% if user.email_notifications %}1{% endif %}">
+
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary">
+                    <i class="bi bi-check2-circle"></i> Save Changes
+                </button>
+                <a href="{{ url_for('profile') }}" class="btn btn-outline-secondary">
+                    <i class="bi bi-x-lg"></i> Cancel
+                </a>
+            </div>
+
+        </form>
+
+        <!-- ========== CHANGE PASSWORD SECTION ========== -->
+        <hr class="edit-divider" style="margin-top: 24px;">
+
+        <div style="margin-bottom: 8px;">
+            <h5 style="font-weight: 600; color: var(--navy); display: flex; align-items: center; gap: 8px; margin: 0;">
+                <i class="bi bi-shield-lock" style="color: var(--blue);"></i> Change Password
+            </h5>
+        </div>
+
+        <form method="POST" action="{{ url_for('profile') }}" id="passwordForm">
+            <div class="form-group">
+                <input type="password" name="old_password" class="form-control" placeholder="Current Password">
+            </div>
+            <div class="form-group">
+                <input type="password" name="new_password" class="form-control" placeholder="New Password (min 6 chars)">
+            </div>
+            <div class="form-group">
+                <input type="password" name="confirm_password" class="form-control" placeholder="Confirm New Password">
+            </div>
+            <button type="submit" class="btn" style="background: linear-gradient(135deg, #F59E0B, #D97706); color: white; box-shadow: 0 4px 14px rgba(245, 158, 11, 0.25);">
+                <i class="bi bi-key"></i> Change Password
+            </button>
+        </form>
+
+    </div>
+</div>
+
+<script>
+    // ---------- AVATAR PREVIEW ----------
+    document.addEventListener('DOMContentLoaded', function() {
+        const avatarInput = document.getElementById('avatarInput');
+        const avatarPreview = document.getElementById('avatarPreview');
+
+        if (avatarInput) {
+            avatarInput.addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(event) {
+                        if (avatarPreview.tagName === 'IMG') {
+                            avatarPreview.src = event.target.result;
+                        } else {
+                            // It's a placeholder div, replace with img
+                            const newImg = document.createElement('img');
+                            newImg.id = 'avatarPreview';
+                            newImg.src = event.target.result;
+                            newImg.alt = 'Avatar preview';
+                            newImg.style.width = '100px';
+                            newImg.style.height = '100px';
+                            newImg.style.objectFit = 'cover';
+                            newImg.style.borderRadius = '50%';
+                            newImg.style.border = '4px solid rgba(255,255,255,0.9)';
+                            newImg.style.boxShadow = '0 4px 20px rgba(37,99,235,0.15)';
+                            avatarPreview.parentNode.replaceChild(newImg, avatarPreview);
+                            // Update reference
+                            document.getElementById('avatarPreview');
+                        }
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+        }
+    });
+</script>
+{% endblock %}

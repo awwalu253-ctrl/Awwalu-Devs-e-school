@@ -1,0 +1,745 @@
+{% extends "base.html" %}
+
+{% block content %}
+<style>
+    /* ============================================================
+       PROFILE — TIKTOK‑INSPIRED VIEW‑ONLY LAYOUT
+       ============================================================ */
+
+    /* ---------- ANIMATIONS ---------- */
+    @keyframes fadeUp {
+        from { opacity: 0; transform: translateY(24px) scale(0.98); }
+        to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    @keyframes pulseGlow {
+        0%, 100% { box-shadow: 0 0 0 0 rgba(37, 99, 235, 0.3); }
+        50% { box-shadow: 0 0 0 8px rgba(37, 99, 235, 0); }
+    }
+
+    .animate-card {
+        animation: fadeUp 0.55s ease forwards;
+        opacity: 0;
+    }
+
+    /* ---------- PROFILE LAYOUT ---------- */
+    .profile-wrapper {
+        max-width: 680px;
+        margin: 0 auto;
+        padding: 0 12px;
+    }
+
+    /* ---------- GLASS CARD ---------- */
+    .glass-card {
+        background: rgba(255, 255, 255, 0.88);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border: 1px solid rgba(37, 99, 235, 0.06);
+        border-radius: var(--radius);
+        box-shadow: var(--shadow-md);
+        transition: var(--transition);
+        padding: 32px 36px;
+        margin-bottom: 24px;
+    }
+
+    .glass-card:hover {
+        box-shadow: var(--shadow-lg), 0 0 0 1px rgba(37, 99, 235, 0.06);
+        transform: translateY(-2px);
+    }
+
+    /* ---------- HEADER ---------- */
+    .profile-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin-bottom: 8px;
+    }
+
+    .profile-header h3 {
+        font-weight: 700;
+        color: var(--navy);
+        letter-spacing: -0.3px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-size: 1.6rem;
+        margin: 0;
+    }
+
+    .profile-header h3 i {
+        color: var(--blue);
+        font-size: 1.6rem;
+    }
+
+    .profile-divider {
+        border: none;
+        height: 2px;
+        background: linear-gradient(90deg, var(--blue), var(--cyan), transparent);
+        opacity: 0.25;
+        margin: 8px 0 24px;
+    }
+
+    /* ---------- BUTTONS ---------- */
+    .btn {
+        font-weight: 600;
+        padding: 8px 20px;
+        border-radius: 50px;
+        transition: var(--transition);
+        border: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 0.85rem;
+        cursor: pointer;
+        text-decoration: none;
+    }
+
+    .btn-outline-secondary {
+        border: 1.5px solid #CBD5E1;
+        color: var(--text-light);
+        background: transparent;
+    }
+    .btn-outline-secondary:hover {
+        border-color: var(--blue);
+        color: var(--blue);
+        background: rgba(37, 99, 235, 0.04);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(37, 99, 235, 0.08);
+    }
+
+    .btn-edit {
+        background: linear-gradient(135deg, var(--blue), #1D4ED8);
+        color: white;
+        box-shadow: 0 4px 14px rgba(37, 99, 235, 0.25);
+        padding: 8px 24px;
+    }
+    .btn-edit:hover {
+        transform: translateY(-2px) scale(1.02);
+        box-shadow: 0 8px 24px rgba(37, 99, 235, 0.35);
+        background: linear-gradient(135deg, var(--blue), var(--cyan));
+        color: white;
+    }
+
+    .btn-success {
+        background: linear-gradient(135deg, #10B981, #059669);
+        color: white;
+        box-shadow: 0 4px 14px rgba(16, 185, 129, 0.25);
+    }
+    .btn-success:hover {
+        transform: translateY(-2px) scale(1.02);
+        box-shadow: 0 8px 24px rgba(16, 185, 129, 0.35);
+        background: linear-gradient(135deg, #34D399, #10B981);
+        color: white;
+    }
+
+    .btn-sm {
+        padding: 6px 16px;
+        font-size: 0.75rem;
+    }
+
+    /* ---------- AVATAR SECTION ---------- */
+    .avatar-section {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin-bottom: 20px;
+        position: relative;
+    }
+
+    .avatar-wrapper {
+        position: relative;
+        display: inline-block;
+        cursor: default;
+    }
+
+    .avatar-wrapper .ring {
+        position: absolute;
+        inset: -4px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, var(--blue), var(--cyan));
+        opacity: 0.5;
+        transition: var(--transition);
+        z-index: 0;
+        animation: pulseGlow 3s ease-in-out infinite;
+    }
+
+    .avatar-wrapper img,
+    .avatar-wrapper .avatar-placeholder {
+        position: relative;
+        z-index: 1;
+        width: 120px;
+        height: 120px;
+        object-fit: cover;
+        border-radius: 50%;
+        border: 4px solid rgba(255, 255, 255, 0.9);
+        box-shadow: 0 4px 20px rgba(37, 99, 235, 0.15);
+        transition: var(--transition);
+        display: block;
+    }
+
+    .avatar-wrapper .avatar-placeholder {
+        background: linear-gradient(135deg, var(--blue), var(--cyan));
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 3.8rem;
+        border: 4px solid rgba(255, 255, 255, 0.9);
+    }
+
+    .avatar-wrapper:hover img,
+    .avatar-wrapper:hover .avatar-placeholder {
+        transform: scale(1.03);
+        box-shadow: 0 8px 28px rgba(37, 99, 235, 0.25);
+    }
+
+    /* ---------- USER NAME & BIO ---------- */
+    .user-name-section {
+        text-align: center;
+        margin-bottom: 24px;
+    }
+
+    .user-name-section h2 {
+        font-weight: 700;
+        color: var(--navy);
+        font-size: 1.6rem;
+        margin: 0 0 2px 0;
+        letter-spacing: -0.3px;
+    }
+
+    .user-name-section .username {
+        font-size: 0.9rem;
+        color: var(--text-light);
+        margin: 0;
+    }
+
+    .user-name-section .bio {
+        color: var(--text);
+        font-size: 0.95rem;
+        margin-top: 6px;
+        max-width: 400px;
+        margin-left: auto;
+        margin-right: auto;
+        line-height: 1.5;
+    }
+
+    .user-name-section .bio .not-set {
+        color: var(--text-light);
+        font-style: italic;
+    }
+
+    /* ---------- USER STATS ---------- */
+    .stats-row {
+        display: flex;
+        justify-content: center;
+        gap: 32px;
+        padding: 16px 0;
+        border-top: 1px solid rgba(15, 23, 42, 0.04);
+        border-bottom: 1px solid rgba(15, 23, 42, 0.04);
+        margin-bottom: 20px;
+    }
+
+    .stats-row .stat-item {
+        text-align: center;
+    }
+
+    .stats-row .stat-item .number {
+        font-weight: 700;
+        font-size: 1.2rem;
+        color: var(--navy);
+        display: block;
+    }
+
+    .stats-row .stat-item .label {
+        font-size: 0.7rem;
+        color: var(--text-light);
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+    }
+
+    /* ---------- USER INFO LIST ---------- */
+    .info-list {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+        margin-bottom: 20px;
+    }
+
+    .info-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px 12px;
+        border-radius: var(--radius-sm);
+        transition: var(--transition);
+        background: rgba(255, 255, 255, 0.3);
+        border: 1px solid rgba(37, 99, 235, 0.02);
+    }
+
+    .info-item:hover {
+        background: rgba(37, 99, 235, 0.03);
+        border-color: rgba(37, 99, 235, 0.04);
+    }
+
+    .info-item .label {
+        font-weight: 500;
+        color: var(--text-light);
+        font-size: 0.8rem;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+    }
+
+    .info-item .value {
+        font-weight: 500;
+        color: var(--text);
+        font-size: 0.9rem;
+        text-align: right;
+        word-break: break-word;
+        max-width: 60%;
+    }
+
+    .info-item .value .not-set {
+        color: var(--text-light);
+        font-style: italic;
+        font-weight: 400;
+    }
+
+    /* ---------- BADGES ---------- */
+    .badge-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        background: linear-gradient(135deg, var(--blue), var(--cyan));
+        color: white;
+        padding: 6px 16px;
+        border-radius: 50px;
+        font-weight: 600;
+        font-size: 0.85rem;
+        box-shadow: 0 2px 8px rgba(37, 99, 235, 0.15);
+        transition: var(--transition);
+        margin: 4px 8px 4px 0;
+    }
+    .badge-pill:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba(37, 99, 235, 0.25);
+    }
+
+    .badges-wrap {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 4px;
+        padding: 4px 0;
+    }
+
+    /* ---------- SECTION ---------- */
+    .section-divider {
+        border: none;
+        height: 1px;
+        background: rgba(37, 99, 235, 0.06);
+        margin: 16px 0;
+    }
+
+    .section-label {
+        font-weight: 600;
+        color: var(--navy);
+        font-size: 0.9rem;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 10px;
+    }
+
+    .section-label i {
+        color: var(--blue);
+    }
+
+    /* ---------- CERTIFICATES (compact) ---------- */
+    .cert-list {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+    }
+
+    .cert-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 8px 12px;
+        background: rgba(255, 255, 255, 0.3);
+        border-radius: var(--radius-sm);
+        border: 1px solid rgba(37, 99, 235, 0.02);
+        transition: var(--transition);
+    }
+
+    .cert-item:hover {
+        background: rgba(37, 99, 235, 0.03);
+        border-color: rgba(37, 99, 235, 0.04);
+    }
+
+    .cert-item .cert-info {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .cert-item .cert-info .name {
+        font-weight: 500;
+        color: var(--navy);
+        font-size: 0.85rem;
+    }
+
+    .cert-item .cert-info .code {
+        font-size: 0.7rem;
+        color: var(--text-light);
+        font-family: 'Fira Code', monospace;
+    }
+
+    .cert-item .cert-info .date {
+        font-size: 0.65rem;
+        color: var(--text-light);
+    }
+
+    /* ---------- RESPONSIVE ---------- */
+    @media (max-width: 768px) {
+        .glass-card {
+            padding: 20px 18px;
+        }
+        .profile-header h3 {
+            font-size: 1.3rem;
+        }
+        .profile-header h3 i {
+            font-size: 1.3rem;
+        }
+        .avatar-wrapper img,
+        .avatar-wrapper .avatar-placeholder {
+            width: 100px;
+            height: 100px;
+        }
+        .avatar-wrapper .avatar-placeholder {
+            font-size: 3rem;
+        }
+        .user-name-section h2 {
+            font-size: 1.3rem;
+        }
+        .stats-row {
+            gap: 16px;
+        }
+        .stats-row .stat-item .number {
+            font-size: 1rem;
+        }
+        .info-item {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 2px;
+        }
+        .info-item .value {
+            max-width: 100%;
+            text-align: left;
+        }
+        .cert-item {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 6px;
+        }
+        .cert-item .cert-info .name {
+            font-size: 0.8rem;
+        }
+        .btn {
+            font-size: 0.8rem;
+            padding: 6px 16px;
+        }
+        .btn-edit {
+            padding: 6px 18px;
+        }
+    }
+
+    @media (max-width: 576px) {
+        .glass-card {
+            padding: 16px 14px;
+        }
+        .profile-header h3 {
+            font-size: 1.1rem;
+        }
+        .profile-header h3 i {
+            font-size: 1.1rem;
+        }
+        .avatar-wrapper img,
+        .avatar-wrapper .avatar-placeholder {
+            width: 80px;
+            height: 80px;
+        }
+        .avatar-wrapper .avatar-placeholder {
+            font-size: 2.5rem;
+        }
+        .user-name-section h2 {
+            font-size: 1.1rem;
+        }
+        .user-name-section .bio {
+            font-size: 0.85rem;
+        }
+        .stats-row {
+            gap: 12px;
+            padding: 12px 0;
+        }
+        .stats-row .stat-item .number {
+            font-size: 0.9rem;
+        }
+        .stats-row .stat-item .label {
+            font-size: 0.6rem;
+        }
+        .info-item {
+            padding: 8px 10px;
+        }
+        .info-item .label {
+            font-size: 0.7rem;
+        }
+        .info-item .value {
+            font-size: 0.8rem;
+        }
+        .badge-pill {
+            font-size: 0.75rem;
+            padding: 4px 12px;
+        }
+    }
+
+    /* ---------- DARK MODE ---------- */
+    body.dark-mode .glass-card {
+        background: rgba(15, 23, 42, 0.85);
+        border-color: rgba(37, 99, 235, 0.08);
+        color: #E2E8F0;
+    }
+
+    body.dark-mode .profile-header h3 {
+        color: #E2E8F0;
+    }
+
+    body.dark-mode .user-name-section h2 {
+        color: #E2E8F0;
+    }
+    body.dark-mode .user-name-section .username {
+        color: #94A3B8;
+    }
+    body.dark-mode .user-name-section .bio {
+        color: #CBD5E1;
+    }
+    body.dark-mode .user-name-section .bio .not-set {
+        color: #64748B;
+    }
+
+    body.dark-mode .stats-row {
+        border-color: rgba(37, 99, 235, 0.06);
+    }
+    body.dark-mode .stats-row .stat-item .number {
+        color: #E2E8F0;
+    }
+    body.dark-mode .stats-row .stat-item .label {
+        color: #94A3B8;
+    }
+
+    body.dark-mode .info-item {
+        background: rgba(15, 23, 42, 0.3);
+        border-color: rgba(37, 99, 235, 0.04);
+    }
+    body.dark-mode .info-item:hover {
+        background: rgba(37, 99, 235, 0.06);
+    }
+    body.dark-mode .info-item .label {
+        color: #94A3B8;
+    }
+    body.dark-mode .info-item .value {
+        color: #E2E8F0;
+    }
+    body.dark-mode .info-item .value .not-set {
+        color: #64748B;
+    }
+
+    body.dark-mode .section-label {
+        color: #E2E8F0;
+    }
+
+    body.dark-mode .cert-item {
+        background: rgba(15, 23, 42, 0.3);
+        border-color: rgba(37, 99, 235, 0.04);
+    }
+    body.dark-mode .cert-item:hover {
+        background: rgba(37, 99, 235, 0.06);
+    }
+    body.dark-mode .cert-item .cert-info .name {
+        color: #E2E8F0;
+    }
+    body.dark-mode .cert-item .cert-info .code {
+        color: #94A3B8;
+    }
+    body.dark-mode .cert-item .cert-info .date {
+        color: #64748B;
+    }
+
+    body.dark-mode .badge-pill {
+        background: linear-gradient(135deg, #1D4ED8, #0891B2);
+    }
+    body.dark-mode .badge-pill:hover {
+        box-shadow: 0 6px 16px rgba(37, 99, 235, 0.20);
+    }
+
+    body.dark-mode .btn-outline-secondary {
+        border-color: #334155;
+        color: #94A3B8;
+    }
+    body.dark-mode .btn-outline-secondary:hover {
+        border-color: var(--blue);
+        color: var(--cyan);
+        background: rgba(37, 99, 235, 0.08);
+    }
+    body.dark-mode .btn-edit {
+        background: linear-gradient(135deg, #1D4ED8, #2563EB);
+    }
+    body.dark-mode .btn-edit:hover {
+        background: linear-gradient(135deg, var(--blue), var(--cyan));
+    }
+    body.dark-mode .btn-success {
+        background: linear-gradient(135deg, #059669, #047857);
+    }
+    body.dark-mode .btn-success:hover {
+        background: linear-gradient(135deg, #10B981, #059669);
+    }
+</style>
+
+<div class="profile-wrapper">
+
+    <!-- ========== PROFILE CARD ========== -->
+    <div class="glass-card animate-card">
+
+        <!-- Header -->
+        <div class="profile-header">
+            <h3>
+                <i class="bi bi-person-circle"></i> My Profile
+            </h3>
+            <a href="{{ url_for('edit_profile') }}" class="btn btn-edit">
+                <i class="bi bi-pencil-square"></i> Edit Profile
+            </a>
+        </div>
+        <hr class="profile-divider">
+
+        <!-- Avatar -->
+        <div class="avatar-section">
+            <div class="avatar-wrapper">
+                <div class="ring"></div>
+                {% if user.avatar %}
+                    <img src="{{ user.avatar }}" alt="Avatar">
+                {% else %}
+                    <div class="avatar-placeholder">
+                        <i class="bi bi-person"></i>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Name & Bio -->
+        <div class="user-name-section">
+            <h2>{{ user.full_name }}</h2>
+            <p class="username">@{{ user.username }}</p>
+            <p class="bio">
+                {% if user.bio %}
+                    {{ user.bio }}
+                {% else %}
+                    <span class="not-set">No bio yet</span>
+                {% endif %}
+            </p>
+        </div>
+
+        <!-- Stats -->
+        <div class="stats-row">
+            <div class="stat-item">
+                <span class="number">{{ read_count }}</span>
+                <span class="label">Notes Read</span>
+            </div>
+            <div class="stat-item">
+                <span class="number">{{ total_notes }}</span>
+                <span class="label">Total Notes</span>
+            </div>
+            <div class="stat-item">
+                <span class="number">{{ certificates|length if certificates else 0 }}</span>
+                <span class="label">Certificates</span>
+            </div>
+            <div class="stat-item">
+                <span class="number">{{ badges|length if badges else 0 }}</span>
+                <span class="label">Badges</span>
+            </div>
+        </div>
+
+        <!-- Info List -->
+        <div class="info-list">
+            <div class="info-item">
+                <span class="label">Email</span>
+                <span class="value">{% if user.email %}{{ user.email }}{% else %}<span class="not-set">Not set</span>{% endif %}</span>
+            </div>
+            <div class="info-item">
+                <span class="label">Phone</span>
+                <span class="value">{% if user.phone %}{{ user.phone }}{% else %}<span class="not-set">Not set</span>{% endif %}</span>
+            </div>
+            <div class="info-item">
+                <span class="label">Date of Birth</span>
+                <span class="value">{% if user.dob %}{{ user.dob }}{% else %}<span class="not-set">Not set</span>{% endif %}</span>
+            </div>
+            <div class="info-item">
+                <span class="label">Enrolled Course</span>
+                <span class="value">{% if course %}{{ course.name }}{% else %}<span class="not-set">Not set</span>{% endif %}</span>
+            </div>
+        </div>
+
+        <hr class="section-divider">
+
+        <!-- Certificates -->
+        <div class="section-label">
+            <i class="bi bi-award"></i> Certificates
+        </div>
+        {% if certificates %}
+            <div class="cert-list">
+                {% for cert in certificates %}
+                <div class="cert-item">
+                    <div class="cert-info">
+                        <span class="name">{{ cert.course_name }}</span>
+                        <span class="code">{{ cert.certificate_code }}</span>
+                        <span class="date">Issued: {{ cert.issued_at.split(' ')[0] }}</span>
+                    </div>
+                    <a href="{{ url_for('download_certificate', certificate_id=cert.id) }}" class="btn btn-success btn-sm">
+                        <i class="bi bi-download"></i> Download
+                    </a>
+                </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p class="text-muted" style="padding: 4px 0;">No certificates yet. Complete a course to earn one.</p>
+        {% endif %}
+
+        <hr class="section-divider">
+
+        <!-- Badges -->
+        <div class="section-label">
+            <i class="bi bi-patch-check"></i> Badges
+        </div>
+        {% if badges %}
+            <div class="badges-wrap">
+                {% for badge in badges %}
+                    <span class="badge-pill">
+                        {{ badge.badge_icon }} {{ badge.badge_name }}
+                    </span>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p class="text-muted" style="padding: 4px 0;">No badges yet. Complete a course to earn one!</p>
+        {% endif %}
+
+        <hr class="section-divider">
+
+        <!-- Back to Dashboard -->
+        <div style="margin-top: 4px;">
+            <a href="{{ url_for('dashboard') }}" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left"></i> Back to Dashboard
+            </a>
+        </div>
+
+    </div>
+</div>
+{% endblock %}

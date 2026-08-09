@@ -1,0 +1,848 @@
+{% extends "base.html" %}
+
+{% macro render_admin_comment(comment, level=0) %}
+    <div class="comment-thread {% if level > 0 %}is-reply{% endif %}" style="margin-left: {{ level * 24 }}px;">
+        <div class="comment-card">
+            <!-- Comment header -->
+            <div class="comment-header">
+                <div class="comment-author">
+                    <span class="comment-avatar">
+                        {{ comment.user_name[:1]|upper }}
+                    </span>
+                    <div>
+                        <span class="comment-name">{{ comment.user_name }}</span>
+                        {% if comment.parent_author_name %}
+                            <span class="comment-reply-to">
+                                <i class="bi bi-arrow-return-right"></i> {{ comment.parent_author_name }}
+                            </span>
+                        {% endif %}
+                        {% if comment.is_admin %}
+                            <span class="badge instructor-badge">Instructor</span>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="comment-meta">
+                    <span class="comment-date">{{ comment.created_at }}</span>
+                    <div class="comment-actions">
+                        <button type="button" class="btn btn-sm btn-outline-secondary" onclick="toggleReplyForm('adminReplyForm{{ comment.id }}')">
+                            <i class="bi bi-reply"></i> Reply
+                        </button>
+                        <a href="{{ url_for('delete_discussion', discussion_id=comment.id) }}"
+                           class="btn btn-sm btn-danger"
+                           onclick="return confirm('Delete this comment and all replies?')">
+                            <i class="bi bi-trash"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Comment body -->
+            <div class="comment-body">
+                {{ comment.message }}
+            </div>
+
+            <!-- Admin reply form -->
+            <div id="adminReplyForm{{ comment.id }}" style="display:none;" class="reply-form-container mt-2">
+                <form method="POST" action="{{ url_for('admin_reply_discussion', discussion_id=comment.id) }}" class="reply-form">
+                    <div class="reply-form-group">
+                        <textarea name="message" class="form-control" rows="2" placeholder="Reply as Instructor..." required></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-sm">
+                        <i class="bi bi-send"></i> Post Reply
+                    </button>
+                    <button type="button" class="btn btn-secondary btn-sm" onclick="toggleReplyForm('adminReplyForm{{ comment.id }}')">
+                        Cancel
+                    </button>
+                </form>
+            </div>
+
+            <!-- Recursively render replies -->
+            {% if comment.replies %}
+                <div class="replies-container">
+                    {% for reply in comment.replies %}
+                        {{ render_admin_comment(reply, level + 1) }}
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </div>
+    </div>
+{% endmacro %}
+
+{% block content %}
+<style>
+    /* ============================================================
+       Q&A MODERATION — NAVY + ELECTRIC BLUE THEME
+       ============================================================ */
+
+    /* ---------- ANIMATIONS ---------- */
+    @keyframes fadeInUp {
+        from { opacity: 0; transform: translateY(30px) scale(0.96); }
+        to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    .animate-card {
+        animation: fadeInUp 0.6s ease forwards;
+        opacity: 0;
+    }
+    .animate-card:nth-child(1) { animation-delay: 0.05s; }
+    .animate-card:nth-child(2) { animation-delay: 0.10s; }
+    .animate-card:nth-child(3) { animation-delay: 0.15s; }
+    .animate-card:nth-child(4) { animation-delay: 0.20s; }
+
+    /* ---------- HEADER ---------- */
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin-bottom: 28px;
+        animation: fadeInUp 0.6s ease forwards;
+        opacity: 0;
+    }
+
+    .page-header h2 {
+        font-weight: 700;
+        color: var(--navy);
+        letter-spacing: -0.3px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-size: 1.8rem;
+        margin: 0;
+    }
+
+    .page-header h2 i {
+        color: var(--blue);
+        font-size: 1.8rem;
+    }
+
+    .page-header .subtitle {
+        color: var(--text-light);
+        font-size: 0.95rem;
+        margin-top: 2px;
+        width: 100%;
+    }
+
+    /* ---------- BUTTONS ---------- */
+    .btn-primary {
+        background: linear-gradient(135deg, var(--blue), #1D4ED8);
+        border: none;
+        color: white;
+        font-weight: 600;
+        padding: 8px 20px;
+        border-radius: 50px;
+        box-shadow: 0 4px 14px rgba(37, 99, 235, 0.25);
+        transition: var(--transition);
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 0.85rem;
+        cursor: pointer;
+        text-decoration: none;
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-2px) scale(1.02);
+        box-shadow: 0 8px 24px rgba(37, 99, 235, 0.35);
+        background: linear-gradient(135deg, var(--blue), var(--cyan));
+        color: white;
+    }
+
+    .btn-secondary {
+        border: 1.5px solid #CBD5E1;
+        color: var(--text-light);
+        background: transparent;
+        font-weight: 500;
+        border-radius: 50px;
+        padding: 8px 20px;
+        transition: var(--transition);
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        text-decoration: none;
+        font-size: 0.85rem;
+    }
+
+    .btn-secondary:hover {
+        border-color: var(--blue);
+        color: var(--blue);
+        background: rgba(37, 99, 235, 0.04);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(37, 99, 235, 0.08);
+    }
+
+    .btn-sm {
+        padding: 4px 12px;
+        font-size: 0.75rem;
+    }
+
+    .btn-outline-secondary {
+        border: 1.5px solid #CBD5E1;
+        color: var(--text-light);
+        background: transparent;
+        font-weight: 500;
+        border-radius: 50px;
+        padding: 4px 12px;
+        transition: var(--transition);
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        font-size: 0.75rem;
+        cursor: pointer;
+        text-decoration: none;
+    }
+
+    .btn-outline-secondary:hover {
+        border-color: var(--blue);
+        color: var(--blue);
+        background: rgba(37, 99, 235, 0.04);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(37, 99, 235, 0.08);
+    }
+
+    .btn-danger {
+        background: linear-gradient(135deg, #EF4444, #DC2626);
+        border: none;
+        color: white;
+        font-weight: 600;
+        padding: 4px 12px;
+        border-radius: 50px;
+        box-shadow: 0 4px 14px rgba(239, 68, 68, 0.20);
+        transition: var(--transition);
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        font-size: 0.75rem;
+        cursor: pointer;
+        text-decoration: none;
+    }
+
+    .btn-danger:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 24px rgba(239, 68, 68, 0.30);
+        background: linear-gradient(135deg, #F87171, #EF4444);
+        color: white;
+    }
+
+    /* ---------- CARDS ---------- */
+    .card {
+        border: none;
+        border-radius: var(--radius);
+        box-shadow: var(--shadow-md);
+        transition: var(--transition);
+        background: rgba(255, 255, 255, 0.92);
+        backdrop-filter: blur(2px);
+        border: 1px solid rgba(37, 99, 235, 0.06);
+        overflow: hidden;
+    }
+
+    .card:hover {
+        box-shadow: var(--shadow-lg), 0 0 0 1px rgba(37, 99, 235, 0.06);
+        transform: translateY(-2px);
+    }
+
+    .card-header-custom {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 16px 20px 12px 20px;
+        border-bottom: 1px solid rgba(37, 99, 235, 0.06);
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    .card-header-custom h5 {
+        font-weight: 700;
+        color: var(--navy);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 1rem;
+        margin: 0;
+    }
+
+    .card-header-custom h5 i {
+        color: var(--blue);
+    }
+
+    .card-header-custom .course-badge {
+        background: rgba(37, 99, 235, 0.08);
+        color: var(--navy);
+        padding: 2px 14px;
+        border-radius: 50px;
+        font-size: 0.7rem;
+        font-weight: 600;
+        border: 1px solid rgba(37, 99, 235, 0.06);
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+    }
+
+    .card-body-custom {
+        padding: 20px;
+    }
+
+    /* ---------- NOTE CARD (each note section) ---------- */
+    .note-section {
+        margin-bottom: 24px;
+        border-bottom: 1px solid rgba(37, 99, 235, 0.06);
+        padding-bottom: 20px;
+    }
+
+    .note-section:last-child {
+        border-bottom: none;
+        margin-bottom: 0;
+        padding-bottom: 0;
+    }
+
+    .note-section .note-title {
+        font-weight: 700;
+        color: var(--navy);
+        font-size: 1.1rem;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 4px;
+    }
+
+    .note-section .note-title i {
+        color: var(--blue);
+    }
+
+    .note-section .note-meta {
+        color: var(--text-light);
+        font-size: 0.8rem;
+        margin-bottom: 12px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        flex-wrap: wrap;
+    }
+
+    .note-section .note-meta .course-badge {
+        background: rgba(37, 99, 235, 0.08);
+        padding: 2px 12px;
+        border-radius: 50px;
+        font-size: 0.7rem;
+        color: var(--navy);
+        border: 1px solid rgba(37, 99, 235, 0.06);
+    }
+
+    /* ---------- COMMENT THREAD ---------- */
+    .comment-thread {
+        margin-top: 8px;
+        transition: var(--transition);
+    }
+
+    .comment-thread.is-reply {
+        border-left: 2px solid rgba(37, 99, 235, 0.12);
+        padding-left: 12px;
+    }
+
+    .comment-card {
+        background: rgba(255, 255, 255, 0.6);
+        border-radius: var(--radius-sm);
+        padding: 14px 16px;
+        border: 1px solid rgba(37, 99, 235, 0.04);
+        box-shadow: var(--shadow-sm);
+        transition: var(--transition);
+        margin-bottom: 8px;
+    }
+
+    .comment-card:hover {
+        background: rgba(255, 255, 255, 0.8);
+        box-shadow: var(--shadow-md);
+        border-color: rgba(37, 99, 235, 0.08);
+    }
+
+    /* Comment header */
+    .comment-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-bottom: 6px;
+    }
+
+    .comment-author {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .comment-avatar {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, var(--blue), var(--cyan));
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        font-size: 0.75rem;
+        flex-shrink: 0;
+        border: 2px solid rgba(37, 99, 235, 0.15);
+    }
+
+    .comment-name {
+        font-weight: 600;
+        color: var(--navy);
+        font-size: 0.9rem;
+    }
+
+    .comment-reply-to {
+        font-size: 0.75rem;
+        color: var(--text-light);
+        margin-left: 4px;
+        display: inline-flex;
+        align-items: center;
+        gap: 2px;
+    }
+
+    .comment-reply-to i {
+        font-size: 0.7rem;
+    }
+
+    .badge.instructor-badge {
+        background: linear-gradient(135deg, var(--blue), var(--cyan));
+        color: white;
+        font-weight: 600;
+        font-size: 0.6rem;
+        padding: 1px 10px;
+        border-radius: 50px;
+        margin-left: 6px;
+        vertical-align: middle;
+        text-transform: uppercase;
+        letter-spacing: 0.03em;
+    }
+
+    .comment-meta {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex-wrap: wrap;
+    }
+
+    .comment-date {
+        font-size: 0.7rem;
+        color: var(--text-light);
+    }
+
+    .comment-actions {
+        display: flex;
+        gap: 4px;
+        align-items: center;
+    }
+
+    /* Comment body */
+    .comment-body {
+        color: var(--text);
+        font-size: 0.9rem;
+        line-height: 1.5;
+        padding: 4px 0 0 42px;
+        word-wrap: break-word;
+    }
+
+    /* Replies container */
+    .replies-container {
+        margin-top: 6px;
+    }
+
+    /* Reply form */
+    .reply-form-container {
+        margin-top: 10px;
+        padding-left: 42px;
+    }
+
+    .reply-form {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        background: rgba(255, 255, 255, 0.4);
+        padding: 12px 14px;
+        border-radius: var(--radius-sm);
+        border: 1px solid rgba(37, 99, 235, 0.04);
+    }
+
+    .reply-form .form-control {
+        border: 1.5px solid #E2E8F0;
+        border-radius: var(--radius-sm);
+        padding: 8px 12px;
+        font-size: 0.85rem;
+        transition: var(--transition);
+        background: var(--bg);
+        color: var(--text);
+        width: 100%;
+        resize: vertical;
+    }
+
+    .reply-form .form-control:focus {
+        border-color: var(--blue);
+        box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.08);
+        background: white;
+        outline: none;
+    }
+
+    .reply-form .form-group {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        align-items: center;
+    }
+
+    /* ---------- EMPTY STATE ---------- */
+    .empty-state {
+        text-align: center;
+        padding: 60px 20px;
+        border: 2px dashed rgba(37, 99, 235, 0.12);
+        border-radius: var(--radius);
+        background: rgba(255, 255, 255, 0.5);
+        animation: fadeInUp 0.7s ease;
+    }
+
+    .empty-state .empty-icon {
+        width: 84px;
+        height: 84px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, rgba(37, 99, 235, 0.08), rgba(34, 211, 238, 0.08));
+        color: var(--blue);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2.6rem;
+        margin: 0 auto 20px;
+        border: 2px solid rgba(37, 99, 235, 0.10);
+        transition: var(--transition);
+    }
+
+    .empty-state:hover .empty-icon {
+        transform: scale(1.06) rotate(-4deg);
+        border-color: var(--cyan);
+        box-shadow: 0 0 0 8px rgba(34, 211, 238, 0.06);
+    }
+
+    .empty-state h5 {
+        color: var(--navy);
+        font-weight: 700;
+        margin-bottom: 8px;
+    }
+
+    .empty-state p {
+        color: var(--text-light);
+        max-width: 420px;
+        margin: 0 auto;
+        font-size: 0.95rem;
+        line-height: 1.5;
+    }
+
+    /* ---------- RESPONSIVE ---------- */
+    @media (max-width: 768px) {
+        .page-header h2 {
+            font-size: 1.4rem;
+        }
+        .page-header h2 i {
+            font-size: 1.4rem;
+        }
+        .card-body-custom {
+            padding: 16px;
+        }
+        .comment-header {
+            flex-direction: column;
+            align-items: stretch;
+        }
+        .comment-meta {
+            justify-content: space-between;
+        }
+        .comment-body {
+            padding-left: 0;
+            margin-top: 4px;
+        }
+        .reply-form-container {
+            padding-left: 0;
+        }
+        .comment-thread.is-reply {
+            margin-left: 8px !important;
+            padding-left: 8px;
+        }
+        .comment-avatar {
+            width: 28px;
+            height: 28px;
+            font-size: 0.65rem;
+        }
+        .comment-name {
+            font-size: 0.85rem;
+        }
+        .comment-date {
+            font-size: 0.65rem;
+        }
+        .btn-sm {
+            font-size: 0.65rem;
+            padding: 3px 8px;
+        }
+        .note-section .note-title {
+            font-size: 1rem;
+        }
+    }
+
+    @media (max-width: 576px) {
+        .page-header {
+            flex-direction: column;
+            align-items: stretch;
+            gap: 8px;
+        }
+        .page-header h2 {
+            font-size: 1.2rem;
+        }
+        .page-header h2 i {
+            font-size: 1.2rem;
+        }
+        .page-header .subtitle {
+            font-size: 0.85rem;
+        }
+        .card-header-custom {
+            flex-direction: column;
+            align-items: stretch;
+            gap: 6px;
+        }
+        .comment-actions {
+            flex-wrap: wrap;
+            gap: 4px;
+        }
+        .reply-form .form-group {
+            flex-direction: column;
+            align-items: stretch;
+        }
+        .comment-thread.is-reply {
+            margin-left: 4px !important;
+            padding-left: 6px;
+        }
+        .comment-card {
+            padding: 10px 12px;
+        }
+        .comment-body {
+            font-size: 0.85rem;
+        }
+        .empty-state {
+            padding: 40px 16px;
+        }
+        .empty-state .empty-icon {
+            width: 60px;
+            height: 60px;
+            font-size: 1.8rem;
+        }
+    }
+
+    /* ---------- DARK MODE ---------- */
+    body.dark-mode .page-header h2 {
+        color: #E2E8F0;
+    }
+    body.dark-mode .page-header h2 i {
+        color: var(--cyan);
+    }
+    body.dark-mode .page-header .subtitle {
+        color: #94A3B8;
+    }
+
+    body.dark-mode .card {
+        background: rgba(15, 23, 42, 0.9);
+        border-color: rgba(37, 99, 235, 0.08);
+        color: #E2E8F0;
+    }
+    body.dark-mode .card-header-custom h5 {
+        color: #E2E8F0;
+    }
+    body.dark-mode .card-header-custom .course-badge {
+        background: rgba(37, 99, 235, 0.12);
+        color: #CBD5E1;
+        border-color: rgba(37, 99, 235, 0.10);
+    }
+
+    body.dark-mode .note-section .note-title {
+        color: #E2E8F0;
+    }
+    body.dark-mode .note-section .note-meta {
+        color: #94A3B8;
+    }
+    body.dark-mode .note-section .note-meta .course-badge {
+        background: rgba(37, 99, 235, 0.12);
+        color: #94A3B8;
+        border-color: rgba(37, 99, 235, 0.10);
+    }
+
+    body.dark-mode .comment-card {
+        background: rgba(15, 23, 42, 0.4);
+        border-color: rgba(37, 99, 235, 0.06);
+    }
+    body.dark-mode .comment-card:hover {
+        background: rgba(15, 23, 42, 0.6);
+        border-color: rgba(37, 99, 235, 0.10);
+    }
+    body.dark-mode .comment-name {
+        color: #E2E8F0;
+    }
+    body.dark-mode .comment-reply-to {
+        color: #94A3B8;
+    }
+    body.dark-mode .comment-body {
+        color: #E2E8F0;
+    }
+    body.dark-mode .comment-date {
+        color: #94A3B8;
+    }
+    body.dark-mode .badge.instructor-badge {
+        background: linear-gradient(135deg, #1D4ED8, var(--cyan));
+    }
+    body.dark-mode .comment-thread.is-reply {
+        border-left-color: rgba(37, 99, 235, 0.15);
+    }
+
+    body.dark-mode .btn-outline-secondary {
+        border-color: #334155;
+        color: #94A3B8;
+    }
+    body.dark-mode .btn-outline-secondary:hover {
+        border-color: var(--blue);
+        color: var(--cyan);
+        background: rgba(37, 99, 235, 0.08);
+    }
+    body.dark-mode .btn-secondary {
+        border-color: #334155;
+        color: #94A3B8;
+    }
+    body.dark-mode .btn-secondary:hover {
+        border-color: var(--blue);
+        color: var(--cyan);
+        background: rgba(37, 99, 235, 0.08);
+    }
+    body.dark-mode .btn-primary {
+        background: linear-gradient(135deg, #1D4ED8, #2563EB);
+    }
+    body.dark-mode .btn-primary:hover {
+        background: linear-gradient(135deg, var(--blue), var(--cyan));
+    }
+    body.dark-mode .btn-danger {
+        background: linear-gradient(135deg, #B91C1C, #991B1B);
+    }
+    body.dark-mode .btn-danger:hover {
+        background: linear-gradient(135deg, #DC2626, #B91C1C);
+    }
+
+    body.dark-mode .reply-form {
+        background: rgba(15, 23, 42, 0.4);
+        border-color: rgba(37, 99, 235, 0.06);
+    }
+    body.dark-mode .reply-form .form-control {
+        background: #1E293B;
+        color: #E2E8F0;
+        border-color: #334155;
+    }
+    body.dark-mode .reply-form .form-control:focus {
+        background: #1E293B;
+        border-color: var(--blue);
+        box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.12);
+    }
+
+    body.dark-mode .empty-state {
+        background: rgba(15, 23, 42, 0.4);
+        border-color: rgba(37, 99, 235, 0.10);
+    }
+    body.dark-mode .empty-state h5 {
+        color: #E2E8F0;
+    }
+    body.dark-mode .empty-state p {
+        color: #94A3B8;
+    }
+</style>
+
+<!-- ============================================================
+     HEADER
+     ============================================================ -->
+<div class="page-header">
+    <div>
+        <h2>
+            <i class="bi bi-chat-dots"></i>
+            Q&A Moderation
+        </h2>
+        <p class="subtitle">View and manage all student questions and replies. You can reply as Instructor to any comment.</p>
+    </div>
+    <a href="{{ url_for('admin_panel') }}" class="btn btn-secondary">
+        <i class="bi bi-arrow-left"></i> Back
+    </a>
+</div>
+
+<!-- ============================================================
+     Q&A CONTENT
+     ============================================================ -->
+{% if notes %}
+    {% for note in notes %}
+        <div class="card mb-4 animate-card">
+            <div class="card-header-custom">
+                <h5>
+                    <i class="bi bi-sticky-fill"></i>
+                    {{ note.note_title }}
+                </h5>
+                <span class="course-badge">
+                    <i class="bi bi-book"></i> {{ note.course_name }}
+                </span>
+            </div>
+            <div class="card-body-custom">
+                <div class="note-section">
+                    {% if note.top_level %}
+                        {% for disc in note.top_level %}
+                            {{ render_admin_comment(disc, level=0) }}
+                        {% endfor %}
+                    {% else %}
+                        <div class="text-muted text-center py-3" style="font-size:0.9rem;">
+                            <i class="bi bi-chat-square-text me-1"></i> No discussions for this note.
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+{% else %}
+    <!-- Empty State -->
+    <div class="card animate-card" style="padding: 0;">
+        <div class="card-body-custom">
+            <div class="empty-state" style="border: none; padding: 40px 20px;">
+                <div class="empty-icon">
+                    <i class="bi bi-chat-dots"></i>
+                </div>
+                <h5>No questions posted yet</h5>
+                <p>Students haven't started any discussions. When they ask questions, they'll appear here for you to respond.</p>
+            </div>
+        </div>
+    </div>
+{% endif %}
+
+<!-- ============================================================
+     BACK BUTTON (duplicate for convenience)
+     ============================================================ -->
+<div class="mt-3" style="animation: fadeInUp 0.6s ease forwards; opacity: 0; animation-delay: 0.2s;">
+    <a href="{{ url_for('admin_panel') }}" class="btn btn-secondary">
+        <i class="bi bi-arrow-left"></i> Back to Admin
+    </a>
+</div>
+
+<!-- ============================================================
+     JAVASCRIPT — Toggle Reply Form
+     ============================================================ -->
+<script>
+    function toggleReplyForm(formId) {
+        var form = document.getElementById(formId);
+        if (form) {
+            if (form.style.display === 'none' || form.style.display === '') {
+                form.style.display = 'block';
+                // Focus the textarea after showing
+                var textarea = form.querySelector('textarea');
+                if (textarea) setTimeout(function() { textarea.focus(); }, 100);
+            } else {
+                form.style.display = 'none';
+            }
+        }
+    }
+</script>
+{% endblock %}

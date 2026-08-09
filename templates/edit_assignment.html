@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card p-4">
+            <h4>Edit Assignment</h4>
+            <form method="POST">
+                <div class="mb-2"><input type="text" name="title" class="form-control" value="{{ assignment.title }}" required></div>
+                <div class="mb-2"><textarea name="description" class="form-control" rows="4" required>{{ assignment.description }}</textarea></div>
+                <div class="mb-2"><input type="date" name="due_date" class="form-control" value="{{ assignment.due_date }}" required></div>
+                <button type="submit" class="btn btn-primary">Update</button>
+                <a href="{{ url_for('admin_panel') }}" class="btn btn-secondary">Cancel</a>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

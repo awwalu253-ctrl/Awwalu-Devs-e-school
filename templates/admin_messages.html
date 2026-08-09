@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% block content %}
+<h2><i class="bi bi-envelope"></i> Messages</h2>
+<p class="text-muted">Send messages to students and view conversation history.</p>
+
+<!-- Send Message Form -->
+<div class="card p-3 mb-4">
+    <h5>Send a Message</h5>
+    <form method="POST" action="{{ url_for('send_message') }}">
+        <div class="row g-2">
+            <div class="col-md-4">
+                <select name="receiver_id" class="form-select" required>
+                    <option value="">Select Student...</option>
+                    {% for s in students %}
+                    <option value="{{ s.id }}">{{ s.full_name }} ({{ s.username }})</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-6">
+                <input type="text" name="message" class="form-control" placeholder="Type your message..." required>
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-primary w-100">Send</button>
+            </div>
+        </div>
+    </form>
+</div>
+
+<!-- Conversation History -->
+<h5>Conversation History</h5>
+{% if messages %}
+<div class="list-group">
+    {% for msg in messages %}
+    <div class="list-group-item {% if msg.receiver_id == session.user_id and not msg.is_read %}list-group-item-info{% endif %}">
+        <div class="d-flex justify-content-between">
+            <strong>{{ msg.sender_name }}</strong>
+            <small class="text-muted">{{ msg.created_at }}</small>
+        </div>
+        <p>{{ msg.message }}</p>
+        {% if msg.receiver_id == session.user_id and not msg.is_read %}
+            <span class="badge bg-primary">New</span>
+        {% endif %}
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div class="alert alert-info">No messages.</div>
+{% endif %}
+
+<a href="{{ url_for('admin_panel') }}" class="btn btn-secondary"><i class="bi bi-arrow-left"></i> Back</a>
+{% endblock %}

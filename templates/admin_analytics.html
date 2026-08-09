@@ -1,0 +1,833 @@
+{% extends "base.html" %}
+
+{% block content %}
+<style>
+    /* ============================================================
+       ANALYTICS DASHBOARD — NAVY + ELECTRIC BLUE THEME
+       ============================================================ */
+
+    /* ---------- ANIMATIONS ---------- */
+    @keyframes fadeInUp {
+        from { opacity: 0; transform: translateY(30px) scale(0.96); }
+        to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    .animate-card {
+        animation: fadeInUp 0.6s ease forwards;
+        opacity: 0;
+    }
+    .animate-card:nth-child(1) { animation-delay: 0.05s; }
+    .animate-card:nth-child(2) { animation-delay: 0.10s; }
+    .animate-card:nth-child(3) { animation-delay: 0.15s; }
+    .animate-card:nth-child(4) { animation-delay: 0.20s; }
+    .animate-card:nth-child(5) { animation-delay: 0.25s; }
+    .animate-card:nth-child(6) { animation-delay: 0.30s; }
+
+    /* ---------- HEADER ---------- */
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin-bottom: 28px;
+        animation: fadeInUp 0.6s ease forwards;
+        opacity: 0;
+    }
+
+    .page-header h2 {
+        font-weight: 700;
+        color: var(--navy);
+        letter-spacing: -0.3px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-size: 1.8rem;
+        margin: 0;
+    }
+
+    .page-header h2 i {
+        color: var(--blue);
+        font-size: 1.8rem;
+    }
+
+    .page-header .subtitle {
+        color: var(--text-light);
+        font-size: 0.95rem;
+        margin-top: 2px;
+        width: 100%;
+    }
+
+    /* ---------- BUTTONS ---------- */
+    .btn-secondary {
+        border: 1.5px solid #CBD5E1;
+        color: var(--text-light);
+        background: transparent;
+        font-weight: 500;
+        border-radius: 50px;
+        padding: 8px 20px;
+        transition: var(--transition);
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        text-decoration: none;
+        font-size: 0.85rem;
+    }
+
+    .btn-secondary:hover {
+        border-color: var(--blue);
+        color: var(--blue);
+        background: rgba(37, 99, 235, 0.04);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(37, 99, 235, 0.08);
+    }
+
+    /* ---------- CARDS ---------- */
+    .card {
+        border: none;
+        border-radius: var(--radius);
+        box-shadow: var(--shadow-md);
+        transition: var(--transition);
+        background: rgba(255, 255, 255, 0.92);
+        backdrop-filter: blur(2px);
+        border: 1px solid rgba(37, 99, 235, 0.06);
+        overflow: hidden;
+    }
+
+    .card:hover {
+        box-shadow: var(--shadow-lg), 0 0 0 1px rgba(37, 99, 235, 0.06);
+        transform: translateY(-2px);
+    }
+
+    .card-header-custom {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 16px 20px 12px 20px;
+        border-bottom: 1px solid rgba(37, 99, 235, 0.06);
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    .card-header-custom h5 {
+        font-weight: 700;
+        color: var(--navy);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 1rem;
+        margin: 0;
+    }
+
+    .card-header-custom h5 i {
+        color: var(--blue);
+    }
+
+    .card-body-custom {
+        padding: 20px;
+    }
+
+    .card-body-custom .chart-container {
+        position: relative;
+        height: 200px;
+        width: 100%;
+    }
+
+    .card-body-custom .chart-container-sm {
+        height: 160px;
+    }
+
+    /* ---------- TABLE ---------- */
+    .table-wrap {
+        overflow-x: auto;
+    }
+
+    .table {
+        margin-bottom: 0;
+        border-collapse: separate;
+        border-spacing: 0 4px;
+        width: 100%;
+    }
+
+    .table thead th {
+        background: rgba(15, 23, 42, 0.04);
+        color: var(--navy);
+        font-weight: 600;
+        font-size: 0.7rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        padding: 10px 14px;
+        border: none;
+        white-space: nowrap;
+        border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+    }
+
+    .table tbody tr {
+        background: rgba(255, 255, 255, 0.5);
+        transition: var(--transition);
+        border-radius: var(--radius-sm);
+        box-shadow: 0 1px 4px rgba(15, 23, 42, 0.02);
+    }
+
+    .table tbody tr:hover {
+        background: rgba(37, 99, 235, 0.04);
+        transform: scale(1.01);
+        box-shadow: var(--shadow-sm);
+    }
+
+    .table tbody td {
+        padding: 8px 14px;
+        border: none;
+        vertical-align: middle;
+        font-size: 0.85rem;
+        color: var(--text);
+        background: transparent;
+    }
+
+    .table tbody tr td:first-child {
+        border-radius: var(--radius-sm) 0 0 var(--radius-sm);
+    }
+    .table tbody tr td:last-child {
+        border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+    }
+
+    .table .progress {
+        height: 8px;
+        border-radius: 50px;
+        background: #E2E8F0;
+        overflow: hidden;
+        min-width: 80px;
+        margin: 0;
+    }
+
+    .table .progress .progress-bar {
+        border-radius: 50px;
+        background: linear-gradient(90deg, var(--blue), var(--cyan));
+        transition: width 0.6s ease;
+        font-size: 0.6rem;
+        line-height: 8px;
+        color: transparent;
+        height: 100%;
+    }
+
+    .table .progress-text {
+        font-weight: 600;
+        font-size: 0.8rem;
+        color: var(--navy);
+        min-width: 44px;
+        text-align: right;
+    }
+
+    .table .student-name {
+        font-weight: 600;
+        color: var(--navy);
+    }
+
+    .table .activity-user {
+        font-weight: 600;
+        color: var(--navy);
+    }
+
+    .table .activity-action {
+        color: var(--blue);
+        font-weight: 500;
+    }
+
+    .table .activity-time {
+        font-size: 0.75rem;
+        color: var(--text-light);
+        white-space: nowrap;
+    }
+
+    .table .badge-action {
+        display: inline-block;
+        padding: 2px 10px;
+        border-radius: 50px;
+        font-size: 0.65rem;
+        font-weight: 600;
+        background: rgba(37, 99, 235, 0.08);
+        color: var(--blue);
+        border: 1px solid rgba(37, 99, 235, 0.06);
+        text-transform: uppercase;
+        letter-spacing: 0.03em;
+    }
+
+    /* ---------- EMPTY STATE ---------- */
+    .empty-state {
+        text-align: center;
+        padding: 30px 20px;
+        background: rgba(255, 255, 255, 0.3);
+        border-radius: var(--radius-sm);
+        border: 1px dashed rgba(37, 99, 235, 0.10);
+    }
+
+    .empty-state .empty-icon {
+        font-size: 1.8rem;
+        color: var(--blue);
+        opacity: 0.3;
+        margin-bottom: 6px;
+    }
+
+    .empty-state p {
+        color: var(--text-light);
+        font-size: 0.9rem;
+        margin: 0;
+    }
+
+    /* ---------- CHART COLORS ---------- */
+    .chart-colors {
+        --color-1: #2563EB;
+        --color-2: #22D3EE;
+        --color-3: #10B981;
+        --color-4: #F59E0B;
+        --color-5: #EF4444;
+        --color-6: #8B5CF6;
+        --color-7: #EC4899;
+    }
+
+    /* ---------- RESPONSIVE ---------- */
+    @media (max-width: 768px) {
+        .page-header h2 {
+            font-size: 1.4rem;
+        }
+        .page-header h2 i {
+            font-size: 1.4rem;
+        }
+        .card-body-custom {
+            padding: 16px;
+        }
+        .card-body-custom .chart-container {
+            height: 160px;
+        }
+        .card-body-custom .chart-container-sm {
+            height: 130px;
+        }
+        .table thead th,
+        .table tbody td {
+            padding: 6px 10px;
+            font-size: 0.78rem;
+        }
+        .table .progress {
+            min-width: 60px;
+            height: 6px;
+        }
+        .table .progress-text {
+            font-size: 0.7rem;
+            min-width: 34px;
+        }
+        .card-header-custom h5 {
+            font-size: 0.9rem;
+        }
+    }
+
+    @media (max-width: 576px) {
+        .page-header {
+            flex-direction: column;
+            align-items: stretch;
+            gap: 8px;
+        }
+        .page-header h2 {
+            font-size: 1.2rem;
+        }
+        .page-header h2 i {
+            font-size: 1.2rem;
+        }
+        .page-header .subtitle {
+            font-size: 0.85rem;
+        }
+        .card-header-custom {
+            flex-direction: column;
+            align-items: stretch;
+            gap: 6px;
+        }
+        .card-body-custom .chart-container {
+            height: 140px;
+        }
+        .card-body-custom .chart-container-sm {
+            height: 120px;
+        }
+        .table thead th {
+            font-size: 0.55rem;
+            padding: 4px 8px;
+        }
+        .table tbody td {
+            font-size: 0.7rem;
+            padding: 4px 8px;
+        }
+        .table .student-name {
+            font-size: 0.75rem;
+        }
+        .table .activity-time {
+            font-size: 0.65rem;
+        }
+        .table .badge-action {
+            font-size: 0.55rem;
+            padding: 1px 8px;
+        }
+        .table .progress {
+            min-width: 40px;
+            height: 5px;
+        }
+    }
+
+    /* ---------- DARK MODE ---------- */
+    body.dark-mode .page-header h2 {
+        color: #E2E8F0;
+    }
+    body.dark-mode .page-header h2 i {
+        color: var(--cyan);
+    }
+    body.dark-mode .page-header .subtitle {
+        color: #94A3B8;
+    }
+
+    body.dark-mode .card {
+        background: rgba(15, 23, 42, 0.9);
+        border-color: rgba(37, 99, 235, 0.08);
+        color: #E2E8F0;
+    }
+    body.dark-mode .card-header-custom h5 {
+        color: #E2E8F0;
+    }
+
+    body.dark-mode .table thead th {
+        background: rgba(37, 99, 235, 0.08);
+        color: #CBD5E1;
+    }
+    body.dark-mode .table tbody tr {
+        background: rgba(15, 23, 42, 0.4);
+        box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+    }
+    body.dark-mode .table tbody tr:hover {
+        background: rgba(37, 99, 235, 0.08);
+    }
+    body.dark-mode .table tbody td {
+        color: #E2E8F0;
+    }
+    body.dark-mode .table .student-name {
+        color: #E2E8F0;
+    }
+    body.dark-mode .table .activity-user {
+        color: #E2E8F0;
+    }
+    body.dark-mode .table .activity-action {
+        color: var(--cyan);
+    }
+    body.dark-mode .table .activity-time {
+        color: #94A3B8;
+    }
+    body.dark-mode .table .badge-action {
+        background: rgba(37, 99, 235, 0.12);
+        color: var(--cyan);
+        border-color: rgba(37, 99, 235, 0.10);
+    }
+    body.dark-mode .table .progress {
+        background: #334155;
+    }
+
+    body.dark-mode .btn-secondary {
+        border-color: #334155;
+        color: #94A3B8;
+    }
+    body.dark-mode .btn-secondary:hover {
+        border-color: var(--blue);
+        color: var(--cyan);
+        background: rgba(37, 99, 235, 0.08);
+    }
+
+    body.dark-mode .empty-state {
+        background: rgba(15, 23, 42, 0.3);
+        border-color: rgba(37, 99, 235, 0.10);
+    }
+    body.dark-mode .empty-state p {
+        color: #94A3B8;
+    }
+</style>
+
+<!-- ============================================================
+     HEADER
+     ============================================================ -->
+<div class="page-header">
+    <div>
+        <h2>
+            <i class="bi bi-graph-up-arrow"></i>
+            Analytics Dashboard
+        </h2>
+        <p class="subtitle">Insights into your course performance, student engagement, and learning outcomes.</p>
+    </div>
+    <a href="{{ url_for('admin_panel') }}" class="btn btn-secondary">
+        <i class="bi bi-arrow-left"></i> Back
+    </a>
+</div>
+
+<!-- ============================================================
+     COURSE ENROLLMENT CHART
+     ============================================================ -->
+<div class="card mb-4 animate-card">
+    <div class="card-header-custom">
+        <h5><i class="bi bi-people-fill"></i> Course Enrollment</h5>
+        <span class="badge" style="background: rgba(37,99,235,0.08); color: var(--navy); font-weight: 600; padding: 2px 12px; border-radius: 50px; border: 1px solid rgba(37,99,235,0.06);">
+            Total: {{ enrollment|sum(attribute='count') if enrollment else 0 }} students
+        </span>
+    </div>
+    <div class="card-body-custom">
+        <div class="chart-container">
+            <canvas id="enrollmentChart"></canvas>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================
+     TOP STUDENT PROGRESS
+     ============================================================ -->
+<div class="card mb-4 animate-card" style="animation-delay: 0.05s;">
+    <div class="card-header-custom">
+        <h5><i class="bi bi-trophy"></i> Top 10 Student Progress</h5>
+        <span class="badge" style="background: rgba(37,99,235,0.08); color: var(--navy); font-weight: 600; padding: 2px 12px; border-radius: 50px; border: 1px solid rgba(37,99,235,0.06);">
+            Leading learners
+        </span>
+    </div>
+    <div class="card-body-custom" style="padding-top: 12px;">
+        {% if student_progress %}
+        <div class="table-wrap">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Student</th>
+                        <th>Notes Read</th>
+                        <th>Total Notes</th>
+                        <th style="width: 40%;">Progress</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for s in student_progress[:10] %}
+                    <tr>
+                        <td><span class="student-name">{{ s.full_name }}</span></td>
+                        <td>{{ s.read_notes }}</td>
+                        <td>{{ s.total_notes }}</td>
+                        <td>
+                            <div class="d-flex align-items-center gap-2">
+                                <div class="progress flex-grow-1">
+                                    <div class="progress-bar" style="width: {{ s.progress }}%;"></div>
+                                </div>
+                                <span class="progress-text">{{ s.progress|int }}%</span>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <div class="empty-icon"><i class="bi bi-person-x"></i></div>
+            <p>No student progress data available yet.</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- ============================================================
+     QUIZ PERFORMANCE CHART
+     ============================================================ -->
+<div class="card mb-4 animate-card" style="animation-delay: 0.10s;">
+    <div class="card-header-custom">
+        <h5><i class="bi bi-bar-chart-line"></i> Quiz Average Scores</h5>
+        <span class="badge" style="background: rgba(37,99,235,0.08); color: var(--navy); font-weight: 600; padding: 2px 12px; border-radius: 50px; border: 1px solid rgba(37,99,235,0.06);">
+            {{ quiz_performance|length if quiz_performance else 0 }} quizzes
+        </span>
+    </div>
+    <div class="card-body-custom">
+        <div class="chart-container chart-container-sm">
+            <canvas id="quizChart"></canvas>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================
+     COMPLETION & ASSIGNMENT RATES (two columns)
+     ============================================================ -->
+<div class="row g-4 mb-4">
+    <!-- Completion Rates -->
+    <div class="col-md-6 animate-card" style="animation-delay: 0.15s;">
+        <div class="card h-100">
+            <div class="card-header-custom">
+                <h5><i class="bi bi-check2-circle"></i> Course Completion Rates</h5>
+            </div>
+            <div class="card-body-custom">
+                <div class="chart-container chart-container-sm">
+                    <canvas id="completionChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Assignment Submission Rates -->
+    <div class="col-md-6 animate-card" style="animation-delay: 0.20s;">
+        <div class="card h-100">
+            <div class="card-header-custom">
+                <h5><i class="bi bi-file-text"></i> Assignment Submission Rates</h5>
+            </div>
+            <div class="card-body-custom">
+                <div class="chart-container chart-container-sm">
+                    <canvas id="assignmentChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================
+     RECENT ACTIVITY LOG
+     ============================================================ -->
+<div class="card mb-4 animate-card" style="animation-delay: 0.25s;">
+    <div class="card-header-custom">
+        <h5><i class="bi bi-clock-history"></i> Recent Activity</h5>
+        <span class="badge" style="background: rgba(37,99,235,0.08); color: var(--navy); font-weight: 600; padding: 2px 12px; border-radius: 50px; border: 1px solid rgba(37,99,235,0.06);">
+            Latest events
+        </span>
+    </div>
+    <div class="card-body-custom" style="padding-top: 12px;">
+        {% if recent_activity %}
+        <div class="table-wrap">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>User</th>
+                        <th>Action</th>
+                        <th>Details</th>
+                        <th style="text-align: right;">Time</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for log in recent_activity %}
+                    <tr>
+                        <td><span class="activity-user">{{ log.full_name }}</span></td>
+                        <td>
+                            <span class="badge-action">
+                                <i class="bi bi-{% if 'created' in log.action or 'added' in log.action %}plus-circle{% elif 'updated' in log.action or 'edited' in log.action %}pencil-square{% elif 'deleted' in log.action or 'removed' in log.action %}trash{% elif 'login' in log.action %}box-arrow-in-right{% else %}activity{% endif %} me-1"></i>
+                                {{ log.action }}
+                            </span>
+                        </td>
+                        <td>{{ log.details or '—' }}</td>
+                        <td style="text-align: right;">
+                            <span class="activity-time">{{ log.created_at }}</span>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <div class="empty-icon"><i class="bi bi-activity"></i></div>
+            <p>No recent activity to display.</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- ============================================================
+     BACK BUTTON (duplicate for convenience)
+     ============================================================ -->
+<div class="mt-3" style="animation: fadeInUp 0.6s ease forwards; opacity: 0; animation-delay: 0.30s;">
+    <a href="{{ url_for('admin_panel') }}" class="btn btn-secondary">
+        <i class="bi bi-arrow-left"></i> Back to Admin
+    </a>
+</div>
+
+<!-- ============================================================
+     CHART.JS SCRIPTS
+     ============================================================ -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // ---------- COLOR PALETTE ----------
+        const colors = {
+            blue: '#2563EB',
+            cyan: '#22D3EE',
+            green: '#10B981',
+            amber: '#F59E0B',
+            red: '#EF4444',
+            purple: '#8B5CF6',
+            pink: '#EC4899',
+            navy: '#0F172A',
+            gray: '#94A3B8'
+        };
+
+        const chartColors = [colors.blue, colors.cyan, colors.green, colors.amber, colors.red, colors.purple, colors.pink];
+
+        // ---------- ENROLLMENT CHART ----------
+        const enrollmentData = {{ enrollment|tojson }};
+        if (enrollmentData && enrollmentData.length) {
+            new Chart(document.getElementById('enrollmentChart'), {
+                type: 'bar',
+                data: {
+                    labels: enrollmentData.map(c => c.name),
+                    datasets: [{
+                        label: 'Students Enrolled',
+                        data: enrollmentData.map(c => c.count),
+                        backgroundColor: enrollmentData.map((_, i) => chartColors[i % chartColors.length] + 'CC'),
+                        borderColor: enrollmentData.map((_, i) => chartColors[i % chartColors.length]),
+                        borderWidth: 2,
+                        borderRadius: 6,
+                        barPercentage: 0.6,
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: { stepSize: 1, font: { size: 11 } },
+                            grid: { color: 'rgba(15,23,42,0.06)', drawBorder: false }
+                        },
+                        x: {
+                            grid: { display: false },
+                            ticks: { font: { size: 11, weight: '500' }, maxRotation: 45, minRotation: 0 }
+                        }
+                    }
+                }
+            });
+        }
+
+        // ---------- QUIZ CHART ----------
+        const quizData = {{ quiz_performance|tojson }};
+        if (quizData && quizData.length) {
+            new Chart(document.getElementById('quizChart'), {
+                type: 'line',
+                data: {
+                    labels: quizData.map(q => q.title),
+                    datasets: [{
+                        label: 'Average Score (%)',
+                        data: quizData.map(q => q.avg_score),
+                        borderColor: colors.blue,
+                        backgroundColor: 'rgba(37,99,235,0.08)',
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.3,
+                        pointBackgroundColor: colors.cyan,
+                        pointBorderColor: colors.blue,
+                        pointBorderWidth: 2,
+                        pointRadius: 4,
+                        pointHoverRadius: 6,
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100,
+                            ticks: { font: { size: 11 }, callback: v => v + '%' },
+                            grid: { color: 'rgba(15,23,42,0.06)', drawBorder: false }
+                        },
+                        x: {
+                            grid: { display: false },
+                            ticks: { font: { size: 10 }, maxRotation: 45, minRotation: 0 }
+                        }
+                    }
+                }
+            });
+        }
+
+        // ---------- COMPLETION CHART ----------
+        const completionData = {{ completion_rates|tojson }};
+        if (completionData && completionData.length) {
+            new Chart(document.getElementById('completionChart'), {
+                type: 'doughnut',
+                data: {
+                    labels: completionData.map(c => c.name),
+                    datasets: [{
+                        label: 'Completion Rate',
+                        data: completionData.map(c => c.completion_rate),
+                        backgroundColor: completionData.map((_, i) => chartColors[i % chartColors.length] + 'CC'),
+                        borderColor: completionData.map((_, i) => chartColors[i % chartColors.length]),
+                        borderWidth: 2,
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutout: '70%',
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                padding: 12,
+                                usePointStyle: true,
+                                pointStyle: 'circle',
+                                font: { size: 11, weight: '500' },
+                                color: document.body.classList.contains('dark-mode') ? '#E2E8F0' : '#1E293B'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // ---------- ASSIGNMENT CHART ----------
+        const assignmentData = {{ assignment_stats|tojson }};
+        if (assignmentData && assignmentData.length) {
+            new Chart(document.getElementById('assignmentChart'), {
+                type: 'bar',
+                data: {
+                    labels: assignmentData.map(a => a.title),
+                    datasets: [{
+                        label: 'Submissions',
+                        data: assignmentData.map(a => a.submissions),
+                        backgroundColor: colors.blue + 'CC',
+                        borderColor: colors.blue,
+                        borderWidth: 2,
+                        borderRadius: 6,
+                        barPercentage: 0.4,
+                    }, {
+                        label: 'Total Students',
+                        data: assignmentData.map(a => a.total_students),
+                        backgroundColor: colors.cyan + 'CC',
+                        borderColor: colors.cyan,
+                        borderWidth: 2,
+                        borderRadius: 6,
+                        barPercentage: 0.4,
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                padding: 12,
+                                usePointStyle: true,
+                                pointStyle: 'circle',
+                                font: { size: 11, weight: '500' },
+                                color: document.body.classList.contains('dark-mode') ? '#E2E8F0' : '#1E293B'
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: { stepSize: 1, font: { size: 11 } },
+                            grid: { color: 'rgba(15,23,42,0.06)', drawBorder: false }
+                        },
+                        x: {
+                            grid: { display: false },
+                            ticks: { font: { size: 10 }, maxRotation: 45, minRotation: 0 }
+                        }
+                    }
+                }
+            });
+        }
+    });
+</script>
+{% endblock %}

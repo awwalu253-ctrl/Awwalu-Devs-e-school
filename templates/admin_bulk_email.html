@@ -1,0 +1,511 @@
+{% extends "base.html" %}
+
+{% block content %}
+<style>
+    /* ============================================================
+       BULK EMAIL — NAVY + ELECTRIC BLUE THEME
+       ============================================================ */
+
+    /* ---------- ANIMATIONS ---------- */
+    @keyframes fadeInUp {
+        from { opacity: 0; transform: translateY(30px) scale(0.96); }
+        to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    @keyframes slideDown {
+        from { opacity: 0; transform: translateY(-10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .animate-card {
+        animation: fadeInUp 0.6s ease forwards;
+        opacity: 0;
+    }
+
+    /* ---------- HEADER ---------- */
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin-bottom: 28px;
+        animation: fadeInUp 0.6s ease forwards;
+        opacity: 0;
+    }
+
+    .page-header h2 {
+        font-weight: 700;
+        color: var(--navy);
+        letter-spacing: -0.3px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-size: 1.8rem;
+        margin: 0;
+    }
+
+    .page-header h2 i {
+        color: var(--blue);
+        font-size: 1.8rem;
+    }
+
+    .page-header .subtitle {
+        color: var(--text-light);
+        font-size: 0.95rem;
+        margin-top: 2px;
+        width: 100%;
+    }
+
+    /* ---------- BUTTONS ---------- */
+    .btn-primary {
+        background: linear-gradient(135deg, var(--blue), #1D4ED8);
+        border: none;
+        color: white;
+        font-weight: 600;
+        padding: 10px 28px;
+        border-radius: 50px;
+        box-shadow: 0 4px 14px rgba(37, 99, 235, 0.25);
+        transition: var(--transition);
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 0.9rem;
+        cursor: pointer;
+        text-decoration: none;
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-2px) scale(1.02);
+        box-shadow: 0 8px 24px rgba(37, 99, 235, 0.35);
+        background: linear-gradient(135deg, var(--blue), var(--cyan));
+        color: white;
+    }
+
+    .btn-secondary {
+        border: 1.5px solid #CBD5E1;
+        color: var(--text-light);
+        background: transparent;
+        font-weight: 500;
+        border-radius: 50px;
+        padding: 10px 28px;
+        transition: var(--transition);
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        text-decoration: none;
+        font-size: 0.9rem;
+    }
+
+    .btn-secondary:hover {
+        border-color: var(--blue);
+        color: var(--blue);
+        background: rgba(37, 99, 235, 0.04);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(37, 99, 235, 0.08);
+    }
+
+    /* ---------- CARD ---------- */
+    .card {
+        border: none;
+        border-radius: var(--radius);
+        box-shadow: var(--shadow-md);
+        transition: var(--transition);
+        background: rgba(255, 255, 255, 0.92);
+        backdrop-filter: blur(2px);
+        border: 1px solid rgba(37, 99, 235, 0.06);
+        overflow: hidden;
+    }
+
+    .card:hover {
+        box-shadow: var(--shadow-lg), 0 0 0 1px rgba(37, 99, 235, 0.06);
+        transform: translateY(-2px);
+    }
+
+    .card-header-custom {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 18px 24px 14px 24px;
+        border-bottom: 1px solid rgba(37, 99, 235, 0.06);
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    .card-header-custom h5 {
+        font-weight: 700;
+        color: var(--navy);
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 1.05rem;
+        margin: 0;
+    }
+
+    .card-header-custom h5 i {
+        color: var(--blue);
+        font-size: 1.2rem;
+    }
+
+    .card-header-custom .info-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        background: rgba(37, 99, 235, 0.06);
+        color: var(--text-light);
+        padding: 4px 14px;
+        border-radius: 50px;
+        font-size: 0.75rem;
+        font-weight: 500;
+        border: 1px solid rgba(37, 99, 235, 0.04);
+    }
+
+    .card-body-custom {
+        padding: 24px;
+    }
+
+    /* ---------- FORM ---------- */
+    .email-form .form-group {
+        margin-bottom: 20px;
+    }
+
+    .email-form .form-label {
+        font-weight: 600;
+        color: var(--navy);
+        font-size: 0.8rem;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        margin-bottom: 6px;
+        display: block;
+    }
+
+    .email-form .form-label .required {
+        color: var(--cyan);
+        font-weight: 700;
+    }
+
+    .email-form .form-control,
+    .email-form .form-select {
+        border: 1.5px solid #E2E8F0;
+        border-radius: var(--radius-sm);
+        padding: 10px 16px;
+        font-size: 0.9rem;
+        transition: var(--transition);
+        background: var(--bg);
+        color: var(--text);
+        width: 100%;
+    }
+
+    .email-form .form-control:focus,
+    .email-form .form-select:focus {
+        border-color: var(--blue);
+        box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.08);
+        background: white;
+        outline: none;
+    }
+
+    .email-form .form-control::placeholder {
+        color: #94A3B8;
+    }
+
+    .email-form textarea.form-control {
+        resize: vertical;
+        min-height: 160px;
+        font-family: 'Inter', system-ui, sans-serif;
+        line-height: 1.6;
+    }
+
+    .email-form .form-select {
+        cursor: pointer;
+        appearance: none;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2364748b' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 14px center;
+        padding-right: 40px;
+    }
+
+    .email-form .form-select option {
+        background: white;
+        color: var(--text);
+    }
+
+    /* Conditional course select */
+    .email-form .course-select-wrapper {
+        animation: slideDown 0.3s ease forwards;
+        overflow: hidden;
+    }
+
+    .email-form .course-select-wrapper.hidden {
+        display: none;
+    }
+
+    /* Form actions */
+    .email-form .form-actions {
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+        margin-top: 8px;
+        padding-top: 16px;
+        border-top: 1px solid rgba(37, 99, 235, 0.06);
+    }
+
+    /* ---------- RESPONSIVE ---------- */
+    @media (max-width: 768px) {
+        .page-header h2 {
+            font-size: 1.4rem;
+        }
+        .page-header h2 i {
+            font-size: 1.4rem;
+        }
+        .page-header .subtitle {
+            font-size: 0.85rem;
+        }
+        .card-header-custom {
+            padding: 14px 16px 10px 16px;
+        }
+        .card-body-custom {
+            padding: 16px;
+        }
+        .email-form .form-actions {
+            flex-direction: column;
+        }
+        .email-form .form-actions .btn {
+            justify-content: center;
+            width: 100%;
+        }
+        .email-form .form-control,
+        .email-form .form-select {
+            font-size: 0.85rem;
+            padding: 8px 14px;
+        }
+        .btn-primary, .btn-secondary {
+            padding: 8px 20px;
+            font-size: 0.85rem;
+        }
+    }
+
+    @media (max-width: 576px) {
+        .page-header {
+            flex-direction: column;
+            align-items: stretch;
+            gap: 8px;
+        }
+        .page-header h2 {
+            font-size: 1.2rem;
+        }
+        .page-header h2 i {
+            font-size: 1.2rem;
+        }
+        .card-header-custom {
+            flex-direction: column;
+            align-items: stretch;
+            gap: 6px;
+        }
+        .card-body-custom {
+            padding: 14px;
+        }
+        .email-form textarea.form-control {
+            min-height: 120px;
+        }
+        .email-form .form-label {
+            font-size: 0.7rem;
+        }
+    }
+
+    /* ---------- DARK MODE ---------- */
+    body.dark-mode .page-header h2 {
+        color: #E2E8F0;
+    }
+    body.dark-mode .page-header h2 i {
+        color: var(--cyan);
+    }
+    body.dark-mode .page-header .subtitle {
+        color: #94A3B8;
+    }
+
+    body.dark-mode .card {
+        background: rgba(15, 23, 42, 0.9);
+        border-color: rgba(37, 99, 235, 0.08);
+        color: #E2E8F0;
+    }
+    body.dark-mode .card-header-custom h5 {
+        color: #E2E8F0;
+    }
+    body.dark-mode .card-header-custom .info-badge {
+        background: rgba(37, 99, 235, 0.10);
+        color: #94A3B8;
+        border-color: rgba(37, 99, 235, 0.08);
+    }
+
+    body.dark-mode .email-form .form-label {
+        color: #CBD5E1;
+    }
+    body.dark-mode .email-form .form-control,
+    body.dark-mode .email-form .form-select {
+        background: #1E293B;
+        color: #E2E8F0;
+        border-color: #334155;
+    }
+    body.dark-mode .email-form .form-control:focus,
+    body.dark-mode .email-form .form-select:focus {
+        background: #1E293B;
+        border-color: var(--blue);
+        box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.12);
+    }
+    body.dark-mode .email-form .form-control::placeholder {
+        color: #64748B;
+    }
+    body.dark-mode .email-form .form-select {
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2394a3b8' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+    }
+    body.dark-mode .email-form .form-select option {
+        background: #1E293B;
+        color: #E2E8F0;
+    }
+    body.dark-mode .email-form .form-actions {
+        border-top-color: rgba(37, 99, 235, 0.08);
+    }
+
+    body.dark-mode .btn-secondary {
+        border-color: #334155;
+        color: #94A3B8;
+    }
+    body.dark-mode .btn-secondary:hover {
+        border-color: var(--blue);
+        color: var(--cyan);
+        background: rgba(37, 99, 235, 0.08);
+    }
+    body.dark-mode .btn-primary {
+        background: linear-gradient(135deg, #1D4ED8, #2563EB);
+    }
+    body.dark-mode .btn-primary:hover {
+        background: linear-gradient(135deg, var(--blue), var(--cyan));
+    }
+</style>
+
+<!-- ============================================================
+     HEADER
+     ============================================================ -->
+<div class="page-header">
+    <div>
+        <h2>
+            <i class="bi bi-envelope-paper"></i>
+            Bulk Email to Students
+        </h2>
+        <p class="subtitle">Send an email to all students or a specific course.</p>
+    </div>
+    <a href="{{ url_for('admin_panel') }}" class="btn btn-secondary">
+        <i class="bi bi-arrow-left"></i> Back
+    </a>
+</div>
+
+<!-- ============================================================
+     BULK EMAIL FORM
+     ============================================================ -->
+<div class="card animate-card">
+    <div class="card-header-custom">
+        <h5>
+            <i class="bi bi-send"></i>
+            Compose Email
+        </h5>
+        <span class="info-badge">
+            <i class="bi bi-info-circle"></i>
+            {{ 'All students' if not course_filter or course_filter == 'all' else 'Course: ' + course_filter }}
+        </span>
+    </div>
+    <div class="card-body-custom">
+        <form method="POST" action="{{ url_for('admin_bulk_email') }}" class="email-form">
+
+            <!-- Recipient -->
+            <div class="form-group">
+                <label class="form-label">
+                    <i class="bi bi-people me-1"></i>
+                    Send To <span class="required">*</span>
+                </label>
+                <select name="send_to" class="form-select" id="sendToSelect" onchange="toggleCourse()">
+                    <option value="all">📬 All Students</option>
+                    <option value="course">📚 Specific Course</option>
+                </select>
+            </div>
+
+            <!-- Course Select (conditional) -->
+            <div class="form-group course-select-wrapper hidden" id="courseSelectWrapper">
+                <label class="form-label">
+                    <i class="bi bi-book me-1"></i>
+                    Select Course <span class="required">*</span>
+                </label>
+                <select name="course_id" class="form-select" id="courseSelect">
+                    <option value="">— Choose a course —</option>
+                    {% for c in courses %}
+                    <option value="{{ c.id }}">{{ c.name }}</option>
+                    {% endfor %}
+                </select>
+                <small class="text-muted" style="font-size:0.7rem; display:block; margin-top:4px;">
+                    <i class="bi bi-info-circle"></i> Only students enrolled in the selected course will receive the email.
+                </small>
+            </div>
+
+            <!-- Subject -->
+            <div class="form-group">
+                <label class="form-label">
+                    <i class="bi bi-tag me-1"></i>
+                    Subject <span class="required">*</span>
+                </label>
+                <input type="text" name="subject" class="form-control" placeholder="e.g., Important Update: New Course Materials" required>
+            </div>
+
+            <!-- Body -->
+            <div class="form-group">
+                <label class="form-label">
+                    <i class="bi bi-text-paragraph me-1"></i>
+                    Message Body <span class="required">*</span>
+                </label>
+                <textarea name="body" class="form-control" rows="6" placeholder="Write your message here..." required></textarea>
+                <small class="text-muted" style="font-size:0.7rem; display:block; margin-top:4px;">
+                    <i class="bi bi-lightbulb"></i> Tip: Keep your message clear and concise. Use formatting sparingly.
+                </small>
+            </div>
+
+            <!-- Form Actions -->
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary">
+                    <i class="bi bi-send"></i> Send Emails
+                </button>
+                <a href="{{ url_for('admin_panel') }}" class="btn btn-secondary">
+                    <i class="bi bi-x-lg"></i> Cancel
+                </a>
+            </div>
+
+        </form>
+    </div>
+</div>
+
+<!-- ============================================================
+     JAVASCRIPT — Toggle Course Select
+     ============================================================ -->
+<script>
+    function toggleCourse() {
+        const select = document.getElementById('sendToSelect');
+        const wrapper = document.getElementById('courseSelectWrapper');
+        const courseSelect = document.getElementById('courseSelect');
+
+        if (select.value === 'course') {
+            wrapper.classList.remove('hidden');
+            courseSelect.setAttribute('required', 'required');
+            // Animate in
+            wrapper.style.animation = 'none';
+            setTimeout(function() {
+                wrapper.style.animation = 'slideDown 0.3s ease forwards';
+            }, 10);
+        } else {
+            wrapper.classList.add('hidden');
+            courseSelect.removeAttribute('required');
+        }
+    }
+
+    // Initialize on page load
+    document.addEventListener('DOMContentLoaded', function() {
+        toggleCourse();
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,1096 @@
+{% extends "base.html" %}
+
+{% block content %}
+<style>
+    /* ============================================================
+       STUDENT DASHBOARD — NAVY + ELECTRIC BLUE (PREMIUM)
+       ============================================================ */
+
+    /* ---------- ANIMATIONS ---------- */
+    @keyframes fadeUp {
+        from { opacity: 0; transform: translateY(24px) scale(0.98); }
+        to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    @keyframes slideDown {
+        from { opacity: 0; transform: translateY(-8px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .animate-card {
+        animation: fadeUp 0.55s ease forwards;
+        opacity: 0;
+    }
+    .animate-card:nth-child(1) { animation-delay: 0.04s; }
+    .animate-card:nth-child(2) { animation-delay: 0.08s; }
+    .animate-card:nth-child(3) { animation-delay: 0.12s; }
+    .animate-card:nth-child(4) { animation-delay: 0.16s; }
+    .animate-card:nth-child(5) { animation-delay: 0.20s; }
+    .animate-card:nth-child(6) { animation-delay: 0.24s; }
+    .animate-card:nth-child(7) { animation-delay: 0.28s; }
+
+    .animate-item {
+        animation: slideDown 0.35s ease forwards;
+        opacity: 0;
+    }
+    .animate-item:nth-child(1) { animation-delay: 0.05s; }
+    .animate-item:nth-child(2) { animation-delay: 0.10s; }
+    .animate-item:nth-child(3) { animation-delay: 0.15s; }
+    .animate-item:nth-child(4) { animation-delay: 0.20s; }
+    .animate-item:nth-child(5) { animation-delay: 0.25s; }
+
+    /* ---------- GLOBAL ---------- */
+    .dashboard-wrapper {
+        max-width: 1280px;
+        margin: 0 auto;
+    }
+
+    /* ---------- HEADER ---------- */
+    .dashboard-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 16px;
+        margin-bottom: 30px;
+    }
+
+    .dashboard-header .brand {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+    }
+
+    .dashboard-header .brand .course-badge {
+        background: linear-gradient(135deg, var(--blue), var(--cyan));
+        color: white;
+        padding: 6px 24px;
+        border-radius: 50px;
+        font-size: 1.6rem;
+        font-weight: 700;
+        box-shadow: 0 4px 16px rgba(37, 99, 235, 0.30);
+        letter-spacing: -0.5px;
+    }
+
+    .dashboard-header .brand .subtitle {
+        color: var(--text-light);
+        font-size: 0.95rem;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .dashboard-header .actions {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex-wrap: wrap;
+    }
+
+    /* ---------- BUTTONS ---------- */
+    .btn {
+        font-weight: 600;
+        padding: 8px 18px;
+        border-radius: 50px;
+        transition: var(--transition);
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 0.85rem;
+        border: none;
+        cursor: pointer;
+        text-decoration: none;
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, var(--blue), #1D4ED8);
+        color: white;
+        box-shadow: 0 4px 14px rgba(37, 99, 235, 0.25);
+    }
+    .btn-primary:hover {
+        transform: translateY(-2px) scale(1.02);
+        box-shadow: 0 8px 24px rgba(37, 99, 235, 0.35);
+        background: linear-gradient(135deg, var(--blue), var(--cyan));
+        color: white;
+    }
+
+    .btn-outline-success {
+        border: 1.5px solid #10B981;
+        color: #10B981;
+        background: transparent;
+    }
+    .btn-outline-success:hover {
+        background: #10B981;
+        color: white;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 14px rgba(16, 185, 129, 0.30);
+    }
+
+    .btn-outline-secondary {
+        border: 1.5px solid #CBD5E1;
+        color: var(--text-light);
+        background: transparent;
+    }
+    .btn-outline-secondary:hover {
+        border-color: var(--blue);
+        color: var(--blue);
+        background: rgba(37, 99, 235, 0.04);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(37, 99, 235, 0.08);
+    }
+
+    .btn-outline-info {
+        border: 1.5px solid var(--blue);
+        color: var(--blue);
+        background: transparent;
+    }
+    .btn-outline-info:hover {
+        background: var(--blue);
+        color: white;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 14px rgba(37, 99, 235, 0.30);
+    }
+
+    .btn-success {
+        background: linear-gradient(135deg, #10B981, #059669);
+        color: white;
+        box-shadow: 0 4px 14px rgba(16, 185, 129, 0.25);
+    }
+    .btn-success:hover {
+        transform: translateY(-2px) scale(1.02);
+        box-shadow: 0 8px 24px rgba(16, 185, 129, 0.35);
+        background: linear-gradient(135deg, #34D399, #10B981);
+        color: white;
+    }
+
+    .btn-sm {
+        padding: 4px 14px;
+        font-size: 0.8rem;
+    }
+
+    /* ---------- GLASS CARDS ---------- */
+    .glass-card {
+        background: rgba(255, 255, 255, 0.88);
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+        border: 1px solid rgba(37, 99, 235, 0.06);
+        border-radius: var(--radius);
+        box-shadow: var(--shadow-md);
+        transition: var(--transition);
+        padding: 24px 28px;
+        margin-bottom: 24px;
+    }
+    .glass-card:hover {
+        box-shadow: var(--shadow-lg), 0 0 0 1px rgba(37, 99, 235, 0.06);
+        transform: translateY(-3px);
+    }
+    .glass-card .card-header {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-weight: 700;
+        color: var(--navy);
+        font-size: 1.1rem;
+        margin-bottom: 16px;
+        border-bottom: 1px solid rgba(37, 99, 235, 0.04);
+        padding-bottom: 10px;
+    }
+    .glass-card .card-header i {
+        color: var(--blue);
+        font-size: 1.3rem;
+    }
+
+    /* ---------- PROGRESS ---------- */
+    .progress-container {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        flex-wrap: wrap;
+    }
+    .progress-container .info {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-weight: 500;
+        color: var(--text);
+    }
+    .progress-container .info strong {
+        color: var(--navy);
+    }
+    .progress-container .badge-progress {
+        background: var(--blue);
+        color: white;
+        padding: 2px 16px;
+        border-radius: 50px;
+        font-weight: 600;
+        font-size: 0.85rem;
+    }
+    .progress-track {
+        width: 100%;
+        height: 8px;
+        background: #E2E8F0;
+        border-radius: 50px;
+        overflow: hidden;
+        margin-top: 10px;
+    }
+    .progress-track .progress-fill {
+        height: 100%;
+        border-radius: 50px;
+        background: linear-gradient(90deg, var(--blue), var(--cyan));
+        transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        width: 0%;
+    }
+
+    /* ---------- ANNOUNCEMENTS ---------- */
+    .announcement-item {
+        border-left: 4px solid var(--blue);
+        padding: 12px 16px;
+        background: rgba(37, 99, 235, 0.02);
+        border-radius: var(--radius-sm);
+        margin-bottom: 12px;
+        transition: var(--transition);
+    }
+    .announcement-item:hover {
+        background: rgba(37, 99, 235, 0.04);
+        transform: translateX(4px);
+    }
+    .announcement-item .title {
+        font-weight: 600;
+        color: var(--navy);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    .announcement-item .title .date {
+        font-weight: 400;
+        color: var(--text-light);
+        font-size: 0.75rem;
+        margin-left: auto;
+    }
+    .announcement-item .content {
+        color: var(--text);
+        margin-top: 2px;
+        font-size: 0.95rem;
+    }
+
+    /* ---------- BADGES ---------- */
+    .badge-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        background: linear-gradient(135deg, #F59E0B, #FBBF24);
+        color: #78350F;
+        padding: 6px 16px;
+        border-radius: 50px;
+        font-weight: 600;
+        font-size: 0.9rem;
+        margin: 4px 8px 4px 0;
+        box-shadow: 0 2px 8px rgba(245, 158, 11, 0.15);
+    }
+
+    /* ---------- CERTIFICATE ---------- */
+    .certificate-block {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 12px;
+        background: rgba(16, 185, 129, 0.06);
+        border-radius: var(--radius-sm);
+        padding: 16px 20px;
+        border: 1px solid rgba(16, 185, 129, 0.15);
+    }
+    .certificate-block .msg {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-weight: 500;
+        color: var(--text);
+    }
+    .certificate-block .msg i {
+        color: #10B981;
+        font-size: 1.4rem;
+    }
+
+    /* ---------- QUIZZES ---------- */
+    .quiz-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 16px;
+    }
+    .quiz-card {
+        background: rgba(255, 255, 255, 0.6);
+        border-radius: var(--radius-sm);
+        padding: 18px 16px;
+        border: 1px solid rgba(37, 99, 235, 0.04);
+        transition: var(--transition);
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+    }
+    .quiz-card:hover {
+        transform: translateY(-4px);
+        box-shadow: var(--shadow-md);
+        border-color: var(--blue);
+    }
+    .quiz-card .title {
+        font-weight: 700;
+        color: var(--navy);
+        font-size: 0.95rem;
+        margin-bottom: 4px;
+    }
+    .quiz-card .desc {
+        color: var(--text-light);
+        font-size: 0.8rem;
+        flex: 1;
+        margin-bottom: 12px;
+    }
+    .quiz-card .score-badge {
+        background: #10B981;
+        color: white;
+        padding: 2px 12px;
+        border-radius: 50px;
+        font-weight: 600;
+        font-size: 0.7rem;
+        align-self: flex-start;
+    }
+
+    /* ---------- SEARCH ---------- */
+    .search-bar {
+        display: flex;
+        gap: 0;
+        background: var(--bg);
+        border-radius: 50px;
+        overflow: hidden;
+        box-shadow: var(--shadow-sm);
+        border: 1px solid #E2E8F0;
+        transition: var(--transition);
+    }
+    .search-bar:focus-within {
+        border-color: var(--blue);
+        box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.08);
+    }
+    .search-bar input {
+        flex: 1;
+        border: none;
+        padding: 10px 18px;
+        background: transparent;
+        color: var(--text);
+        font-size: 0.95rem;
+        outline: none;
+    }
+    .search-bar input::placeholder {
+        color: #94A3B8;
+    }
+    .search-bar .btn {
+        border-radius: 0;
+        padding: 0 18px;
+        border: none;
+        background: transparent;
+        color: var(--text-light);
+        transition: var(--transition);
+        cursor: pointer;
+    }
+    .search-bar .btn:hover {
+        color: var(--blue);
+    }
+    .search-bar .btn-clear {
+        color: #EF4444;
+    }
+    .search-bar .btn-clear:hover {
+        color: #DC2626;
+    }
+
+    /* ---------- NOTES ---------- */
+    .note-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 20px;
+    }
+    .note-card {
+        background: rgba(255, 255, 255, 0.7);
+        border-radius: var(--radius-sm);
+        padding: 18px 16px 16px;
+        border: 1px solid rgba(37, 99, 235, 0.04);
+        transition: var(--transition);
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+    }
+    .note-card:hover {
+        transform: translateY(-5px);
+        box-shadow: var(--shadow-lg);
+        border-color: rgba(37, 99, 235, 0.10);
+    }
+    .note-card .top {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 10px;
+        margin-bottom: 6px;
+    }
+    .note-card .top .left {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        min-width: 0;
+    }
+    .note-card .top .left input[type="checkbox"] {
+        flex-shrink: 0;
+        width: 18px;
+        height: 18px;
+        accent-color: var(--blue);
+        cursor: pointer;
+        transition: var(--transition);
+    }
+    .note-card .top .left input[type="checkbox"]:checked {
+        transform: scale(1.1);
+    }
+    .note-card .top .left .title {
+        font-weight: 600;
+        color: var(--navy);
+        text-decoration: none;
+        transition: var(--transition);
+        font-size: 0.95rem;
+        word-break: break-word;
+    }
+    .note-card .top .left .title:hover {
+        color: var(--blue);
+    }
+    .note-card .top .status {
+        flex-shrink: 0;
+        font-size: 0.65rem;
+        font-weight: 600;
+        padding: 2px 12px;
+        border-radius: 50px;
+        text-transform: uppercase;
+        letter-spacing: 0.03em;
+    }
+    .status-read {
+        background: rgba(16, 185, 129, 0.12);
+        color: #065F46;
+    }
+    .status-new {
+        background: rgba(148, 163, 184, 0.12);
+        color: #475569;
+    }
+    .note-card .body {
+        color: var(--text);
+        font-size: 0.9rem;
+        line-height: 1.5;
+        margin: 8px 0 12px;
+        flex: 1;
+        overflow: hidden;
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+    }
+    .note-card .actions {
+        display: flex;
+        gap: 6px;
+        flex-wrap: wrap;
+        margin-top: auto;
+        padding-top: 10px;
+        border-top: 1px solid rgba(37, 99, 235, 0.04);
+    }
+    .note-card .actions .btn {
+        font-size: 0.7rem;
+        padding: 4px 12px;
+        border-radius: 50px;
+        border: 1px solid #E2E8F0;
+        background: transparent;
+        color: var(--text-light);
+        transition: var(--transition);
+        cursor: pointer;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+    }
+    .note-card .actions .btn:hover {
+        border-color: var(--blue);
+        color: var(--blue);
+        background: rgba(37, 99, 235, 0.04);
+        transform: translateY(-1px);
+    }
+    .note-card .actions .btn-success {
+        background: #10B981;
+        border-color: #10B981;
+        color: white;
+    }
+    .note-card .actions .btn-success:hover {
+        background: #059669;
+        border-color: #059669;
+        color: white;
+    }
+
+    /* ---------- CUSTOM DROPDOWN (FIXED) ---------- */
+    .custom-dropdown-menu {
+        display: none;
+        position: fixed;
+        background: #ffffff !important;
+        border: 1px solid rgba(37, 99, 235, 0.12);
+        border-radius: var(--radius-sm);
+        box-shadow: var(--shadow-lg);
+        padding: 8px 0;
+        min-width: 210px;
+        z-index: 999999;
+        color: #0F172A;
+        font-size: 0.9rem;
+        overflow: visible;
+        opacity: 0;
+        transform: translateY(-4px);
+        transition: opacity 0.2s ease, transform 0.2s ease;
+    }
+    .custom-dropdown-menu.show {
+        display: block;
+        opacity: 1;
+        transform: translateY(0);
+    }
+    .custom-dropdown-menu .dropdown-item {
+        display: flex;
+        align-items: center;
+        padding: 10px 18px;
+        color: #0F172A;
+        text-decoration: none;
+        transition: var(--transition);
+        cursor: pointer;
+        border: none;
+        background: transparent;
+        width: 100%;
+        text-align: left;
+        font-weight: 500;
+        gap: 6px;
+    }
+    .custom-dropdown-menu .dropdown-item i {
+        width: 22px;
+        margin-right: 8px;
+        color: var(--blue);
+        font-size: 1rem;
+    }
+    .custom-dropdown-menu .dropdown-item:hover {
+        background: rgba(37, 99, 235, 0.08);
+        color: var(--blue);
+        border-radius: 6px;
+    }
+    .custom-dropdown-menu .dropdown-divider {
+        margin: 4px 0;
+        border-top: 1px solid rgba(15, 23, 42, 0.06);
+    }
+
+    /* ---------- EMPTY STATE ---------- */
+    .empty-state {
+        text-align: center;
+        padding: 50px 20px;
+        border: 2px dashed rgba(37, 99, 235, 0.12);
+        border-radius: var(--radius-sm);
+        background: rgba(255, 255, 255, 0.4);
+    }
+    .empty-state i {
+        font-size: 2.8rem;
+        color: var(--blue);
+        opacity: 0.3;
+        margin-bottom: 12px;
+    }
+    .empty-state p {
+        color: var(--text-light);
+        font-size: 0.95rem;
+        margin: 0;
+    }
+
+    /* ---------- RESPONSIVE ---------- */
+    @media (max-width: 992px) {
+        .dashboard-header {
+            flex-direction: column;
+            align-items: stretch;
+            gap: 12px;
+        }
+        .dashboard-header .actions {
+            justify-content: flex-start;
+        }
+        .note-grid {
+            grid-template-columns: 1fr 1fr;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .glass-card {
+            padding: 18px 16px;
+        }
+        .note-grid {
+            grid-template-columns: 1fr;
+        }
+        .quiz-grid {
+            grid-template-columns: 1fr 1fr;
+        }
+        .dashboard-header .brand .course-badge {
+            font-size: 1.3rem;
+            padding: 4px 18px;
+        }
+        .dashboard-header .brand .subtitle {
+            font-size: 0.85rem;
+        }
+        .btn .btn-text-mobile {
+            display: none;
+        }
+        .certificate-block {
+            flex-direction: column;
+            align-items: stretch;
+            text-align: center;
+        }
+        .progress-container {
+            flex-direction: column;
+            align-items: stretch;
+            gap: 8px;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .quiz-grid {
+            grid-template-columns: 1fr;
+        }
+        .dashboard-header .brand .course-badge {
+            font-size: 1.1rem;
+        }
+        .search-bar input {
+            font-size: 0.85rem;
+            padding: 8px 14px;
+        }
+    }
+
+    /* ---------- DARK MODE ---------- */
+    body.dark-mode .glass-card {
+        background: rgba(15, 23, 42, 0.85);
+        border-color: rgba(37, 99, 235, 0.08);
+        color: #E2E8F0;
+    }
+    body.dark-mode .glass-card .card-header {
+        color: #E2E8F0;
+        border-bottom-color: rgba(37, 99, 235, 0.08);
+    }
+    body.dark-mode .progress-track {
+        background: #334155;
+    }
+    body.dark-mode .announcement-item {
+        background: rgba(37, 99, 235, 0.06);
+    }
+    body.dark-mode .announcement-item:hover {
+        background: rgba(37, 99, 235, 0.10);
+    }
+    body.dark-mode .announcement-item .title {
+        color: #E2E8F0;
+    }
+    body.dark-mode .announcement-item .content {
+        color: #CBD5E1;
+    }
+    body.dark-mode .certificate-block {
+        background: rgba(16, 185, 129, 0.08);
+        border-color: rgba(16, 185, 129, 0.15);
+    }
+    body.dark-mode .quiz-card {
+        background: rgba(15, 23, 42, 0.4);
+        border-color: rgba(37, 99, 235, 0.06);
+    }
+    body.dark-mode .quiz-card .title {
+        color: #E2E8F0;
+    }
+    body.dark-mode .quiz-card .desc {
+        color: #94A3B8;
+    }
+    body.dark-mode .search-bar {
+        background: rgba(15, 23, 42, 0.6);
+        border-color: #334155;
+    }
+    body.dark-mode .search-bar input {
+        color: #E2E8F0;
+    }
+    body.dark-mode .search-bar input::placeholder {
+        color: #64748B;
+    }
+    body.dark-mode .note-card {
+        background: rgba(15, 23, 42, 0.5);
+        border-color: rgba(37, 99, 235, 0.06);
+    }
+    body.dark-mode .note-card .top .left .title {
+        color: #E2E8F0;
+    }
+    body.dark-mode .note-card .body {
+        color: #CBD5E1;
+    }
+    body.dark-mode .note-card .actions .btn {
+        border-color: #334155;
+        color: #94A3B8;
+    }
+    body.dark-mode .note-card .actions .btn:hover {
+        border-color: var(--blue);
+        color: var(--cyan);
+    }
+    body.dark-mode .status-read {
+        background: rgba(16, 185, 129, 0.15);
+        color: #34D399;
+    }
+    body.dark-mode .status-new {
+        background: rgba(148, 163, 184, 0.15);
+        color: #94A3B8;
+    }
+    body.dark-mode .empty-state {
+        border-color: rgba(37, 99, 235, 0.10);
+        background: rgba(15, 23, 42, 0.3);
+    }
+    body.dark-mode .empty-state p {
+        color: #94A3B8;
+    }
+    body.dark-mode .btn-outline-secondary {
+        border-color: #334155;
+        color: #94A3B8;
+    }
+    body.dark-mode .btn-outline-secondary:hover {
+        border-color: var(--blue);
+        color: var(--cyan);
+        background: rgba(37, 99, 235, 0.08);
+    }
+    body.dark-mode .btn-outline-success {
+        border-color: #059669;
+        color: #10B981;
+    }
+    body.dark-mode .btn-outline-success:hover {
+        background: #10B981;
+        color: white;
+    }
+    body.dark-mode .btn-outline-info {
+        border-color: #1D4ED8;
+        color: #60A5FA;
+    }
+    body.dark-mode .btn-outline-info:hover {
+        background: var(--blue);
+        color: white;
+    }
+    body.dark-mode .badge-pill {
+        background: linear-gradient(135deg, #B45309, #D97706);
+        color: #FDE68A;
+    }
+    body.dark-mode .custom-dropdown-menu {
+        background: #1E293B !important;
+        border-color: rgba(37, 99, 235, 0.15);
+        color: #E2E8F0;
+    }
+    body.dark-mode .custom-dropdown-menu .dropdown-item {
+        color: #E2E8F0;
+    }
+    body.dark-mode .custom-dropdown-menu .dropdown-item:hover {
+        background: rgba(37, 99, 235, 0.15);
+        color: var(--cyan);
+    }
+    body.dark-mode .custom-dropdown-menu .dropdown-item i {
+        color: var(--cyan);
+    }
+    body.dark-mode .custom-dropdown-menu .dropdown-divider {
+        border-top-color: rgba(37, 99, 235, 0.10);
+    }
+</style>
+
+<div class="dashboard-wrapper">
+
+    <!-- ========== HEADER ========== -->
+    <div class="dashboard-header animate-card">
+        <div class="brand">
+            <span class="course-badge">{{ course.name }}</span>
+            <span class="subtitle"><i class="bi bi-book"></i> Your lessons</span>
+        </div>
+        <div class="actions">
+            <a href="{{ url_for('assignments') }}" class="btn btn-primary">
+                <i class="bi bi-list-check"></i>
+                <span class="btn-text-mobile">Assignments</span>
+            </a>
+            <a href="{{ url_for('courses_list') }}" class="btn btn-outline-success">
+                <i class="bi bi-grid"></i>
+                <span class="btn-text-mobile">Courses</span>
+            </a>
+            <a href="{{ url_for('student_messages') }}" class="btn btn-outline-secondary">
+                <i class="bi bi-envelope"></i>
+                <span class="btn-text-mobile">Messages</span>
+            </a>
+
+            <!-- Custom Dropdown -->
+            <div class="action-dropdown" id="customDropdownContainer">
+                <button class="btn btn-outline-secondary" type="button" id="customDropdownBtn">
+                    <i class="bi bi-three-dots"></i>
+                    <span class="btn-text-mobile">More</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========== PROGRESS ========== -->
+    <div class="glass-card animate-card">
+        <div class="progress-container">
+            <div class="info">
+                <strong>Progress:</strong> {{ read_count }} of {{ total }} lessons read
+                <span class="badge-progress">{{ progress }}%</span>
+            </div>
+        </div>
+        <div class="progress-track">
+            <div class="progress-fill" style="width: {{ progress }}%;"></div>
+        </div>
+    </div>
+
+    <!-- ========== ANNOUNCEMENTS ========== -->
+    {% if announcements %}
+    <div class="glass-card animate-card">
+        <div class="card-header">
+            <i class="bi bi-megaphone-fill"></i> Announcements
+        </div>
+        {% for a in announcements %}
+        <div class="announcement-item">
+            <div class="title">
+                {{ a.title }}
+                <span class="date">{{ a.created_at.split(' ')[0] }}</span>
+            </div>
+            <div class="content">{{ a.content }}</div>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- ========== BADGES ========== -->
+    {% if badges %}
+    <div class="glass-card animate-card">
+        <div class="card-header">
+            <i class="bi bi-award"></i> My Badges
+        </div>
+        <div>
+            {% for badge in badges %}
+            <span class="badge-pill">
+                {{ badge.badge_icon }} {{ badge.badge_name }}
+            </span>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- ========== CERTIFICATE ========== -->
+    {% if read_count == total and total > 0 %}
+    <div class="glass-card animate-card" style="border-color: rgba(16, 185, 129, 0.20);">
+        <div class="certificate-block">
+            <div class="msg">
+                <i class="bi bi-award"></i>
+                <span>🎉 You've completed all lessons!</span>
+            </div>
+            <div>
+                {% if certificate %}
+                <a href="{{ url_for('download_certificate', certificate_id=certificate.id) }}" class="btn btn-success">
+                    <i class="bi bi-download"></i> Download Certificate
+                </a>
+                {% else %}
+                <span class="badge-pill" style="background: #F59E0B; color: #78350F;">⏳ Certificate pending approval</span>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- ========== QUIZZES ========== -->
+    {% if quizzes %}
+    <div class="glass-card animate-card">
+        <div class="card-header">
+            <i class="bi bi-question-circle"></i> Quizzes
+        </div>
+        <div class="quiz-grid">
+            {% for q in quizzes %}
+            <div class="quiz-card">
+                <div class="title">{{ q.title }}</div>
+                <div class="desc">{{ q.description }}</div>
+                {% if q.attempted %}
+                <span class="score-badge">Score: {{ q.score }}/{{ q.total_questions }}</span>
+                {% else %}
+                <a href="{{ url_for('take_quiz', quiz_id=q.id) }}" class="btn btn-primary btn-sm mt-2" style="align-self: flex-start;">Take Quiz</a>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- ========== SEARCH ========== -->
+    <form method="GET" action="{{ url_for('dashboard') }}" class="animate-card">
+        <div class="search-bar">
+            <input type="text" name="q" placeholder="Search notes..." value="{{ search_query or '' }}">
+            <button class="btn" type="submit"><i class="bi bi-search"></i></button>
+            <a href="{{ url_for('dashboard') }}" class="btn btn-clear"><i class="bi bi-x-lg"></i></a>
+        </div>
+    </form>
+
+    <!-- ========== NOTES ========== -->
+    <form id="noteSelectionForm">
+        <div class="note-grid">
+            {% if notes %}
+                {% for note in notes %}
+                <div class="note-card animate-item">
+                    <div class="top">
+                        <div class="left">
+                            <input type="checkbox" class="note-checkbox" value="{{ note.id }}">
+                            <a href="{{ url_for('note_detail', note_id=note.id) }}" class="title">{{ note.title }}</a>
+                        </div>
+                        <span class="status {% if note.id in read_ids %}status-read{% else %}status-new{% endif %}">
+                            {% if note.id in read_ids %}✅ Read{% else %}📖 New{% endif %}
+                        </span>
+                    </div>
+                    <div class="body">
+                        {{ note.content|truncate(200, true)|safe }}
+                    </div>
+                    <div class="actions">
+                        {% if note.id not in read_ids %}
+                        <form method="POST" action="{{ url_for('mark_read', note_id=note.id) }}" class="d-inline">
+                            <button type="submit" class="btn btn-success"><i class="bi bi-check-circle"></i> Mark as Read</button>
+                        </form>
+                        {% else %}
+                        <span class="btn" style="border-color: #10B981; color: #10B981; cursor: default;">
+                            <i class="bi bi-check-circle-fill"></i> Completed
+                        </span>
+                        {% endif %}
+                        <a href="{{ url_for('note_detail', note_id=note.id) }}" class="btn">
+                            <i class="bi bi-chat"></i> Discuss
+                        </a>
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="empty-state" style="grid-column: 1 / -1;">
+                    <i class="bi bi-info-circle"></i>
+                    <p>No lessons found.</p>
+                </div>
+            {% endif %}
+        </div>
+    </form>
+
+    <!-- ========== DOWNLOAD SELECTED ========== -->
+    <form method="POST" action="{{ url_for('download_selected_notes_pdf') }}" id="downloadSelectedForm" style="display:inline;">
+        <div id="selectedNotesInputs"></div>
+        <button type="button" class="btn btn-outline-info mt-3 animate-card" onclick="downloadSelected()">
+            <i class="bi bi-file-earmark-pdf"></i> Download Selected
+        </button>
+    </form>
+
+</div>
+
+<!-- ========== SCRIPTS ========== -->
+<script>
+    // ---------- CUSTOM DROPDOWN (FIXED) ----------
+    (function() {
+        var menu = document.createElement('div');
+        menu.className = 'custom-dropdown-menu';
+        menu.id = 'customDropdownMenu';
+        menu.innerHTML = `
+            <a class="dropdown-item" href="{{ url_for('download_notes_pdf') }}"><i class="bi bi-file-earmark-pdf"></i> Download notes</a>
+            <a class="dropdown-item" href="{{ url_for('assignment_history') }}"><i class="bi bi-archive"></i> My portfolio</a>
+            <a class="dropdown-item" href="{{ url_for('schedule') }}"><i class="bi bi-calendar"></i> Schedule</a>
+            <div class="dropdown-divider"></div>
+            <a class="dropdown-item" href="{{ url_for('public_profile', username=session.username) }}"><i class="bi bi-person-badge"></i> My public profile</a>
+            <a class="dropdown-item" href="{{ url_for('profile') }}"><i class="bi bi-person"></i> Profile settings</a>
+        `;
+        document.body.appendChild(menu);
+
+        var toggleBtn = document.getElementById('customDropdownBtn');
+        var isOpen = false;
+
+        function positionMenu() {
+            var rect = toggleBtn.getBoundingClientRect();
+            var menuWidth = 210;
+            var isMobile = window.innerWidth <= 768;
+            var padding = 12;
+
+            // Position below the button
+            menu.style.top = (rect.bottom + window.scrollY + 6) + 'px';
+
+            if (isMobile) {
+                // Mobile: align to right edge of viewport
+                menu.style.left = (window.innerWidth - menuWidth - padding + window.scrollX) + 'px';
+                menu.style.minWidth = '200px';
+            } else {
+                // Desktop: align to right edge of button
+                menu.style.left = (rect.right - menuWidth + window.scrollX) + 'px';
+                menu.style.minWidth = '210px';
+            }
+        }
+
+        function toggleDropdown(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            isOpen = !isOpen;
+            if (isOpen) {
+                positionMenu();
+                menu.classList.add('show');
+                toggleBtn.setAttribute('aria-expanded', 'true');
+            } else {
+                menu.classList.remove('show');
+                toggleBtn.setAttribute('aria-expanded', 'false');
+            }
+        }
+
+        toggleBtn.addEventListener('click', toggleDropdown);
+
+        // Close when clicking outside
+        document.addEventListener('click', function(e) {
+            if (!e.target.closest('#customDropdownContainer') && !e.target.closest('#customDropdownMenu')) {
+                if (isOpen) {
+                    menu.classList.remove('show');
+                    toggleBtn.setAttribute('aria-expanded', 'false');
+                    isOpen = false;
+                }
+            }
+        });
+
+        // Close on Escape
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && isOpen) {
+                menu.classList.remove('show');
+                toggleBtn.setAttribute('aria-expanded', 'false');
+                isOpen = false;
+            }
+        });
+
+        // Reposition on scroll/resize/orientation change only if open
+        function repositionIfOpen() {
+            if (isOpen) positionMenu();
+        }
+        window.addEventListener('scroll', repositionIfOpen);
+        window.addEventListener('resize', repositionIfOpen);
+        window.addEventListener('orientationchange', function() {
+            if (isOpen) setTimeout(positionMenu, 300);
+        });
+    })();
+
+    // ---------- Download Selected Notes ----------
+    function downloadSelected() {
+        var checkboxes = document.querySelectorAll('.note-checkbox:checked');
+        if (checkboxes.length === 0) {
+            alert('Please select at least one note.');
+            return;
+        }
+        var form = document.getElementById('downloadSelectedForm');
+        var container = document.getElementById('selectedNotesInputs');
+        container.innerHTML = '';
+        checkboxes.forEach(function(cb) {
+            var input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = 'selected_notes';
+            input.value = cb.value;
+            container.appendChild(input);
+        });
+        form.submit();
+    }
+
+    // ---------- Animate progress bar ----------
+    document.addEventListener('DOMContentLoaded', function() {
+        var fill = document.querySelector('.progress-fill');
+        if (fill) {
+            var width = fill.style.width;
+            fill.style.width = '0%';
+            setTimeout(function() {
+                fill.style.width = width;
+            }, 200);
+        }
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,652 @@
+{% extends "base.html" %}
+
+{% block content %}
+<style>
+    /* ============================================================
+       MANAGE COURSES — NAVY + ELECTRIC BLUE THEME
+       ============================================================ */
+
+    /* ---------- ANIMATIONS ---------- */
+    @keyframes fadeInUp {
+        from { opacity: 0; transform: translateY(30px) scale(0.96); }
+        to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    .animate-card {
+        animation: fadeInUp 0.6s ease forwards;
+        opacity: 0;
+    }
+    .animate-card:nth-child(1) { animation-delay: 0.05s; }
+    .animate-card:nth-child(2) { animation-delay: 0.10s; }
+
+    /* ---------- HEADER ---------- */
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin-bottom: 28px;
+        animation: fadeInUp 0.6s ease forwards;
+        opacity: 0;
+    }
+
+    .page-header h2 {
+        font-weight: 700;
+        color: var(--navy);
+        letter-spacing: -0.3px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-size: 1.8rem;
+    }
+
+    .page-header h2 i {
+        color: var(--blue);
+        font-size: 1.8rem;
+    }
+
+    /* ---------- BUTTONS ---------- */
+    .btn-secondary {
+        border: 1.5px solid #CBD5E1;
+        color: var(--text-light);
+        background: transparent;
+        font-weight: 500;
+        border-radius: 50px;
+        padding: 8px 20px;
+        transition: var(--transition);
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        text-decoration: none;
+        font-size: 0.85rem;
+    }
+
+    .btn-secondary:hover {
+        border-color: var(--blue);
+        color: var(--blue);
+        background: rgba(37, 99, 235, 0.04);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(37, 99, 235, 0.08);
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, var(--blue), #1D4ED8);
+        border: none;
+        color: white;
+        font-weight: 600;
+        padding: 8px 20px;
+        border-radius: 50px;
+        box-shadow: 0 4px 14px rgba(37, 99, 235, 0.25);
+        transition: var(--transition);
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 0.85rem;
+        cursor: pointer;
+        text-decoration: none;
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-2px) scale(1.02);
+        box-shadow: 0 8px 24px rgba(37, 99, 235, 0.35);
+        background: linear-gradient(135deg, var(--blue), var(--cyan));
+        color: white;
+    }
+
+    .btn-info {
+        background: linear-gradient(135deg, var(--blue), var(--cyan));
+        border: none;
+        color: white;
+        font-weight: 600;
+        padding: 6px 14px;
+        border-radius: 50px;
+        box-shadow: 0 4px 14px rgba(37, 99, 235, 0.20);
+        transition: var(--transition);
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 0.75rem;
+        cursor: pointer;
+        text-decoration: none;
+    }
+
+    .btn-info:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 24px rgba(37, 99, 235, 0.30);
+        background: linear-gradient(135deg, var(--blue), var(--cyan));
+        color: white;
+        opacity: 0.9;
+    }
+
+    .btn-danger {
+        background: linear-gradient(135deg, #EF4444, #DC2626);
+        border: none;
+        color: white;
+        font-weight: 600;
+        padding: 6px 14px;
+        border-radius: 50px;
+        box-shadow: 0 4px 14px rgba(239, 68, 68, 0.20);
+        transition: var(--transition);
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 0.75rem;
+        cursor: pointer;
+        text-decoration: none;
+    }
+
+    .btn-danger:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 24px rgba(239, 68, 68, 0.30);
+        background: linear-gradient(135deg, #F87171, #EF4444);
+        color: white;
+    }
+
+    .btn-success {
+        background: linear-gradient(135deg, #10B981, #059669);
+        border: none;
+        color: white;
+        font-weight: 600;
+        padding: 6px 14px;
+        border-radius: 50px;
+        box-shadow: 0 4px 14px rgba(16, 185, 129, 0.20);
+        transition: var(--transition);
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 0.75rem;
+        cursor: pointer;
+        text-decoration: none;
+    }
+
+    .btn-success:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 24px rgba(16, 185, 129, 0.30);
+        background: linear-gradient(135deg, #34D399, #10B981);
+        color: white;
+    }
+
+    /* ---------- CARDS ---------- */
+    .card {
+        border: none;
+        border-radius: var(--radius);
+        box-shadow: var(--shadow-md);
+        transition: var(--transition);
+        background: rgba(255, 255, 255, 0.92);
+        backdrop-filter: blur(2px);
+        border: 1px solid rgba(37, 99, 235, 0.06);
+        overflow: hidden;
+    }
+
+    .card:hover {
+        box-shadow: var(--shadow-lg), 0 0 0 1px rgba(37, 99, 235, 0.06);
+        transform: translateY(-2px);
+    }
+
+    .card-header-custom {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 16px 20px 12px 20px;
+        border-bottom: 1px solid rgba(37, 99, 235, 0.06);
+    }
+
+    .card-header-custom h5 {
+        font-weight: 700;
+        color: var(--navy);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 1rem;
+        margin: 0;
+    }
+
+    .card-header-custom h5 i {
+        color: var(--blue);
+    }
+
+    .card-body-custom {
+        padding: 20px;
+    }
+
+    /* ---------- FORM ELEMENTS ---------- */
+    .form-label {
+        font-weight: 600;
+        color: var(--navy);
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        margin-bottom: 4px;
+    }
+
+    .form-control,
+    .form-select,
+    .form-control-color {
+        border: 1.5px solid #E2E8F0;
+        border-radius: var(--radius-sm);
+        padding: 8px 14px;
+        font-size: 0.85rem;
+        transition: var(--transition);
+        background: var(--bg);
+        color: var(--text);
+        width: 100%;
+    }
+
+    .form-control:focus,
+    .form-select:focus,
+    .form-control-color:focus {
+        border-color: var(--blue);
+        box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.08);
+        background: white;
+        outline: none;
+    }
+
+    .form-control-color {
+        padding: 4px;
+        height: 44px;
+        cursor: pointer;
+    }
+
+    .form-control-color::-webkit-color-swatch-wrapper {
+        padding: 0;
+    }
+    .form-control-color::-webkit-color-swatch {
+        border: none;
+        border-radius: 6px;
+    }
+
+    /* ---------- TABLE ---------- */
+    .table-wrap {
+        overflow-x: auto;
+    }
+
+    .table {
+        margin-bottom: 0;
+        border-collapse: separate;
+        border-spacing: 0 6px;
+        width: 100%;
+    }
+
+    .table thead th {
+        background: rgba(15, 23, 42, 0.04);
+        color: var(--navy);
+        font-weight: 600;
+        font-size: 0.7rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        padding: 12px 16px;
+        border: none;
+        white-space: nowrap;
+        border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+    }
+
+    .table tbody tr {
+        background: rgba(255, 255, 255, 0.6);
+        transition: var(--transition);
+        border-radius: var(--radius-sm);
+        box-shadow: var(--shadow-sm);
+    }
+
+    .table tbody tr:hover {
+        background: rgba(37, 99, 235, 0.04);
+        transform: scale(1.01);
+        box-shadow: var(--shadow-md);
+    }
+
+    .table tbody td {
+        padding: 12px 16px;
+        border: none;
+        vertical-align: middle;
+        font-size: 0.85rem;
+        color: var(--text);
+        background: transparent;
+    }
+
+    .table tbody tr td:first-child {
+        border-radius: var(--radius-sm) 0 0 var(--radius-sm);
+    }
+
+    .table tbody tr td:last-child {
+        border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+    }
+
+    .table .course-badge {
+        display: inline-block;
+        padding: 4px 14px;
+        border-radius: 50px;
+        font-weight: 600;
+        font-size: 0.8rem;
+        color: white;
+        text-shadow: 0 1px 2px rgba(0,0,0,0.15);
+    }
+
+    .table .color-preview {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        border: 2px solid rgba(15, 23, 42, 0.08);
+        display: inline-block;
+        vertical-align: middle;
+    }
+
+    .table .action-group {
+        display: flex;
+        gap: 6px;
+        flex-wrap: wrap;
+    }
+
+    /* ---------- COLLAPSIBLE EDIT ROW ---------- */
+    .edit-row td {
+        padding: 0 16px 16px 16px !important;
+        background: rgba(37, 99, 235, 0.02) !important;
+        border-radius: 0 0 var(--radius-sm) var(--radius-sm) !important;
+    }
+
+    .edit-row .edit-form {
+        padding: 16px 0 0 0;
+        border-top: 1px solid rgba(37, 99, 235, 0.06);
+    }
+
+    .edit-row .edit-form .row {
+        margin: 0;
+        gap: 10px;
+    }
+
+    .edit-row .edit-form .col-auto {
+        flex: 1;
+        min-width: 140px;
+    }
+
+    .edit-row .edit-form .col-auto .form-control,
+    .edit-row .edit-form .col-auto .form-control-color {
+        width: 100%;
+    }
+
+    /* ---------- RESPONSIVE ---------- */
+    @media (max-width: 768px) {
+        .page-header h2 {
+            font-size: 1.4rem;
+        }
+        .page-header h2 i {
+            font-size: 1.4rem;
+        }
+        .card-body-custom {
+            padding: 16px;
+        }
+        .table thead th,
+        .table tbody td {
+            padding: 10px 12px;
+            font-size: 0.8rem;
+        }
+        .table .action-group {
+            gap: 4px;
+        }
+        .btn-info, .btn-danger, .btn-success {
+            font-size: 0.65rem;
+            padding: 4px 10px;
+        }
+        .edit-row .edit-form .row {
+            flex-direction: column;
+            gap: 8px;
+        }
+        .edit-row .edit-form .col-auto {
+            min-width: 100%;
+        }
+        .form-control-color {
+            height: 38px;
+        }
+    }
+
+    @media (max-width: 576px) {
+        .page-header {
+            flex-direction: column;
+            align-items: stretch;
+            gap: 8px;
+        }
+        .page-header h2 {
+            font-size: 1.2rem;
+        }
+        .table thead th {
+            font-size: 0.6rem;
+            padding: 8px 10px;
+        }
+        .table tbody td {
+            font-size: 0.75rem;
+            padding: 8px 10px;
+        }
+        .table .course-badge {
+            font-size: 0.7rem;
+            padding: 2px 10px;
+        }
+        .btn-primary {
+            font-size: 0.8rem;
+            padding: 6px 14px;
+        }
+        .btn-secondary {
+            font-size: 0.8rem;
+            padding: 6px 14px;
+        }
+        .card-header-custom h5 {
+            font-size: 0.9rem;
+        }
+    }
+
+    /* ---------- DARK MODE ---------- */
+    body.dark-mode .page-header h2 {
+        color: #E2E8F0;
+    }
+
+    body.dark-mode .page-header h2 i {
+        color: var(--cyan);
+    }
+
+    body.dark-mode .card {
+        background: rgba(15, 23, 42, 0.9);
+        border-color: rgba(37, 99, 235, 0.08);
+        color: #E2E8F0;
+    }
+
+    body.dark-mode .card-header-custom h5 {
+        color: #E2E8F0;
+    }
+
+    body.dark-mode .form-label {
+        color: #CBD5E1;
+    }
+
+    body.dark-mode .form-control,
+    body.dark-mode .form-select,
+    body.dark-mode .form-control-color {
+        background: #1E293B;
+        color: #E2E8F0;
+        border-color: #334155;
+    }
+
+    body.dark-mode .form-control:focus,
+    body.dark-mode .form-select:focus,
+    body.dark-mode .form-control-color:focus {
+        background: #1E293B;
+        border-color: var(--blue);
+        box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.12);
+    }
+
+    body.dark-mode .table thead th {
+        background: rgba(37, 99, 235, 0.08);
+        color: #CBD5E1;
+    }
+
+    body.dark-mode .table tbody tr {
+        background: rgba(15, 23, 42, 0.6);
+        box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    }
+
+    body.dark-mode .table tbody tr:hover {
+        background: rgba(37, 99, 235, 0.08);
+    }
+
+    body.dark-mode .table tbody td {
+        color: #E2E8F0;
+    }
+
+    body.dark-mode .edit-row td {
+        background: rgba(37, 99, 235, 0.04) !important;
+    }
+
+    body.dark-mode .edit-row .edit-form {
+        border-top-color: rgba(37, 99, 235, 0.10);
+    }
+
+    body.dark-mode .btn-secondary {
+        border-color: #334155;
+        color: #94A3B8;
+    }
+
+    body.dark-mode .btn-secondary:hover {
+        border-color: var(--blue);
+        color: var(--cyan);
+        background: rgba(37, 99, 235, 0.08);
+    }
+
+    body.dark-mode .btn-primary {
+        background: linear-gradient(135deg, #1D4ED8, #2563EB);
+    }
+
+    body.dark-mode .btn-primary:hover {
+        background: linear-gradient(135deg, var(--blue), var(--cyan));
+    }
+
+    body.dark-mode .color-preview {
+        border-color: rgba(255,255,255,0.1);
+    }
+</style>
+
+<!-- ============================================================
+     HEADER
+     ============================================================ -->
+<div class="page-header">
+    <h2>
+        <i class="bi bi-book"></i>
+        Manage Courses
+    </h2>
+    <a href="{{ url_for('admin_panel') }}" class="btn btn-secondary">
+        <i class="bi bi-arrow-left"></i> Back
+    </a>
+</div>
+
+<!-- ============================================================
+     ADD COURSE CARD
+     ============================================================ -->
+<div class="card mb-4 animate-card">
+    <div class="card-header-custom">
+        <h5><i class="bi bi-plus-circle text-primary"></i> Add New Course</h5>
+    </div>
+    <div class="card-body-custom">
+        <form method="POST" action="{{ url_for('add_course') }}" class="row g-3">
+            <div class="col-md-5">
+                <label class="form-label">Course Name</label>
+                <input type="text" name="name" class="form-control" placeholder="e.g., Web Development" required>
+            </div>
+            <div class="col-md-5">
+                <label class="form-label">Description</label>
+                <input type="text" name="description" class="form-control" placeholder="Brief description">
+            </div>
+            <div class="col-md-2">
+                <label class="form-label">Color</label>
+                <input type="color" name="color" class="form-control form-control-color" value="#2563EB">
+            </div>
+            <div class="col-12">
+                <button type="submit" class="btn btn-primary">
+                    <i class="bi bi-plus"></i> Add Course
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- ============================================================
+     COURSE LIST TABLE
+     ============================================================ -->
+<div class="card animate-card" style="animation-delay: 0.1s;">
+    <div class="card-header-custom">
+        <h5><i class="bi bi-list-ul"></i> All Courses</h5>
+        <span class="badge bg-primary" style="font-size:0.75rem;">{{ courses|length }} total</span>
+    </div>
+    <div class="card-body-custom" style="padding: 0 20px 20px 20px;">
+        <div class="table-wrap">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Course</th>
+                        <th>Description</th>
+                        <th>Color</th>
+                        <th style="text-align: right;">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for course in courses %}
+                    <tr>
+                        <td>
+                            <span class="course-badge" style="background-color: {{ course.color }};">
+                                {{ course.name }}
+                            </span>
+                        </td>
+                        <td>{{ course.description or '—' }}</td>
+                        <td>
+                            <span class="color-preview" style="background-color: {{ course.color }};"></span>
+                        </td>
+                        <td style="text-align: right;">
+                            <div class="action-group" style="justify-content: flex-end;">
+                                <button class="btn btn-info btn-sm" data-bs-toggle="collapse" data-bs-target="#editCourse{{ course.id }}" aria-expanded="false">
+                                    <i class="bi bi-pencil"></i> Edit
+                                </button>
+                                <a href="{{ url_for('delete_course', course_id=course.id) }}"
+                                   class="btn btn-danger btn-sm"
+                                   onclick="return confirm('Delete this course? This will also delete its notes and assignments.')">
+                                    <i class="bi bi-trash"></i>
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    <!-- Edit Row (collapsible) -->
+                    <tr class="edit-row collapse" id="editCourse{{ course.id }}">
+                        <td colspan="4">
+                            <div class="edit-form">
+                                <form method="POST" action="{{ url_for('edit_course', course_id=course.id) }}" class="row align-items-end">
+                                    <div class="col-md-5 col-sm-12">
+                                        <label class="form-label">Name</label>
+                                        <input type="text" name="name" class="form-control" value="{{ course.name }}" required>
+                                    </div>
+                                    <div class="col-md-5 col-sm-12">
+                                        <label class="form-label">Description</label>
+                                        <input type="text" name="description" class="form-control" value="{{ course.description or '' }}">
+                                    </div>
+                                    <div class="col-md-2 col-sm-12">
+                                        <label class="form-label">Color</label>
+                                        <input type="color" name="color" class="form-control form-control-color" value="{{ course.color }}">
+                                    </div>
+                                    <div class="col-12 mt-3">
+                                        <button type="submit" class="btn btn-success btn-sm">
+                                            <i class="bi bi-check-lg"></i> Save Changes
+                                        </button>
+                                        <button type="button" class="btn btn-secondary btn-sm" data-bs-toggle="collapse" data-bs-target="#editCourse{{ course.id }}">
+                                            <i class="bi bi-x-lg"></i> Cancel
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="4" class="text-muted text-center py-4">
+                            <i class="bi bi-info-circle me-1"></i> No courses yet. Add your first course above!
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,70 @@
+/* static/css/style.css */
+:root {
+    --brand-purple: #6c63ff;
+    --brand-dark: #2a2a4a;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f8f9fc;
+}
+
+.custom-navbar {
+    background: linear-gradient(135deg, var(--brand-purple), var(--brand-dark)) !important;
+    box-shadow: 0 4px 12px rgba(108, 99, 255, 0.25);
+}
+
+.navbar-brand {
+    font-size: 1.6rem;
+    letter-spacing: -0.5px;
+}
+
+.navbar-brand i {
+    color: #ffd700;
+}
+
+.card {
+    border: none;
+    border-radius: 16px;
+    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.06);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 32px rgba(108, 99, 255, 0.12);
+}
+
+.course-badge {
+    background: var(--brand-purple);
+    color: white;
+    padding: 6px 18px;
+    border-radius: 30px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+}
+
+.btn-primary {
+    background: var(--brand-purple);
+    border: none;
+    padding: 10px 24px;
+    font-weight: 600;
+}
+
+.btn-primary:hover {
+    background: #5a52d5;
+    transform: scale(1.02);
+}
+
+.flash-container {
+    position: fixed;
+    top: 80px;
+    right: 20px;
+    z-index: 9999;
+    min-width: 300px;
+}
+
+footer {
+    background-color: white;
+}

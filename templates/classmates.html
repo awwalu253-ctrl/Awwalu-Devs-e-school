@@ -1,0 +1,434 @@
+{% extends "base.html" %}
+
+{% block content %}
+<style>
+    /* ============================================================
+       CLASSMATES — PREMIUM NAVY + ELECTRIC BLUE THEME
+       ============================================================ */
+
+    /* ---------- ANIMATIONS ---------- */
+    @keyframes fadeUp {
+        from { opacity: 0; transform: translateY(24px) scale(0.98); }
+        to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    .animate-card {
+        animation: fadeUp 0.55s ease forwards;
+        opacity: 0;
+    }
+    .animate-card:nth-child(1) { animation-delay: 0.04s; }
+    .animate-card:nth-child(2) { animation-delay: 0.06s; }
+    .animate-card:nth-child(3) { animation-delay: 0.08s; }
+    .animate-card:nth-child(4) { animation-delay: 0.10s; }
+    .animate-card:nth-child(5) { animation-delay: 0.12s; }
+    .animate-card:nth-child(6) { animation-delay: 0.14s; }
+    .animate-card:nth-child(7) { animation-delay: 0.16s; }
+    .animate-card:nth-child(8) { animation-delay: 0.18s; }
+
+    /* ---------- HEADER ---------- */
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 16px;
+        margin-bottom: 28px;
+        animation: fadeUp 0.6s ease forwards;
+        opacity: 0;
+    }
+
+    .page-header .brand {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+    }
+
+    .page-header .brand h2 {
+        font-weight: 700;
+        color: var(--navy);
+        letter-spacing: -0.3px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-size: 1.8rem;
+        margin: 0;
+    }
+
+    .page-header .brand h2 i {
+        color: var(--blue);
+        font-size: 1.8rem;
+    }
+
+    .page-header .brand .subtitle {
+        color: var(--text-light);
+        font-size: 0.95rem;
+        margin-left: 4px;
+    }
+
+    .page-header .actions {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    /* ---------- BUTTONS ---------- */
+    .btn-outline-secondary {
+        border: 1.5px solid #CBD5E1;
+        color: var(--text-light);
+        background: transparent;
+        font-weight: 500;
+        border-radius: 50px;
+        padding: 8px 20px;
+        transition: var(--transition);
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        text-decoration: none;
+        font-size: 0.85rem;
+    }
+    .btn-outline-secondary:hover {
+        border-color: var(--blue);
+        color: var(--blue);
+        background: rgba(37, 99, 235, 0.04);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(37, 99, 235, 0.08);
+    }
+
+    /* ---------- GLASS CARD ---------- */
+    .classmate-card {
+        background: rgba(255, 255, 255, 0.88);
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+        border: 1px solid rgba(37, 99, 235, 0.06);
+        border-radius: var(--radius);
+        box-shadow: var(--shadow-sm);
+        transition: var(--transition);
+        padding: 20px 12px 16px;
+        text-align: center;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        cursor: default;
+    }
+
+    .classmate-card:hover {
+        transform: translateY(-6px);
+        box-shadow: var(--shadow-lg), 0 0 0 1px rgba(37, 99, 235, 0.08);
+        border-color: rgba(37, 99, 235, 0.12);
+    }
+
+    /* ---------- AVATAR ---------- */
+    .avatar-wrapper {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        flex-shrink: 0;
+        position: relative;
+        margin-bottom: 10px;
+        background: linear-gradient(135deg, var(--blue), var(--cyan));
+        padding: 2px;
+    }
+
+    .avatar-wrapper .avatar-img {
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        object-fit: cover;
+        display: block;
+        border: 2px solid white;
+        transition: var(--transition);
+    }
+
+    .avatar-wrapper .avatar-placeholder {
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        background: rgba(37, 99, 235, 0.10);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2.4rem;
+        color: var(--blue);
+        border: 2px solid white;
+        transition: var(--transition);
+    }
+
+    .classmate-card:hover .avatar-wrapper .avatar-img,
+    .classmate-card:hover .avatar-wrapper .avatar-placeholder {
+        transform: scale(1.05);
+        border-color: var(--cyan);
+    }
+
+    /* ---------- CARD CONTENT ---------- */
+    .classmate-card .name {
+        font-weight: 700;
+        color: var(--navy);
+        font-size: 1rem;
+        margin: 2px 0 4px;
+        transition: var(--transition);
+    }
+
+    .classmate-card:hover .name {
+        color: var(--blue);
+    }
+
+    .classmate-card .course {
+        font-size: 0.8rem;
+        color: var(--text-light);
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        background: rgba(37, 99, 235, 0.06);
+        padding: 2px 12px;
+        border-radius: 50px;
+        border: 1px solid rgba(37, 99, 235, 0.04);
+        margin-top: 2px;
+    }
+
+    .classmate-card .course i {
+        font-size: 0.7rem;
+    }
+
+    /* ---------- EMPTY STATE ---------- */
+    .empty-state {
+        text-align: center;
+        padding: 50px 20px;
+        border: 2px dashed rgba(37, 99, 235, 0.12);
+        border-radius: var(--radius);
+        background: rgba(255, 255, 255, 0.4);
+    }
+
+    .empty-state .empty-icon {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, rgba(37, 99, 235, 0.08), rgba(34, 211, 238, 0.08));
+        color: var(--blue);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2.4rem;
+        margin: 0 auto 16px;
+        border: 2px solid rgba(37, 99, 235, 0.10);
+        transition: var(--transition);
+    }
+
+    .empty-state:hover .empty-icon {
+        transform: scale(1.06) rotate(-4deg);
+        border-color: var(--cyan);
+        box-shadow: 0 0 0 8px rgba(34, 211, 238, 0.06);
+    }
+
+    .empty-state h5 {
+        color: var(--navy);
+        font-weight: 700;
+        margin-bottom: 6px;
+    }
+
+    .empty-state p {
+        color: var(--text-light);
+        max-width: 400px;
+        margin: 0 auto;
+        font-size: 0.95rem;
+        line-height: 1.5;
+    }
+
+    /* ---------- RESPONSIVE ---------- */
+    @media (max-width: 768px) {
+        .page-header .brand h2 {
+            font-size: 1.4rem;
+        }
+        .page-header .brand h2 i {
+            font-size: 1.4rem;
+        }
+        .page-header .brand .subtitle {
+            font-size: 0.85rem;
+        }
+        .avatar-wrapper {
+            width: 64px;
+            height: 64px;
+        }
+        .classmate-card {
+            padding: 16px 8px 12px;
+        }
+        .classmate-card .name {
+            font-size: 0.9rem;
+        }
+        .classmate-card .course {
+            font-size: 0.7rem;
+            padding: 1px 10px;
+        }
+        .btn-outline-secondary {
+            font-size: 0.8rem;
+            padding: 6px 14px;
+        }
+    }
+
+    @media (max-width: 576px) {
+        .page-header {
+            flex-direction: column;
+            align-items: stretch;
+            gap: 12px;
+        }
+        .page-header .brand h2 {
+            font-size: 1.2rem;
+        }
+        .page-header .brand h2 i {
+            font-size: 1.2rem;
+        }
+        .page-header .brand .subtitle {
+            font-size: 0.8rem;
+        }
+        .page-header .actions {
+            justify-content: flex-start;
+        }
+        .avatar-wrapper {
+            width: 56px;
+            height: 56px;
+        }
+        .classmate-card {
+            padding: 12px 6px 10px;
+        }
+        .classmate-card .name {
+            font-size: 0.85rem;
+        }
+        .classmate-card .course {
+            font-size: 0.65rem;
+        }
+        .empty-state {
+            padding: 30px 16px;
+        }
+        .empty-state .empty-icon {
+            width: 60px;
+            height: 60px;
+            font-size: 1.8rem;
+        }
+        .empty-state h5 {
+            font-size: 1.1rem;
+        }
+        .empty-state p {
+            font-size: 0.85rem;
+        }
+    }
+
+    /* ---------- DARK MODE ---------- */
+    body.dark-mode .page-header .brand h2 {
+        color: #E2E8F0;
+    }
+    body.dark-mode .page-header .brand h2 i {
+        color: var(--cyan);
+    }
+    body.dark-mode .page-header .brand .subtitle {
+        color: #94A3B8;
+    }
+
+    body.dark-mode .classmate-card {
+        background: rgba(15, 23, 42, 0.85);
+        border-color: rgba(37, 99, 235, 0.08);
+    }
+    body.dark-mode .classmate-card:hover {
+        border-color: rgba(37, 99, 235, 0.15);
+        box-shadow: var(--shadow-lg), 0 0 0 1px rgba(37, 99, 235, 0.08);
+    }
+    body.dark-mode .classmate-card .name {
+        color: #E2E8F0;
+    }
+    body.dark-mode .classmate-card:hover .name {
+        color: var(--cyan);
+    }
+    body.dark-mode .classmate-card .course {
+        background: rgba(37, 99, 235, 0.10);
+        border-color: rgba(37, 99, 235, 0.06);
+        color: #94A3B8;
+    }
+    body.dark-mode .classmate-card .course i {
+        color: var(--cyan);
+    }
+    body.dark-mode .avatar-wrapper {
+        background: linear-gradient(135deg, #1D4ED8, var(--cyan));
+    }
+    body.dark-mode .avatar-wrapper .avatar-placeholder {
+        background: rgba(37, 99, 235, 0.15);
+        color: var(--cyan);
+        border-color: rgba(37, 99, 235, 0.08);
+    }
+    body.dark-mode .avatar-wrapper .avatar-img {
+        border-color: rgba(37, 99, 235, 0.08);
+    }
+
+    body.dark-mode .btn-outline-secondary {
+        border-color: #334155;
+        color: #94A3B8;
+    }
+    body.dark-mode .btn-outline-secondary:hover {
+        border-color: var(--blue);
+        color: var(--cyan);
+        background: rgba(37, 99, 235, 0.08);
+    }
+
+    body.dark-mode .empty-state {
+        border-color: rgba(37, 99, 235, 0.10);
+        background: rgba(15, 23, 42, 0.3);
+    }
+    body.dark-mode .empty-state h5 {
+        color: #E2E8F0;
+    }
+    body.dark-mode .empty-state p {
+        color: #94A3B8;
+    }
+</style>
+
+<!-- ========== HEADER ========== -->
+<div class="page-header">
+    <div class="brand">
+        <h2>
+            <i class="bi bi-people"></i>
+            Your Classmates
+        </h2>
+        <span class="subtitle"><i class="bi bi-person-heart me-1"></i>Meet your fellow learners in your course.</span>
+    </div>
+    <div class="actions">
+        <a href="{{ url_for('dashboard') }}" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left"></i> Back
+        </a>
+    </div>
+</div>
+
+<!-- ========== CLASSMATES GRID ========== -->
+<div class="row g-4">
+    {% if students %}
+        {% for s in students %}
+        <div class="col-md-3 col-sm-4 col-6 animate-card">
+            <div class="classmate-card">
+                <div class="avatar-wrapper">
+                    {% if s.avatar %}
+                        <img src="{{ s.avatar }}" alt="{{ s.full_name }}" class="avatar-img">
+                    {% else %}
+                        <div class="avatar-placeholder">
+                            <i class="bi bi-person"></i>
+                        </div>
+                    {% endif %}
+                </div>
+                <div class="name">{{ s.full_name }}</div>
+                <div class="course">
+                    <i class="bi bi-book"></i>
+                    {{ s.course_name or 'No course' }}
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    {% else %}
+        <!-- ========== EMPTY STATE ========== -->
+        <div class="col-12">
+            <div class="empty-state">
+                <div class="empty-icon">
+                    <i class="bi bi-people"></i>
+                </div>
+                <h5>No classmates yet</h5>
+                <p>When other students join your course, they'll appear here. Share your course link to grow your learning community.</p>
+            </div>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

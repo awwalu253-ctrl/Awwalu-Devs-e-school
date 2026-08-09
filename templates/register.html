@@ -1,0 +1,848 @@
+{% extends "base.html" %}
+
+{% block content %}
+<style>
+    /* ---------- SPLIT LAYOUT ---------- */
+    .split-auth {
+        display: flex;
+        min-height: 90vh;
+        margin: -20px -24px;
+        border-radius: var(--radius);
+        overflow: hidden;
+        background: var(--bg);
+        box-shadow: var(--shadow-lg);
+    }
+
+    .split-auth .auth-image {
+        flex: 1 1 50%;
+        background: url("{{ url_for('static', filename='images/bg-image.png') }}") center/cover no-repeat;
+        position: relative;
+        min-height: 400px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .split-auth .auth-image::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(135deg, rgba(15, 23, 42, 0.4), rgba(37, 99, 235, 0.3));
+        backdrop-filter: blur(2px);
+    }
+
+    .split-auth .auth-image .image-content {
+        position: relative;
+        z-index: 2;
+        text-align: center;
+        color: white;
+        padding: 30px;
+        max-width: 400px;
+    }
+
+    .split-auth .auth-image .image-content h1 {
+        font-size: 2.8rem;
+        font-weight: 700;
+        font-family: 'Space Grotesk', sans-serif;
+        text-shadow: 0 4px 30px rgba(0,0,0,0.4);
+    }
+
+    .split-auth .auth-image .image-content h1 span {
+        color: var(--cyan);
+        text-shadow: 0 0 30px rgba(34, 211, 238, 0.4);
+    }
+
+    .split-auth .auth-image .image-content p {
+        font-size: 1.1rem;
+        opacity: 0.9;
+        text-shadow: 0 2px 20px rgba(0,0,0,0.3);
+    }
+
+    /* ---------- RIGHT SIDE: TYPEWRITER + FORM ---------- */
+    .split-auth .auth-form-side {
+        flex: 1 1 50%;
+        background: rgba(15, 23, 42, 0.95);
+        backdrop-filter: blur(12px);
+        padding: 24px 32px 20px;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+        overflow-y: auto;
+        border-left: 1px solid rgba(34, 211, 238, 0.08);
+        max-height: 90vh;
+    }
+
+    /* ---------- TYPEWRITER ---------- */
+    .typewriter-container {
+        margin-bottom: 14px;
+        text-align: center;
+        flex-shrink: 0;
+    }
+
+    .typewriter-container .greeting {
+        font-size: 0.9rem;
+        color: #94A3B8;
+        font-weight: 400;
+    }
+
+    .typewriter-container .typed-wrapper {
+        font-size: 0.9rem;
+        font-weight: 500;
+        font-family: 'Fira Code', 'JetBrains Mono', 'Inter', monospace;
+        color: #F8FAFC;
+        min-height: 3.2rem;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 2px;
+        padding: 2px 0;
+    }
+
+    .typewriter-container .lang-label {
+        font-size: 0.6rem;
+        color: #94A3B8;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        font-family: 'Inter', sans-serif;
+        font-weight: 600;
+        background: rgba(37, 99, 235, 0.12);
+        padding: 1px 10px;
+        border-radius: 50px;
+        border: 1px solid rgba(34, 211, 238, 0.10);
+    }
+
+    .typewriter-container .code-line {
+        font-size: 0.9rem;
+        font-weight: 500;
+        font-family: 'Fira Code', 'JetBrains Mono', 'Inter', monospace;
+        background: rgba(0, 0, 0, 0.3);
+        padding: 4px 12px;
+        border-radius: 10px;
+        border: 1px solid rgba(34, 211, 238, 0.06);
+        min-height: 2.2rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        flex-wrap: wrap;
+        width: 100%;
+        max-width: 450px;
+        margin: 0 auto;
+    }
+
+    .typewriter-container .code-line .typed-text {
+        background: linear-gradient(135deg, #60A5FA, #34D399);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+        text-shadow: 0 0 40px rgba(34, 211, 238, 0.15);
+        animation: glow-pulse 2.5s ease-in-out infinite alternate;
+    }
+
+    .typewriter-container .code-line .cursor {
+        display: inline-block;
+        width: 2px;
+        height: 1rem;
+        background: var(--cyan);
+        margin-left: 2px;
+        animation: blink 0.8s step-end infinite;
+        vertical-align: middle;
+    }
+
+    @keyframes glow-pulse {
+        0% { text-shadow: 0 0 20px rgba(34, 211, 238, 0.05); }
+        100% { text-shadow: 0 0 50px rgba(34, 211, 238, 0.25); }
+    }
+
+    @keyframes blink {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0; }
+    }
+
+    /* ---------- REGISTRATION FORM ---------- */
+    .auth-form {
+        flex: 1;
+        overflow-y: auto;
+        padding-right: 4px;
+    }
+
+    .auth-form .auth-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+    }
+
+    .auth-form .auth-field--full {
+        grid-column: 1 / -1;
+    }
+
+    .auth-form .auth-section {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-family: 'Space Grotesk', 'Inter', sans-serif;
+        font-weight: 700;
+        font-size: 0.8rem;
+        color: #F1F5F9;
+        padding-bottom: 4px;
+        margin: 10px 0 8px;
+        border-bottom: 1px solid rgba(148, 163, 184, 0.18);
+    }
+
+    .auth-form .auth-section__icon {
+        width: 24px;
+        height: 24px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(37, 99, 235, 0.15);
+        border: 1px solid rgba(34, 211, 238, 0.3);
+        color: var(--cyan);
+        font-size: 0.75rem;
+    }
+
+    .auth-form .auth-label {
+        display: block;
+        font-size: 0.65rem;
+        font-weight: 600;
+        color: #CBD5E1;
+        margin-bottom: 3px;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+    }
+
+    .auth-form .auth-req { color: var(--cyan); }
+    .auth-form .auth-optional { color: #64748B; text-transform: none; font-weight: 400; letter-spacing: 0; font-size: 0.6rem; }
+
+    .auth-form .auth-input-group {
+        display: flex;
+        align-items: center;
+        background: rgba(248, 250, 252, 0.04);
+        border: 1px solid rgba(148, 163, 184, 0.25);
+        border-radius: 10px;
+        transition: border-color .2s ease, box-shadow .2s ease;
+    }
+
+    .auth-form .auth-input-group:focus-within {
+        border-color: var(--cyan);
+        box-shadow: 0 0 0 3px rgba(34, 211, 238, 0.15);
+    }
+
+    .auth-form .auth-input-group--textarea { align-items: flex-start; }
+
+    .auth-form .auth-input-icon {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 34px;
+        color: #64748B;
+        font-size: 0.8rem;
+        flex-shrink: 0;
+    }
+
+    .auth-form .auth-input-icon--top { padding-top: 8px; }
+
+    .auth-form .auth-input {
+        flex: 1;
+        background: transparent;
+        border: none;
+        outline: none;
+        color: #F1F5F9;
+        padding: 8px 8px 8px 0;
+        font-size: 0.8rem;
+        width: 100%;
+    }
+
+    .auth-form .auth-input::placeholder { color: #64748B; }
+
+    /* Password toggle button */
+    .auth-form .auth-toggle-btn {
+        background: transparent;
+        border: none;
+        color: #64748B;
+        padding: 0 10px;
+        cursor: pointer;
+        transition: color 0.2s ease;
+        font-size: 1rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 100%;
+        flex-shrink: 0;
+    }
+
+    .auth-form .auth-toggle-btn:hover {
+        color: var(--cyan);
+    }
+
+    /* Password strength meter */
+    .auth-form .password-strength {
+        margin-top: 4px;
+        display: flex;
+        flex-direction: column;
+        gap: 3px;
+    }
+
+    .auth-form .strength-bar {
+        display: flex;
+        gap: 4px;
+        height: 4px;
+    }
+
+    .auth-form .strength-bar span {
+        flex: 1;
+        background: rgba(148, 163, 184, 0.2);
+        border-radius: 4px;
+        transition: background 0.3s ease;
+    }
+
+    .auth-form .strength-bar span.active.weak {
+        background: #EF4444;
+    }
+    .auth-form .strength-bar span.active.medium {
+        background: #F59E0B;
+    }
+    .auth-form .strength-bar span.active.strong {
+        background: #10B981;
+    }
+
+    .auth-form .strength-text {
+        font-size: 0.6rem;
+        font-weight: 600;
+        color: #94A3B8;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        min-height: 1rem;
+    }
+    .auth-form .strength-text.weak { color: #EF4444; }
+    .auth-form .strength-text.medium { color: #F59E0B; }
+    .auth-form .strength-text.strong { color: #10B981; }
+
+    .auth-form .auth-select { appearance: none; cursor: pointer; }
+    .auth-form .auth-select option { background: #1E293B; color: #F1F5F9; }
+    .auth-form .auth-hint { font-size: 0.6rem; color: #64748B; margin-top: 2px; }
+
+    .auth-form .auth-dropzone {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 2px;
+        text-align: center;
+        border: 1.5px dashed rgba(148, 163, 184, 0.3);
+        border-radius: 10px;
+        padding: 12px 8px;
+        cursor: pointer;
+        transition: border-color .2s ease, background .2s ease;
+    }
+
+    .auth-form .auth-dropzone:hover {
+        border-color: var(--cyan);
+        background: rgba(34, 211, 238, 0.05);
+    }
+
+    .auth-form .auth-dropzone__icon { font-size: 1.2rem; color: var(--cyan); margin-bottom: 0; }
+    .auth-form .auth-dropzone__text { font-size: 0.75rem; color: #CBD5E1; }
+    .auth-form .auth-dropzone__hint { font-size: 0.6rem; color: #64748B; }
+
+    .auth-form .auth-checkbox {
+        display: flex;
+        align-items: flex-start;
+        gap: 8px;
+        font-size: 0.7rem;
+        color: #94A3B8;
+        cursor: pointer;
+        user-select: none;
+        margin: 10px 0 14px;
+    }
+
+    .auth-form .auth-checkbox input { display: none; }
+
+    .auth-form .auth-checkbox__box {
+        width: 14px;
+        height: 14px;
+        margin-top: 1px;
+        flex-shrink: 0;
+        border-radius: 4px;
+        border: 1.5px solid #475569;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        transition: all .15s ease;
+    }
+
+    .auth-form .auth-checkbox input:checked + .auth-checkbox__box {
+        background: linear-gradient(135deg, var(--blue), var(--cyan));
+        border-color: transparent;
+    }
+
+    .auth-form .auth-checkbox input:checked + .auth-checkbox__box::after {
+        content: "";
+        width: 4px;
+        height: 8px;
+        border: solid #0F172A;
+        border-width: 0 2px 2px 0;
+        transform: rotate(45deg) translate(-1px,-1px);
+    }
+
+    .auth-form .auth-link { color: #67E8F9; text-decoration: none; }
+    .auth-form .auth-link:hover { text-decoration: underline; }
+
+    .auth-form .auth-submit {
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        padding: 10px;
+        border: none;
+        border-radius: 10px;
+        background: linear-gradient(90deg, var(--blue), var(--cyan));
+        background-size: 160% 100%;
+        background-position: 0% 0;
+        color: #0B1220;
+        font-weight: 700;
+        font-size: 0.85rem;
+        cursor: pointer;
+        transition: transform .15s ease, box-shadow .15s ease, background-position .4s ease;
+        margin-top: 4px;
+    }
+
+    .auth-form .auth-submit:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 12px 28px -8px rgba(37, 99, 235, 0.6);
+        background-position: 100% 0;
+    }
+
+    /* ============================================================
+       FIX: WHITE DIVIDER & FOOTER (these are OUTSIDE the form!)
+       ============================================================ */
+    .auth-divider {
+        display: flex;
+        align-items: center;
+        text-align: center;
+        color: #FFFFFF !important;
+        font-size: 0.6rem;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        margin: 12px 0 10px;
+    }
+
+    .auth-divider span {
+        color: #FFFFFF !important;
+    }
+
+    .auth-divider::before,
+    .auth-divider::after {
+        content: "";
+        flex: 1;
+        height: 1px;
+        background: rgba(148, 163, 184, 0.2);
+    }
+
+    .auth-divider span {
+        padding: 0 12px;
+    }
+
+    .auth-footer {
+        text-align: center;
+        color: #FFFFFF !important;
+        font-size: 0.75rem;
+        margin-bottom: 0;
+        padding-bottom: 4px;
+    }
+
+    .auth-footer .auth-link,
+    .auth-footer .auth-link--strong {
+        color: #22D3EE !important;
+        font-weight: 700;
+    }
+
+    .auth-footer .auth-link:hover,
+    .auth-footer .auth-link--strong:hover {
+        color: #FFFFFF !important;
+        text-decoration: underline;
+    }
+
+    /* ---------- RESPONSIVE ---------- */
+    @media (max-width: 768px) {
+        .split-auth {
+            flex-direction: column;
+            margin: 0;
+            border-radius: 0;
+            min-height: 100vh;
+        }
+
+        .split-auth .auth-image {
+            min-height: 120px;
+            flex: 0 0 110px;
+        }
+
+        .split-auth .auth-image .image-content h1 {
+            font-size: 1.8rem;
+        }
+        .split-auth .auth-image .image-content p {
+            font-size: 0.8rem;
+        }
+
+        .split-auth .auth-form-side {
+            padding: 16px 14px 12px;
+            max-height: none;
+            border-left: none;
+            border-top: 1px solid rgba(34, 211, 238, 0.08);
+            flex: 1;
+        }
+
+        .typewriter-container .code-line {
+            font-size: 0.7rem;
+            padding: 3px 8px;
+            min-height: 1.8rem;
+            max-width: 100%;
+        }
+        .typewriter-container .typed-wrapper {
+            min-height: 2.6rem;
+        }
+        .typewriter-container .code-line .cursor {
+            height: 0.8rem;
+        }
+
+        .auth-form .auth-grid {
+            grid-template-columns: 1fr;
+            gap: 8px;
+        }
+        .auth-form .auth-section {
+            font-size: 0.75rem;
+            margin: 8px 0 4px;
+        }
+        .auth-form .auth-input {
+            font-size: 0.75rem;
+            padding: 6px 6px 6px 0;
+        }
+        .auth-form .auth-submit {
+            font-size: 0.8rem;
+            padding: 8px;
+        }
+        .auth-form .auth-dropzone {
+            padding: 8px;
+        }
+        .auth-form .auth-checkbox {
+            font-size: 0.65rem;
+        }
+    }
+
+    @media (max-width: 576px) {
+        .split-auth .auth-image .image-content h1 {
+            font-size: 1.4rem;
+        }
+        .typewriter-container .code-line {
+            font-size: 0.6rem;
+            padding: 2px 6px;
+            min-height: 1.6rem;
+        }
+        .typewriter-container .lang-label {
+            font-size: 0.5rem;
+        }
+        .split-auth .auth-form-side {
+            padding: 12px 10px 10px;
+        }
+        .auth-form .auth-input {
+            font-size: 0.7rem;
+            padding: 5px 5px 5px 0;
+        }
+        .auth-form .auth-label {
+            font-size: 0.6rem;
+        }
+        .auth-form .auth-submit {
+            font-size: 0.75rem;
+            padding: 6px;
+        }
+    }
+</style>
+<div class="split-auth">
+    <!-- LEFT: Background Image -->
+    <div class="auth-image">
+        <div class="image-content">
+            <h1>Awwalu <span>Devs</span></h1>
+            <p>Code · Learn · Build · Succeed</p>
+        </div>
+    </div>
+
+    <!-- RIGHT: Typewriter + Registration Form -->
+    <div class="auth-form-side">
+        <!-- Typewriter -->
+        <div class="typewriter-container">
+            <div class="greeting">🚀 Join the community,</div>
+            <div class="typed-wrapper">
+                <span class="lang-label" id="langLabel">Python</span>
+                <div class="code-line">
+                    <span class="typed-text" id="typedText"></span>
+                    <span class="cursor" id="cursor"></span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Registration Form -->
+        <form method="POST" action="{{ url_for('register') }}" enctype="multipart/form-data" class="auth-form" id="registerForm">
+
+            <h5 class="auth-section"><span class="auth-section__icon"><i class="bi bi-person-circle"></i></span>Personal Information</h5>
+
+            <div class="auth-grid">
+                <div class="auth-field">
+                    <label class="auth-label">Full Name <span class="auth-req">*</span></label>
+                    <div class="auth-input-group">
+                        <span class="auth-input-icon"><i class="bi bi-person-badge"></i></span>
+                        <input type="text" name="full_name" class="auth-input" placeholder="e.g. John Doe" required>
+                    </div>
+                </div>
+
+                <div class="auth-field">
+                    <label class="auth-label">Username <span class="auth-req">*</span></label>
+                    <div class="auth-input-group">
+                        <span class="auth-input-icon"><i class="bi bi-person"></i></span>
+                        <input type="text" name="username" class="auth-input" placeholder="Unique username" required>
+                    </div>
+                </div>
+
+                <div class="auth-field">
+                    <label class="auth-label">Email Address <span class="auth-req">*</span></label>
+                    <div class="auth-input-group">
+                        <span class="auth-input-icon"><i class="bi bi-envelope"></i></span>
+                        <input type="email" name="email" class="auth-input" placeholder="your@email.com" required>
+                    </div>
+                </div>
+
+                <div class="auth-field">
+                    <label class="auth-label">Phone Number <span class="auth-optional">optional</span></label>
+                    <div class="auth-input-group">
+                        <span class="auth-input-icon"><i class="bi bi-phone"></i></span>
+                        <input type="tel" name="phone" class="auth-input" placeholder="+234 800 000 0000">
+                    </div>
+                </div>
+
+                <div class="auth-field">
+                    <label class="auth-label">Date of Birth <span class="auth-optional">optional</span></label>
+                    <div class="auth-input-group">
+                        <span class="auth-input-icon"><i class="bi bi-calendar"></i></span>
+                        <input type="date" name="dob" class="auth-input">
+                    </div>
+                </div>
+
+                <div class="auth-field auth-field--full">
+                    <label class="auth-label">About Yourself <span class="auth-optional">optional</span></label>
+                    <div class="auth-input-group auth-input-group--textarea">
+                        <span class="auth-input-icon auth-input-icon--top"><i class="bi bi-chat-text"></i></span>
+                        <textarea name="bio" class="auth-input" rows="2" placeholder="Tell us a bit about yourself..."></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <div class="auth-field auth-field--full">
+                <label class="auth-label">Profile Picture <span class="auth-optional">optional</span></label>
+                <label class="auth-dropzone">
+                    <input type="file" name="avatar" accept="image/*" hidden>
+                    <i class="bi bi-cloud-arrow-up auth-dropzone__icon"></i>
+                    <span class="auth-dropzone__text">Click to upload, or drag a photo here</span>
+                    <span class="auth-dropzone__hint">PNG, JPG or GIF · Max 2MB</span>
+                </label>
+            </div>
+
+            <h5 class="auth-section"><span class="auth-section__icon"><i class="bi bi-shield-lock"></i></span>Account Security</h5>
+
+            <div class="auth-grid">
+                <div class="auth-field">
+                    <label class="auth-label">Password <span class="auth-req">*</span></label>
+                    <div class="auth-input-group">
+                        <span class="auth-input-icon"><i class="bi bi-lock"></i></span>
+                        <input type="password" name="password" id="password" class="auth-input" placeholder="Min 6 characters" required minlength="6">
+                        <button type="button" class="auth-toggle-btn" id="togglePassword" aria-label="Toggle password visibility">
+                            <i class="bi bi-eye"></i>
+                        </button>
+                    </div>
+                    <div class="password-strength">
+                        <div class="strength-bar" id="strengthBar">
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                        </div>
+                        <div class="strength-text" id="strengthText">Enter a password</div>
+                    </div>
+                    <div class="auth-hint">At least 6 characters, including a number and a special character.</div>
+                </div>
+
+                <div class="auth-field">
+                    <label class="auth-label">Confirm Password <span class="auth-req">*</span></label>
+                    <div class="auth-input-group">
+                        <span class="auth-input-icon"><i class="bi bi-shield-lock"></i></span>
+                        <input type="password" name="confirm_password" id="confirmPassword" class="auth-input" placeholder="Re-enter password" required>
+                        <button type="button" class="auth-toggle-btn" id="toggleConfirm" aria-label="Toggle confirm password visibility">
+                            <i class="bi bi-eye"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <h5 class="auth-section"><span class="auth-section__icon"><i class="bi bi-book"></i></span>Course Enrollment</h5>
+
+            <div class="auth-field auth-field--full">
+                <label class="auth-label">Select Your Course <span class="auth-req">*</span></label>
+                <div class="auth-input-group">
+                    <span class="auth-input-icon"><i class="bi bi-book"></i></span>
+                    <select name="course_id" class="auth-input auth-select" required>
+                        <option value="">Choose...</option>
+                        {% for course in courses %}
+                        <option value="{{ course.id }}">{{ course.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+
+            <label class="auth-checkbox">
+                <input type="checkbox" id="terms" required>
+                <span class="auth-checkbox__box"></span>
+                <span>I agree to the <a href="#" class="auth-link">Terms of Service</a> and <a href="#" class="auth-link">Privacy Policy</a>.</span>
+            </label>
+
+            <button type="submit" class="auth-submit">
+                <i class="bi bi-person-plus"></i>
+                <span>Register Now</span>
+            </button>
+        </form>
+
+        <!-- ====== DIVIDER & FOOTER (now white) ====== -->
+        <div class="auth-divider"><span>or</span></div>
+
+        <p class="auth-footer">
+            Already have an account? <a href="{{ url_for('login') }}" class="auth-link auth-link--strong">Login here</a>
+        </p>
+    </div>
+</div>
+
+<script>
+    // ---------- TYPEWRITER ----------
+    document.addEventListener('DOMContentLoaded', function() {
+        const snippets = [
+            { lang: 'Python', code: 'print("Welcome to Awwalu Devs")' },
+            { lang: 'JavaScript', code: 'console.log("Welcome to Awwalu Devs")' },
+            { lang: 'Java', code: 'System.out.println("Welcome to Awwalu Devs")' },
+            { lang: 'C++', code: 'cout << "Welcome to Awwalu Devs" << endl;' },
+            { lang: 'Ruby', code: 'puts "Welcome to Awwalu Devs"' },
+            { lang: 'Go', code: 'fmt.Println("Welcome to Awwalu Devs")' },
+            { lang: 'Rust', code: 'println!("Welcome to Awwalu Devs");' },
+            { lang: 'TypeScript', code: 'console.log("Welcome to Awwalu Devs");' },
+            { lang: 'Swift', code: 'print("Welcome to Awwalu Devs")' },
+            { lang: 'Kotlin', code: 'println("Welcome to Awwalu Devs")' },
+            { lang: 'PHP', code: 'echo "Welcome to Awwalu Devs";' },
+            { lang: 'C#', code: 'Console.WriteLine("Welcome to Awwalu Devs");' }
+        ];
+
+        let index = 0;
+        let charIndex = 0;
+        let isDeleting = false;
+        const typedElement = document.getElementById('typedText');
+        const langLabel = document.getElementById('langLabel');
+        let currentText = '';
+
+        function typeEffect() {
+            const fullText = snippets[index].code;
+            langLabel.textContent = snippets[index].lang;
+
+            if (isDeleting) {
+                currentText = fullText.substring(0, charIndex--);
+            } else {
+                currentText = fullText.substring(0, charIndex++);
+            }
+
+            typedElement.textContent = currentText;
+
+            let speed = isDeleting ? 30 : 60;
+
+            if (!isDeleting && charIndex === fullText.length) {
+                speed = 2500;
+                isDeleting = true;
+            } else if (isDeleting && charIndex === 0) {
+                isDeleting = false;
+                index = (index + 1) % snippets.length;
+                speed = 400;
+            }
+
+            setTimeout(typeEffect, speed);
+        }
+
+        typeEffect();
+
+        // ---------- PASSWORD STRENGTH ----------
+        const passwordInput = document.getElementById('password');
+        const strengthBar = document.getElementById('strengthBar');
+        const strengthText = document.getElementById('strengthText');
+
+        function checkStrength(password) {
+            let score = 0;
+            if (password.length >= 6) score++;
+            if (password.length >= 10) score++;
+            if (/[a-z]/.test(password) && /[A-Z]/.test(password)) score++;
+            if (/\d/.test(password)) score++;
+            if (/[^a-zA-Z0-9]/.test(password)) score++;
+
+            let level = 'weak';
+            let label = 'Weak';
+            let color = 'weak';
+            if (score >= 5) { level = 'strong'; label = 'Strong'; color = 'strong'; }
+            else if (score >= 3) { level = 'medium'; label = 'Medium'; color = 'medium'; }
+            else { level = 'weak'; label = 'Weak'; color = 'weak'; }
+
+            // Update bar
+            const spans = strengthBar.querySelectorAll('span');
+            spans.forEach((span, i) => {
+                span.className = '';
+                if (i < score) {
+                    span.classList.add('active', color);
+                }
+            });
+
+            // Update text
+            strengthText.textContent = password.length === 0 ? 'Enter a password' : `Password strength: ${label}`;
+            strengthText.className = 'strength-text ' + (password.length === 0 ? '' : color);
+        }
+
+        passwordInput.addEventListener('input', function() {
+            checkStrength(this.value);
+        });
+
+        // ---------- TOGGLE PASSWORD VISIBILITY ----------
+        function toggleVisibility(inputId, toggleBtnId) {
+            const input = document.getElementById(inputId);
+            const btn = document.getElementById(toggleBtnId);
+            btn.addEventListener('click', function() {
+                const type = input.getAttribute('type') === 'password' ? 'text' : 'password';
+                input.setAttribute('type', type);
+                this.querySelector('i').classList.toggle('bi-eye');
+                this.querySelector('i').classList.toggle('bi-eye-slash');
+            });
+        }
+
+        toggleVisibility('password', 'togglePassword');
+        toggleVisibility('confirmPassword', 'toggleConfirm');
+
+        // ---------- FILE UPLOAD PREVIEW ----------
+        const fileInput = document.querySelector('input[name="avatar"]');
+        if (fileInput) {
+            const dropzone = fileInput.closest('.auth-dropzone');
+            const dropzoneText = dropzone.querySelector('.auth-dropzone__text');
+            fileInput.addEventListener('change', function() {
+                if (this.files && this.files[0]) {
+                    dropzoneText.textContent = '📎 ' + this.files[0].name;
+                    dropzoneText.style.color = '#22D3EE';
+                    dropzone.style.borderColor = '#22D3EE';
+                } else {
+                    dropzoneText.textContent = 'Click to upload, or drag a photo here';
+                    dropzoneText.style.color = '';
+                    dropzone.style.borderColor = '';
+                }
+            });
+        }
+    });
+</script>
+{% endblock %}

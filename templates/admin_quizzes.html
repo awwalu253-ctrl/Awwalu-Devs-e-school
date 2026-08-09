@@ -1,0 +1,695 @@
+{% extends "base.html" %}
+
+{% block content %}
+<style>
+    /* ============================================================
+       QUIZ MANAGEMENT — NAVY + ELECTRIC BLUE THEME
+       ============================================================ */
+
+    /* ---------- ANIMATIONS ---------- */
+    @keyframes fadeInUp {
+        from { opacity: 0; transform: translateY(30px) scale(0.96); }
+        to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    .animate-card {
+        animation: fadeInUp 0.6s ease forwards;
+        opacity: 0;
+    }
+    .animate-card:nth-child(1) { animation-delay: 0.05s; }
+    .animate-card:nth-child(2) { animation-delay: 0.10s; }
+
+    /* ---------- HEADER ---------- */
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin-bottom: 28px;
+        animation: fadeInUp 0.6s ease forwards;
+        opacity: 0;
+    }
+
+    .page-header .header-left {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        flex-wrap: wrap;
+    }
+
+    .page-header h2 {
+        font-weight: 700;
+        color: var(--navy);
+        letter-spacing: -0.3px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-size: 1.8rem;
+        margin: 0;
+    }
+
+    .page-header h2 i {
+        color: var(--blue);
+        font-size: 1.8rem;
+    }
+
+    .page-header .header-badge {
+        background: linear-gradient(135deg, var(--blue), var(--cyan));
+        color: white;
+        padding: 2px 14px;
+        border-radius: 50px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+    }
+
+    .page-header .subtitle {
+        color: var(--text-light);
+        font-size: 0.95rem;
+        margin-top: 2px;
+        width: 100%;
+    }
+
+    /* ---------- BUTTONS ---------- */
+    .btn-primary {
+        background: linear-gradient(135deg, var(--blue), #1D4ED8);
+        border: none;
+        color: white;
+        font-weight: 600;
+        padding: 8px 20px;
+        border-radius: 50px;
+        box-shadow: 0 4px 14px rgba(37, 99, 235, 0.25);
+        transition: var(--transition);
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 0.85rem;
+        cursor: pointer;
+        text-decoration: none;
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-2px) scale(1.02);
+        box-shadow: 0 8px 24px rgba(37, 99, 235, 0.35);
+        background: linear-gradient(135deg, var(--blue), var(--cyan));
+        color: white;
+    }
+
+    .btn-secondary {
+        border: 1.5px solid #CBD5E1;
+        color: var(--text-light);
+        background: transparent;
+        font-weight: 500;
+        border-radius: 50px;
+        padding: 8px 20px;
+        transition: var(--transition);
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        text-decoration: none;
+        font-size: 0.85rem;
+    }
+
+    .btn-secondary:hover {
+        border-color: var(--blue);
+        color: var(--blue);
+        background: rgba(37, 99, 235, 0.04);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(37, 99, 235, 0.08);
+    }
+
+    .btn-info {
+        background: linear-gradient(135deg, var(--blue), var(--cyan));
+        border: none;
+        color: white;
+        font-weight: 600;
+        padding: 6px 14px;
+        border-radius: 50px;
+        box-shadow: 0 4px 14px rgba(37, 99, 235, 0.20);
+        transition: var(--transition);
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 0.75rem;
+        cursor: pointer;
+        text-decoration: none;
+    }
+
+    .btn-info:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 24px rgba(37, 99, 235, 0.30);
+        background: linear-gradient(135deg, var(--blue), var(--cyan));
+        color: white;
+        opacity: 0.9;
+    }
+
+    .btn-danger {
+        background: linear-gradient(135deg, #EF4444, #DC2626);
+        border: none;
+        color: white;
+        font-weight: 600;
+        padding: 6px 14px;
+        border-radius: 50px;
+        box-shadow: 0 4px 14px rgba(239, 68, 68, 0.20);
+        transition: var(--transition);
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 0.75rem;
+        cursor: pointer;
+        text-decoration: none;
+    }
+
+    .btn-danger:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 24px rgba(239, 68, 68, 0.30);
+        background: linear-gradient(135deg, #F87171, #EF4444);
+        color: white;
+    }
+
+    .btn-sm {
+        padding: 4px 12px;
+        font-size: 0.7rem;
+    }
+
+    /* ---------- CARDS ---------- */
+    .card {
+        border: none;
+        border-radius: var(--radius);
+        box-shadow: var(--shadow-md);
+        transition: var(--transition);
+        background: rgba(255, 255, 255, 0.92);
+        backdrop-filter: blur(2px);
+        border: 1px solid rgba(37, 99, 235, 0.06);
+        overflow: hidden;
+    }
+
+    .card:hover {
+        box-shadow: var(--shadow-lg), 0 0 0 1px rgba(37, 99, 235, 0.06);
+        transform: translateY(-2px);
+    }
+
+    .card-header-custom {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 16px 20px 12px 20px;
+        border-bottom: 1px solid rgba(37, 99, 235, 0.06);
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    .card-header-custom h5 {
+        font-weight: 700;
+        color: var(--navy);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 1rem;
+        margin: 0;
+    }
+
+    .card-header-custom h5 i {
+        color: var(--blue);
+    }
+
+    .card-header-custom .total-badge {
+        background: rgba(37, 99, 235, 0.08);
+        color: var(--navy);
+        padding: 2px 14px;
+        border-radius: 50px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        border: 1px solid rgba(37, 99, 235, 0.06);
+    }
+
+    .card-body-custom {
+        padding: 20px;
+    }
+
+    /* ---------- TABLE ---------- */
+    .table-wrap {
+        overflow-x: auto;
+    }
+
+    .table {
+        margin-bottom: 0;
+        border-collapse: separate;
+        border-spacing: 0 6px;
+        width: 100%;
+    }
+
+    .table thead th {
+        background: rgba(15, 23, 42, 0.04);
+        color: var(--navy);
+        font-weight: 600;
+        font-size: 0.7rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        padding: 10px 14px;
+        border: none;
+        white-space: nowrap;
+        border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+    }
+
+    .table tbody tr {
+        background: rgba(255, 255, 255, 0.6);
+        transition: var(--transition);
+        border-radius: var(--radius-sm);
+        box-shadow: 0 2px 8px rgba(15, 23, 42, 0.03);
+    }
+
+    .table tbody tr:hover {
+        background: rgba(37, 99, 235, 0.04);
+        transform: scale(1.01);
+        box-shadow: var(--shadow-md);
+    }
+
+    .table tbody td {
+        padding: 10px 14px;
+        border: none;
+        vertical-align: middle;
+        font-size: 0.85rem;
+        color: var(--text);
+        background: transparent;
+    }
+
+    .table tbody tr td:first-child {
+        border-radius: var(--radius-sm) 0 0 var(--radius-sm);
+    }
+
+    .table tbody tr td:last-child {
+        border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+    }
+
+    /* Quiz title with icon */
+    .table .quiz-title {
+        font-weight: 600;
+        color: var(--navy);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .table .quiz-title i {
+        color: var(--blue);
+        font-size: 1rem;
+    }
+
+    /* Course badge */
+    .table .course-badge {
+        display: inline-block;
+        padding: 3px 12px;
+        border-radius: 50px;
+        font-weight: 600;
+        font-size: 0.7rem;
+        color: white;
+        background: var(--blue);
+        box-shadow: 0 2px 6px rgba(37, 99, 235, 0.15);
+    }
+
+    /* Question count */
+    .table .question-count {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        font-weight: 600;
+        color: var(--text);
+    }
+
+    .table .question-count i {
+        color: var(--blue);
+        font-size: 0.85rem;
+    }
+
+    /* Action buttons group */
+    .table .action-group {
+        display: flex;
+        gap: 6px;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+    }
+
+    /* ---------- EMPTY STATE ---------- */
+    .empty-state {
+        text-align: center;
+        padding: 60px 20px;
+        border: 2px dashed rgba(37, 99, 235, 0.12);
+        border-radius: var(--radius);
+        background: rgba(255, 255, 255, 0.5);
+        animation: fadeInUp 0.7s ease;
+    }
+
+    .empty-state .empty-icon {
+        width: 84px;
+        height: 84px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, rgba(37, 99, 235, 0.08), rgba(34, 211, 238, 0.08));
+        color: var(--blue);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2.6rem;
+        margin: 0 auto 20px;
+        border: 2px solid rgba(37, 99, 235, 0.10);
+        transition: var(--transition);
+    }
+
+    .empty-state:hover .empty-icon {
+        transform: scale(1.06) rotate(-4deg);
+        border-color: var(--cyan);
+        box-shadow: 0 0 0 8px rgba(34, 211, 238, 0.06);
+    }
+
+    .empty-state h5 {
+        color: var(--navy);
+        font-weight: 700;
+        margin-bottom: 8px;
+    }
+
+    .empty-state p {
+        color: var(--text-light);
+        max-width: 420px;
+        margin: 0 auto;
+        font-size: 0.95rem;
+        line-height: 1.5;
+    }
+
+    .empty-state .btn-primary {
+        margin-top: 16px;
+    }
+
+    /* ---------- RESPONSIVE ---------- */
+    @media (max-width: 768px) {
+        .page-header h2 {
+            font-size: 1.4rem;
+        }
+        .page-header h2 i {
+            font-size: 1.4rem;
+        }
+        .card-body-custom {
+            padding: 16px;
+        }
+        .table thead th,
+        .table tbody td {
+            padding: 8px 10px;
+            font-size: 0.78rem;
+        }
+        .table .course-badge {
+            font-size: 0.6rem;
+            padding: 2px 10px;
+        }
+        .btn-info, .btn-danger {
+            font-size: 0.65rem;
+            padding: 4px 10px;
+        }
+        .card-header-custom h5 {
+            font-size: 0.9rem;
+        }
+        .page-header .header-left {
+            gap: 10px;
+        }
+    }
+
+    @media (max-width: 576px) {
+        .page-header {
+            flex-direction: column;
+            align-items: stretch;
+            gap: 8px;
+        }
+        .page-header .header-left {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 6px;
+        }
+        .page-header h2 {
+            font-size: 1.2rem;
+        }
+        .page-header h2 i {
+            font-size: 1.2rem;
+        }
+        .page-header .header-badge {
+            font-size: 0.65rem;
+            padding: 2px 10px;
+        }
+        .page-header .subtitle {
+            font-size: 0.85rem;
+        }
+        .card-header-custom {
+            flex-direction: column;
+            align-items: stretch;
+            gap: 6px;
+        }
+        .table thead th {
+            font-size: 0.55rem;
+            padding: 6px 8px;
+        }
+        .table tbody td {
+            font-size: 0.7rem;
+            padding: 6px 8px;
+        }
+        .table .quiz-title {
+            font-size: 0.75rem;
+        }
+        .table .course-badge {
+            font-size: 0.55rem;
+            padding: 1px 8px;
+        }
+        .table .question-count {
+            font-size: 0.7rem;
+        }
+        .btn-info, .btn-danger {
+            font-size: 0.6rem;
+            padding: 3px 8px;
+        }
+        .action-group {
+            gap: 4px;
+        }
+        .empty-state {
+            padding: 40px 16px;
+        }
+        .empty-state .empty-icon {
+            width: 60px;
+            height: 60px;
+            font-size: 1.8rem;
+        }
+    }
+
+    /* ---------- DARK MODE ---------- */
+    body.dark-mode .page-header h2 {
+        color: #E2E8F0;
+    }
+    body.dark-mode .page-header h2 i {
+        color: var(--cyan);
+    }
+    body.dark-mode .page-header .subtitle {
+        color: #94A3B8;
+    }
+    body.dark-mode .page-header .header-badge {
+        background: linear-gradient(135deg, #1D4ED8, var(--cyan));
+    }
+    body.dark-mode .page-header .total-badge {
+        background: rgba(37, 99, 235, 0.12);
+        color: #CBD5E1;
+        border-color: rgba(37, 99, 235, 0.10);
+    }
+
+    body.dark-mode .card {
+        background: rgba(15, 23, 42, 0.9);
+        border-color: rgba(37, 99, 235, 0.08);
+        color: #E2E8F0;
+    }
+    body.dark-mode .card-header-custom h5 {
+        color: #E2E8F0;
+    }
+
+    body.dark-mode .table thead th {
+        background: rgba(37, 99, 235, 0.08);
+        color: #CBD5E1;
+    }
+    body.dark-mode .table tbody tr {
+        background: rgba(15, 23, 42, 0.6);
+        box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    }
+    body.dark-mode .table tbody tr:hover {
+        background: rgba(37, 99, 235, 0.08);
+    }
+    body.dark-mode .table tbody td {
+        color: #E2E8F0;
+    }
+    body.dark-mode .table .quiz-title {
+        color: #E2E8F0;
+    }
+    body.dark-mode .table .quiz-title i {
+        color: var(--cyan);
+    }
+    body.dark-mode .table .course-badge {
+        background: linear-gradient(135deg, #1D4ED8, #2563EB);
+    }
+    body.dark-mode .table .question-count {
+        color: #E2E8F0;
+    }
+    body.dark-mode .table .question-count i {
+        color: var(--cyan);
+    }
+
+    body.dark-mode .btn-secondary {
+        border-color: #334155;
+        color: #94A3B8;
+    }
+    body.dark-mode .btn-secondary:hover {
+        border-color: var(--blue);
+        color: var(--cyan);
+        background: rgba(37, 99, 235, 0.08);
+    }
+    body.dark-mode .btn-primary {
+        background: linear-gradient(135deg, #1D4ED8, #2563EB);
+    }
+    body.dark-mode .btn-primary:hover {
+        background: linear-gradient(135deg, var(--blue), var(--cyan));
+    }
+    body.dark-mode .btn-info {
+        background: linear-gradient(135deg, #1D4ED8, #0891B2);
+    }
+    body.dark-mode .btn-info:hover {
+        background: linear-gradient(135deg, #2563EB, #22D3EE);
+    }
+    body.dark-mode .btn-danger {
+        background: linear-gradient(135deg, #B91C1C, #991B1B);
+    }
+    body.dark-mode .btn-danger:hover {
+        background: linear-gradient(135deg, #DC2626, #B91C1C);
+    }
+
+    body.dark-mode .empty-state {
+        background: rgba(15, 23, 42, 0.4);
+        border-color: rgba(37, 99, 235, 0.10);
+    }
+    body.dark-mode .empty-state h5 {
+        color: #E2E8F0;
+    }
+    body.dark-mode .empty-state p {
+        color: #94A3B8;
+    }
+</style>
+
+<!-- ============================================================
+     HEADER
+     ============================================================ -->
+<div class="page-header">
+    <div>
+        <div class="header-left">
+            <h2>
+                <i class="bi bi-question-circle"></i>
+                Manage Quizzes
+            </h2>
+            {% if quizzes %}
+            <span class="header-badge">
+                <i class="bi bi-list-check"></i> {{ quizzes|length }} total
+            </span>
+            {% endif %}
+        </div>
+        <p class="subtitle">Create, edit, and manage quizzes for your courses.</p>
+    </div>
+    <a href="{{ url_for('add_quiz') }}" class="btn btn-primary">
+        <i class="bi bi-plus-lg"></i> New Quiz
+    </a>
+</div>
+
+<!-- ============================================================
+     QUIZ LIST CARD
+     ============================================================ -->
+<div class="card animate-card">
+    <div class="card-header-custom">
+        <h5>
+            <i class="bi bi-list-ul"></i>
+            All Quizzes
+        </h5>
+        {% if quizzes %}
+        <span class="total-badge">
+            <i class="bi bi-question-circle"></i> {{ quizzes|length }} quizzes
+        </span>
+        {% endif %}
+    </div>
+
+    <div class="card-body-custom">
+        {% if quizzes %}
+        <div class="table-wrap">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Quiz</th>
+                        <th>Course</th>
+                        <th>Questions</th>
+                        <th style="text-align: right;">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for q in quizzes %}
+                    <tr>
+                        <td>
+                            <div class="quiz-title">
+                                <i class="bi bi-question-circle-fill"></i>
+                                {{ q.title }}
+                            </div>
+                        </td>
+                        <td>
+                            <span class="course-badge">{{ q.course_name }}</span>
+                        </td>
+                        <td>
+                            <span class="question-count">
+                                <i class="bi bi-hash"></i>
+                                {{ q.question_count }}
+                            </span>
+                        </td>
+                        <td style="text-align: right;">
+                            <div class="action-group">
+                                <a href="{{ url_for('edit_quiz', quiz_id=q.id) }}"
+                                   class="btn btn-info btn-sm"
+                                   title="Edit quiz">
+                                    <i class="bi bi-pencil"></i> Edit
+                                </a>
+                                <a href="{{ url_for('delete_quiz', quiz_id=q.id) }}"
+                                   class="btn btn-danger btn-sm"
+                                   onclick="return confirm('Delete this quiz? This action cannot be undone.')"
+                                   title="Delete quiz">
+                                    <i class="bi bi-trash"></i>
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <!-- Empty State -->
+        <div class="empty-state">
+            <div class="empty-icon">
+                <i class="bi bi-question-circle"></i>
+            </div>
+            <h5>No quizzes yet</h5>
+            <p>Create your first quiz to test your students' knowledge and track their progress.</p>
+            <a href="{{ url_for('add_quiz') }}" class="btn btn-primary">
+                <i class="bi bi-plus-lg"></i> Create First Quiz
+            </a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- ============================================================
+     BACK BUTTON
+     ============================================================ -->
+<div class="mt-3" style="animation: fadeInUp 0.6s ease forwards; opacity: 0; animation-delay: 0.15s;">
+    <a href="{{ url_for('admin_panel') }}" class="btn btn-secondary">
+        <i class="bi bi-arrow-left"></i> Back to Admin
+    </a>
+</div>
+{% endblock %}

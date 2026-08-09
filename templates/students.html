@@ -1,0 +1,796 @@
+{% extends "base.html" %}
+
+{% block content %}
+<style>
+    /* ============================================================
+       REGISTERED STUDENTS — NAVY + ELECTRIC BLUE THEME
+       ============================================================ */
+
+    /* ---------- ANIMATIONS ---------- */
+    @keyframes fadeInUp {
+        from { opacity: 0; transform: translateY(30px) scale(0.96); }
+        to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    .animate-card {
+        animation: fadeInUp 0.6s ease forwards;
+        opacity: 0;
+    }
+    .animate-card:nth-child(1) { animation-delay: 0.05s; }
+    .animate-card:nth-child(2) { animation-delay: 0.10s; }
+
+    /* ---------- HEADER ---------- */
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin-bottom: 28px;
+        animation: fadeInUp 0.6s ease forwards;
+        opacity: 0;
+    }
+
+    .page-header h2 {
+        font-weight: 700;
+        color: var(--navy);
+        letter-spacing: -0.3px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-size: 1.8rem;
+    }
+
+    .page-header h2 i {
+        color: var(--blue);
+        font-size: 1.8rem;
+    }
+
+    /* ---------- BUTTONS ---------- */
+    .btn-secondary {
+        border: 1.5px solid #CBD5E1;
+        color: var(--text-light);
+        background: transparent;
+        font-weight: 500;
+        border-radius: 50px;
+        padding: 8px 20px;
+        transition: var(--transition);
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        text-decoration: none;
+        font-size: 0.85rem;
+    }
+
+    .btn-secondary:hover {
+        border-color: var(--blue);
+        color: var(--blue);
+        background: rgba(37, 99, 235, 0.04);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(37, 99, 235, 0.08);
+    }
+
+    .btn-danger {
+        background: linear-gradient(135deg, #EF4444, #DC2626);
+        border: none;
+        color: white;
+        font-weight: 600;
+        padding: 8px 20px;
+        border-radius: 50px;
+        box-shadow: 0 4px 14px rgba(239, 68, 68, 0.25);
+        transition: var(--transition);
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 0.85rem;
+        cursor: pointer;
+        text-decoration: none;
+    }
+
+    .btn-danger:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 24px rgba(239, 68, 68, 0.35);
+        background: linear-gradient(135deg, #F87171, #EF4444);
+        color: white;
+    }
+
+    .btn-sm {
+        padding: 4px 12px;
+        font-size: 0.75rem;
+    }
+
+    .btn-outline-danger {
+        border: 1.5px solid #EF4444;
+        color: #EF4444;
+        background: transparent;
+        font-weight: 500;
+        border-radius: 50px;
+        padding: 4px 12px;
+        transition: var(--transition);
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        font-size: 0.75rem;
+        cursor: pointer;
+        text-decoration: none;
+    }
+
+    .btn-outline-danger:hover {
+        background: #EF4444;
+        color: white;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 14px rgba(239, 68, 68, 0.20);
+    }
+
+    /* ---------- CARDS ---------- */
+    .card {
+        border: none;
+        border-radius: var(--radius);
+        box-shadow: var(--shadow-md);
+        transition: var(--transition);
+        background: rgba(255, 255, 255, 0.92);
+        backdrop-filter: blur(2px);
+        border: 1px solid rgba(37, 99, 235, 0.06);
+        overflow: hidden;
+    }
+
+    .card:hover {
+        box-shadow: var(--shadow-lg), 0 0 0 1px rgba(37, 99, 235, 0.06);
+        transform: translateY(-2px);
+    }
+
+    .card-header-custom {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 16px 20px 12px 20px;
+        border-bottom: 1px solid rgba(37, 99, 235, 0.06);
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    .card-header-custom h5 {
+        font-weight: 700;
+        color: var(--navy);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 1rem;
+        margin: 0;
+    }
+
+    .card-header-custom h5 i {
+        color: var(--blue);
+    }
+
+    .card-header-custom .header-badge {
+        background: linear-gradient(135deg, var(--blue), var(--cyan));
+        color: white;
+        padding: 2px 14px;
+        border-radius: 50px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+    }
+
+    .card-body-custom {
+        padding: 20px;
+    }
+
+    /* ---------- TABLE ---------- */
+    .table-wrap {
+        overflow-x: auto;
+    }
+
+    .table {
+        margin-bottom: 0;
+        border-collapse: separate;
+        border-spacing: 0 6px;
+        width: 100%;
+    }
+
+    .table thead th {
+        background: rgba(15, 23, 42, 0.04);
+        color: var(--navy);
+        font-weight: 600;
+        font-size: 0.7rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        padding: 12px 14px;
+        border: none;
+        white-space: nowrap;
+        border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+        position: sticky;
+        top: 0;
+        z-index: 2;
+    }
+
+    .table tbody tr {
+        background: rgba(255, 255, 255, 0.6);
+        transition: var(--transition);
+        border-radius: var(--radius-sm);
+        box-shadow: 0 2px 8px rgba(15, 23, 42, 0.03);
+    }
+
+    .table tbody tr:hover {
+        background: rgba(37, 99, 235, 0.04);
+        transform: scale(1.01);
+        box-shadow: var(--shadow-md);
+    }
+
+    .table tbody td {
+        padding: 10px 14px;
+        border: none;
+        vertical-align: middle;
+        font-size: 0.85rem;
+        color: var(--text);
+        background: transparent;
+    }
+
+    .table tbody tr td:first-child {
+        border-radius: var(--radius-sm) 0 0 var(--radius-sm);
+    }
+
+    .table tbody tr td:last-child {
+        border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+    }
+
+    /* Student row number */
+    .table .row-number {
+        font-weight: 600;
+        color: var(--text-light);
+        font-size: 0.75rem;
+        width: 30px;
+        text-align: center;
+    }
+
+    /* Student name with avatar */
+    .table .student-info {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .table .student-avatar {
+        width: 34px;
+        height: 34px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, var(--blue), var(--cyan));
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.85rem;
+        font-weight: 600;
+        flex-shrink: 0;
+        border: 2px solid rgba(37, 99, 235, 0.15);
+    }
+
+    .table .student-avatar img {
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        object-fit: cover;
+    }
+
+    .table .student-name {
+        font-weight: 600;
+        color: var(--navy);
+    }
+
+    .table .student-username {
+        font-size: 0.75rem;
+        color: var(--text-light);
+    }
+
+    /* Course badge */
+    .table .course-badge {
+        display: inline-block;
+        padding: 3px 12px;
+        border-radius: 50px;
+        font-weight: 600;
+        font-size: 0.7rem;
+        color: white;
+        background: var(--blue);
+        box-shadow: 0 2px 6px rgba(37, 99, 235, 0.15);
+    }
+
+    .table .course-badge.not-set {
+        background: #CBD5E1;
+        color: #475569;
+        box-shadow: none;
+    }
+
+    /* Date */
+    .table .date-text {
+        font-size: 0.8rem;
+        color: var(--text-light);
+        white-space: nowrap;
+    }
+
+    /* ---------- CHECKBOX ---------- */
+    .form-check-input {
+        width: 16px;
+        height: 16px;
+        accent-color: var(--blue);
+        cursor: pointer;
+        transition: var(--transition);
+        border: 1.5px solid #CBD5E1;
+        border-radius: 4px;
+    }
+
+    .form-check-input:checked {
+        transform: scale(1.1);
+        border-color: var(--blue);
+    }
+
+    /* ---------- BULK ACTION BAR ---------- */
+    .bulk-bar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 12px;
+        padding: 12px 16px;
+        background: rgba(255, 255, 255, 0.6);
+        border-radius: var(--radius-sm);
+        border: 1px solid rgba(37, 99, 235, 0.04);
+        margin-top: 16px;
+    }
+
+    .bulk-bar .bulk-info {
+        font-size: 0.85rem;
+        color: var(--text-light);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .bulk-bar .bulk-info strong {
+        color: var(--navy);
+    }
+
+    /* ---------- EMPTY STATE ---------- */
+    .empty-state {
+        text-align: center;
+        padding: 60px 20px;
+        border: 2px dashed rgba(37, 99, 235, 0.12);
+        border-radius: var(--radius);
+        background: rgba(255, 255, 255, 0.5);
+        animation: fadeInUp 0.7s ease;
+    }
+
+    .empty-state .empty-icon {
+        width: 84px;
+        height: 84px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, rgba(37, 99, 235, 0.08), rgba(34, 211, 238, 0.08));
+        color: var(--blue);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2.6rem;
+        margin: 0 auto 20px;
+        border: 2px solid rgba(37, 99, 235, 0.10);
+        transition: var(--transition);
+    }
+
+    .empty-state:hover .empty-icon {
+        transform: scale(1.06) rotate(-4deg);
+        border-color: var(--cyan);
+        box-shadow: 0 0 0 8px rgba(34, 211, 238, 0.06);
+    }
+
+    .empty-state h5 {
+        color: var(--navy);
+        font-weight: 700;
+        margin-bottom: 8px;
+    }
+
+    .empty-state p {
+        color: var(--text-light);
+        max-width: 420px;
+        margin: 0 auto;
+        font-size: 0.95rem;
+        line-height: 1.5;
+    }
+
+    /* ---------- RESPONSIVE ---------- */
+    @media (max-width: 768px) {
+        .page-header h2 {
+            font-size: 1.4rem;
+        }
+        .page-header h2 i {
+            font-size: 1.4rem;
+        }
+        .card-body-custom {
+            padding: 16px;
+        }
+        .table thead th,
+        .table tbody td {
+            padding: 8px 10px;
+            font-size: 0.78rem;
+        }
+        .table .student-avatar {
+            width: 28px;
+            height: 28px;
+            font-size: 0.7rem;
+        }
+        .table .course-badge {
+            font-size: 0.6rem;
+            padding: 2px 10px;
+        }
+        .btn-danger {
+            font-size: 0.8rem;
+            padding: 6px 14px;
+        }
+        .btn-secondary {
+            font-size: 0.8rem;
+            padding: 6px 14px;
+        }
+        .bulk-bar {
+            flex-direction: column;
+            align-items: stretch;
+            text-align: center;
+        }
+        .bulk-bar .bulk-info {
+            justify-content: center;
+        }
+    }
+
+    @media (max-width: 576px) {
+        .page-header {
+            flex-direction: column;
+            align-items: stretch;
+            gap: 8px;
+        }
+        .page-header h2 {
+            font-size: 1.2rem;
+        }
+        .page-header h2 i {
+            font-size: 1.2rem;
+        }
+        .card-header-custom {
+            flex-direction: column;
+            align-items: stretch;
+            gap: 6px;
+        }
+        .table thead th {
+            font-size: 0.55rem;
+            padding: 6px 8px;
+        }
+        .table tbody td {
+            font-size: 0.7rem;
+            padding: 6px 8px;
+        }
+        .table .student-info {
+            gap: 6px;
+        }
+        .table .student-avatar {
+            width: 24px;
+            height: 24px;
+            font-size: 0.6rem;
+        }
+        .table .student-name {
+            font-size: 0.75rem;
+        }
+        .table .student-username {
+            font-size: 0.65rem;
+        }
+        .table .course-badge {
+            font-size: 0.55rem;
+            padding: 1px 8px;
+        }
+        .table .date-text {
+            font-size: 0.65rem;
+        }
+        .btn-outline-danger {
+            font-size: 0.65rem;
+            padding: 2px 8px;
+        }
+        .bulk-bar {
+            padding: 10px 12px;
+        }
+        .bulk-bar .bulk-info {
+            font-size: 0.75rem;
+        }
+        .empty-state {
+            padding: 40px 16px;
+        }
+        .empty-state .empty-icon {
+            width: 60px;
+            height: 60px;
+            font-size: 1.8rem;
+        }
+    }
+
+    /* ---------- DARK MODE ---------- */
+    body.dark-mode .page-header h2 {
+        color: #E2E8F0;
+    }
+
+    body.dark-mode .page-header h2 i {
+        color: var(--cyan);
+    }
+
+    body.dark-mode .card {
+        background: rgba(15, 23, 42, 0.9);
+        border-color: rgba(37, 99, 235, 0.08);
+        color: #E2E8F0;
+    }
+
+    body.dark-mode .card-header-custom h5 {
+        color: #E2E8F0;
+    }
+
+    body.dark-mode .card-header-custom .header-badge {
+        background: linear-gradient(135deg, #1D4ED8, var(--cyan));
+    }
+
+    body.dark-mode .table thead th {
+        background: rgba(37, 99, 235, 0.08);
+        color: #CBD5E1;
+    }
+
+    body.dark-mode .table tbody tr {
+        background: rgba(15, 23, 42, 0.6);
+        box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    }
+
+    body.dark-mode .table tbody tr:hover {
+        background: rgba(37, 99, 235, 0.08);
+    }
+
+    body.dark-mode .table tbody td {
+        color: #E2E8F0;
+    }
+
+    body.dark-mode .table .student-name {
+        color: #E2E8F0;
+    }
+
+    body.dark-mode .table .student-username {
+        color: #94A3B8;
+    }
+
+    body.dark-mode .table .row-number {
+        color: #64748B;
+    }
+
+    body.dark-mode .table .course-badge.not-set {
+        background: #334155;
+        color: #94A3B8;
+    }
+
+    body.dark-mode .table .date-text {
+        color: #94A3B8;
+    }
+
+    body.dark-mode .bulk-bar {
+        background: rgba(15, 23, 42, 0.6);
+        border-color: rgba(37, 99, 235, 0.08);
+    }
+
+    body.dark-mode .bulk-bar .bulk-info {
+        color: #94A3B8;
+    }
+
+    body.dark-mode .bulk-bar .bulk-info strong {
+        color: #E2E8F0;
+    }
+
+    body.dark-mode .empty-state {
+        background: rgba(15, 23, 42, 0.4);
+        border-color: rgba(37, 99, 235, 0.10);
+    }
+
+    body.dark-mode .empty-state h5 {
+        color: #E2E8F0;
+    }
+
+    body.dark-mode .empty-state p {
+        color: #94A3B8;
+    }
+
+    body.dark-mode .btn-secondary {
+        border-color: #334155;
+        color: #94A3B8;
+    }
+
+    body.dark-mode .btn-secondary:hover {
+        border-color: var(--blue);
+        color: var(--cyan);
+        background: rgba(37, 99, 235, 0.08);
+    }
+
+    body.dark-mode .btn-danger {
+        background: linear-gradient(135deg, #DC2626, #B91C1C);
+    }
+
+    body.dark-mode .btn-danger:hover {
+        background: linear-gradient(135deg, #EF4444, #DC2626);
+    }
+
+    body.dark-mode .btn-outline-danger {
+        border-color: #DC2626;
+        color: #F87171;
+    }
+
+    body.dark-mode .btn-outline-danger:hover {
+        background: #DC2626;
+        color: white;
+    }
+
+    body.dark-mode .form-check-input {
+        border-color: #475569;
+        background: #1E293B;
+    }
+
+    body.dark-mode .form-check-input:checked {
+        background-color: var(--blue);
+        border-color: var(--blue);
+    }
+</style>
+
+<!-- ============================================================
+     HEADER
+     ============================================================ -->
+<div class="page-header">
+    <h2>
+        <i class="bi bi-people-fill"></i>
+        Registered Students
+    </h2>
+    <a href="{{ url_for('admin_panel') }}" class="btn btn-secondary">
+        <i class="bi bi-arrow-left"></i> Back
+    </a>
+</div>
+
+<!-- ============================================================
+     STUDENTS TABLE CARD
+     ============================================================ -->
+<div class="card animate-card">
+    <div class="card-header-custom">
+        <h5>
+            <i class="bi bi-people"></i>
+            All Students
+        </h5>
+        <span class="header-badge">
+            <i class="bi bi-person"></i> {{ students|length }} total
+        </span>
+    </div>
+
+    <div class="card-body-custom">
+        {% if students %}
+        <form method="POST" action="{{ url_for('bulk_delete_students') }}" id="bulkForm" onsubmit="return confirm('Delete selected students? This cannot be undone.')">
+
+            <div class="table-wrap">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th style="width: 36px;">
+                                <input type="checkbox" id="selectAllStudents" class="form-check-input">
+                            </th>
+                            <th style="width: 36px;">#</th>
+                            <th>Student</th>
+                            <th>Enrolled Course</th>
+                            <th>Registered On</th>
+                            <th style="text-align: right;">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for student in students %}
+                        <tr>
+                            <td>
+                                <input type="checkbox" name="student_ids" value="{{ student.id }}" class="student-checkbox form-check-input">
+                            </td>
+                            <td>
+                                <span class="row-number">{{ loop.index }}</span>
+                            </td>
+                            <td>
+                                <div class="student-info">
+                                    {% if student.avatar %}
+                                    <span class="student-avatar">
+                                        <img src="{{ student.avatar }}" alt="{{ student.full_name }}">
+                                    </span>
+                                    {% else %}
+                                    <span class="student-avatar">
+                                        {{ student.full_name[:1]|upper }}
+                                    </span>
+                                    {% endif %}
+                                    <div>
+                                        <div class="student-name">{{ student.full_name }}</div>
+                                        <div class="student-username">@{{ student.username }}</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                {% if student.course_name %}
+                                <span class="course-badge" style="background: {{ student.course_color or '#2563EB' }};">
+                                    <i class="bi bi-book me-1"></i>{{ student.course_name }}
+                                </span>
+                                {% else %}
+                                <span class="course-badge not-set">
+                                    <i class="bi bi-dash-circle me-1"></i>Not set
+                                </span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <span class="date-text">
+                                    <i class="bi bi-calendar3 me-1"></i>
+                                    {{ student.created_at.split(' ')[0] if student.created_at else 'N/A' }}
+                                </span>
+                            </td>
+                            <td style="text-align: right;">
+                                <a href="{{ url_for('delete_student', student_id=student.id) }}"
+                                   class="btn btn-outline-danger btn-sm"
+                                   onclick="return confirm('Remove this student? This cannot be undone.')"
+                                   title="Delete student">
+                                    <i class="bi bi-person-x"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Bulk Action Bar -->
+            <div class="bulk-bar">
+                <div class="bulk-info">
+                    <i class="bi bi-check2-square"></i>
+                    <span>Selected: <strong id="selectedCount">0</strong> student(s)</span>
+                </div>
+                <button type="submit" class="btn btn-danger btn-sm" id="deleteSelectedBtn" disabled>
+                    <i class="bi bi-trash"></i> Delete Selected
+                </button>
+            </div>
+
+        </form>
+        {% else %}
+        <!-- Empty State -->
+        <div class="empty-state">
+            <div class="empty-icon">
+                <i class="bi bi-people"></i>
+            </div>
+            <h5>No students registered yet</h5>
+            <p>When students sign up for courses, they'll appear here. Share your platform to start growing your community.</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- ============================================================
+     JAVASCRIPT — Bulk Select & Counter
+     ============================================================ -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const selectAll = document.getElementById('selectAllStudents');
+        const checkboxes = document.querySelectorAll('.student-checkbox');
+        const selectedCount = document.getElementById('selectedCount');
+        const deleteBtn = document.getElementById('deleteSelectedBtn');
+
+        function updateSelection() {
+            const checked = document.querySelectorAll('.student-checkbox:checked');
+            const count = checked.length;
+            selectedCount.textContent = count;
+            deleteBtn.disabled = count === 0;
+        }
+
+        if (selectAll) {
+            selectAll.addEventListener('change', function(e) {
+                checkboxes.forEach(cb => cb.checked = e.target.checked);
+                updateSelection();
+            });
+        }
+
+        checkboxes.forEach(function(cb) {
+            cb.addEventListener('change', updateSelection);
+        });
+
+        // Initial state
+        updateSelection();
+    });
+</script>
+{% endblock %}

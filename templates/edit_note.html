@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card p-4">
+            <h4>Edit Note</h4>
+            <form method="POST">
+                <div class="mb-2"><input type="text" name="title" class="form-control" value="{{ note.title }}"
+                        required></div>
+                <div class="mb-2"><textarea name="content" class="form-control" rows="8"
+                        required>{{ note.content }}</textarea></div>
+                <div class="mb-2">
+                    <select name="status" class="form-select">
+                        <option value="draft" {% if note.status=='draft' %}selected{% endif %}>Draft</option>
+                        <option value="published" {% if note.status=='published' %}selected{% endif %}>Published
+                        </option>
+                    </select>
+                </div>
+                <div class="mb-2">
+                    <label class="form-label">Tags</label>
+                    <select name="tags" class="form-select" multiple size="4">
+                        {% for tag in all_tags %}
+                        <option value="{{ tag.id }}" {% if tag.id in selected_tag_ids %}selected{% endif %}>{{ tag.name
+                            }}</option>
+                        {% endfor %}
+                    </select>
+                    <small class="text-muted">Hold Ctrl/Cmd to select multiple.</small>
+                </div>
+                <button type="submit" class="btn btn-primary">Update</button>
+                <a href="{{ url_for('admin_panel') }}" class="btn btn-secondary">Cancel</a>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

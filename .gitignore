@@ -1,0 +1,99 @@
+# =====================================
+# Python / Flask
+# =====================================
+__pycache__/
+*.py[cod]
+*.pyc
+*.pyo
+*.pyd
+.Python
+pip-log.txt
+pip-delete-this-directory.txt
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+.mypy_cache/
+.dmypy.json
+dmypy.json
+*.log
+
+# Virtual environments
+env/
+venv/
+.venv/
+ENV/
+env.bak/
+venv.bak/
+
+# =====================================
+# Databases
+# =====================================
+*.db
+*.sqlite
+*.sqlite3
+*.db-journal
+
+# =====================================
+# Environment variables (sensitive!)
+# =====================================
+.env
+.env.local
+.env.*.local
+.env.example    # if you don't want to commit the example either (optional)
+
+# =====================================
+# Flask-specific
+# =====================================
+instance/
+.webassets-cache
+.session
+flask_session/
+
+# =====================================
+# Uploads / user-generated files
+# =====================================
+uploads/
+!uploads/.gitkeep   # keep this if you want the folder to exist in repo
+
+# =====================================
+# Static files (generated)
+# =====================================
+*.min.css
+*.min.js
+*.map
+*.bundle.js
+
+# =====================================
+# Reports / PDFs
+# =====================================
+*.pdf
+*.zip
+*.rar
+*.tar.gz
+
+# =====================================
+# IDE / OS
+# =====================================
+.vscode/
+.idea/
+*.swp
+*.swo
+*.swn
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# =====================================
+# Logs
+# =====================================
+logs/
+*.log
+
+# =====================================
+# Misc
+# =====================================
+*.pkl
+*.pickle
+*.tmp
+*.temp

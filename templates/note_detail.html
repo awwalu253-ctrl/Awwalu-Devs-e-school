@@ -1,0 +1,278 @@
+{% extends "base.html" %}
+
+{% macro render_comment(comment, level=0) %}
+    <div class="card p-2 mb-2 {% if level > 0 %}bg-light{% endif %}" id="comment-{{ comment.id }}" style="margin-left: {{ level * 20 }}px;">
+        <div>
+            <strong>{{ comment.full_name }}</strong>
+            {% if comment.parent_author_name %}
+                <span class="text-muted small">(in reply to {{ comment.parent_author_name }})</span>
+            {% endif %}
+            {% if comment.is_admin %}<span class="badge bg-primary">Instructor</span>{% endif %}
+            <small class="text-muted">{{ comment.created_at }}</small>
+            <button type="button" class="btn btn-sm btn-outline-secondary ms-2" onclick="toggleReplyForm('replyForm{{ comment.id }}')">Reply</button>
+        </div>
+        <p>{{ comment.message }}</p>
+
+        <!-- Reply form -->
+        <div id="replyForm{{ comment.id }}" style="display:none;" class="mt-2">
+            <form method="POST" action="{{ url_for('note_add_reply', parent_id=comment.id) }}">
+                <div class="mb-2">
+                    <textarea name="message" class="form-control" rows="2" placeholder="Reply to @{{ comment.full_name }}..." required></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary btn-sm">Post Reply</button>
+            </form>
+        </div>
+
+        <!-- Recursively render replies -->
+        {% if comment.replies %}
+            <div class="mt-2">
+                {% for reply in comment.replies %}
+                    {{ render_comment(reply, level + 1) }}
+                {% endfor %}
+            </div>
+        {% endif %}
+    </div>
+{% endmacro %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>{{ note.title }}</h2>
+    <div>
+        <a href="{{ url_for('dashboard') }}" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left"></i> Back to Dashboard
+        </a>
+    </div>
+</div>
+
+<!-- Full Note Content (with CodeMirror integration) -->
+<div class="card p-4 mb-4">
+    <div id="noteContent" class="mt-2" style="font-size: 1rem; line-height: 1.8;">
+        {{ note.content_html|safe }}
+    </div>
+</div>
+
+<!-- Q&A Section -->
+<h3 id="discussions"><i class="bi bi-chat-dots"></i> Discussion</h3>
+
+<!-- Existing Discussions -->
+{% if discussions %}
+    <div class="mb-4">
+        {% for disc in discussions %}
+            {{ render_comment(disc, level=0) }}
+        {% endfor %}
+    </div>
+{% else %}
+    <div class="alert alert-info">No discussions yet. Be the first to ask a question!</div>
+{% endif %}
+
+<!-- New Comment Form -->
+<div class="card p-3">
+    <h5>Ask a Question</h5>
+    <form method="POST" action="{{ url_for('note_add_comment', note_id=note.id) }}">
+        <div class="mb-2">
+            <textarea name="message" class="form-control" rows="4" placeholder="Type your question..." required></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary">Post Comment</button>
+    </form>
+</div>
+
+<!-- CodeMirror and Runner Scripts -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<!-- Language modes -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/python/python.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/javascript/javascript.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/css/css.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/htmlmixed/htmlmixed.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/xml/xml.min.js"></script>
+
+<script>
+    // Toggle reply forms
+    function toggleReplyForm(formId) {
+        var form = document.getElementById(formId);
+        if (form) {
+            if (form.style.display === 'none' || form.style.display === '') {
+                form.style.display = 'block';
+            } else {
+                form.style.display = 'none';
+            }
+        }
+    }
+
+    // Scroll to and highlight a specific comment
+    function scrollToComment(commentId) {
+        var target = document.getElementById(commentId);
+        if (target) {
+            target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            target.style.transition = 'background-color 0.5s';
+            target.style.backgroundColor = '#fff3cd';
+            target.style.borderLeft = '5px solid #ffc107';
+            setTimeout(function() {
+                target.style.backgroundColor = '';
+                target.style.borderLeft = '';
+            }, 3000);
+        }
+    }
+
+    // --- CodeMirror: Convert all code blocks to editors with input ---
+    document.addEventListener('DOMContentLoaded', function() {
+        const noteContent = document.getElementById('noteContent');
+        if (!noteContent) return;
+
+        // Find all <pre><code> blocks inside noteContent
+        const blocks = noteContent.querySelectorAll('pre > code');
+        blocks.forEach((codeElement) => {
+            const pre = codeElement.parentElement;
+            const codeText = codeElement.textContent;
+            const language = codeElement.className.replace('language-', '').trim();
+
+            // Create a container for the editor
+            const container = document.createElement('div');
+            container.className = 'editor-container';
+            container.style.margin = '10px 0';
+
+            // Create a textarea for CodeMirror
+            const textarea = document.createElement('textarea');
+            textarea.value = codeText;
+            textarea.className = 'codemirror-textarea';
+
+            // --- NEW: Input field for stdin ---
+            const inputArea = document.createElement('textarea');
+            inputArea.className = 'form-control form-control-sm input-stdin';
+            inputArea.placeholder = 'Enter input here (optional)';
+            inputArea.rows = 2;
+            inputArea.style.marginTop = '8px';
+            inputArea.style.fontFamily = 'monospace';
+            inputArea.style.fontSize = '14px';
+
+            // Create a run button
+            const runBtn = document.createElement('button');
+            runBtn.className = 'btn btn-sm btn-success run-btn';
+            runBtn.textContent = '▶ Run';
+            runBtn.style.marginTop = '8px';
+
+            // Create output div
+            const outputDiv = document.createElement('div');
+            outputDiv.className = 'output-div';
+            outputDiv.style.cssText = 'background: #1e1e1e; color: #d4d4d4; padding: 8px; border-radius: 4px; margin-top: 8px; white-space: pre-wrap; display: none; font-family: monospace; font-size: 13px; max-height: 300px; overflow: auto;';
+
+            // Build container
+            container.appendChild(textarea);
+            container.appendChild(inputArea);
+            container.appendChild(runBtn);
+            container.appendChild(outputDiv);
+
+            // Replace the original pre with the container
+            pre.replaceWith(container);
+
+            // Initialize CodeMirror
+            const editor = CodeMirror.fromTextArea(textarea, {
+                mode: language || 'python',
+                lineNumbers: true,
+                theme: 'default',
+                indentUnit: 4,
+                tabSize: 4,
+                lineWrapping: true,
+                viewportMargin: Infinity,
+            });
+
+            // Store the editor reference on the container for later use
+            container._editor = editor;
+            container._language = language || 'python';
+            container._outputDiv = outputDiv;
+            container._inputArea = inputArea;
+
+            // Run button click
+            runBtn.addEventListener('click', function() {
+                const code = editor.getValue();
+                const lang = container._language;
+                const stdin = container._inputArea.value;
+                const outputDiv = container._outputDiv;
+
+                outputDiv.textContent = 'Running...';
+                outputDiv.style.display = 'block';
+
+                fetch('/run_code', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ language: lang, code: code, stdin: stdin })
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.error) {
+                        outputDiv.textContent = '❌ Error: ' + data.error;
+                    } else {
+                        outputDiv.textContent = data.output || '(no output)';
+                    }
+                })
+                .catch(err => {
+                    outputDiv.textContent = '❌ Network error: ' + err.message;
+                });
+            });
+        });
+
+        // After replacing, handle new comment/reply highlight
+        const urlParams = new URLSearchParams(window.location.search);
+        const newReply = urlParams.get('new_reply');
+        const newComment = urlParams.get('new_comment');
+
+        if (newReply) {
+            setTimeout(function() {
+                scrollToComment('comment-' + newReply);
+            }, 500);
+        } else if (newComment) {
+            setTimeout(function() {
+                scrollToComment('comment-' + newComment);
+            }, 500);
+        } else if (window.location.hash) {
+            var target = document.querySelector(window.location.hash);
+            if (target) {
+                target.scrollIntoView({ behavior: 'smooth' });
+                target.style.borderLeft = '3px solid #6c63ff';
+                target.style.paddingLeft = '12px';
+            }
+        }
+    });
+</script>
+
+<!-- Custom styles for the editor -->
+<style>
+    .editor-container .CodeMirror {
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        font-size: 14px;
+    }
+    .editor-container .run-btn {
+        background-color: #28a745;
+        border: none;
+        color: white;
+        padding: 6px 16px;
+        font-weight: 500;
+        border-radius: 4px;
+    }
+    .editor-container .run-btn:hover {
+        background-color: #218838;
+    }
+    .editor-container .input-stdin {
+        background-color: #f8f9fa;
+        border: 1px solid #ced4da;
+        border-radius: 4px;
+        padding: 6px 10px;
+        font-family: monospace;
+        font-size: 14px;
+        width: 100%;
+        resize: vertical;
+    }
+    .editor-container .input-stdin:focus {
+        outline: none;
+        border-color: #6c63ff;
+        box-shadow: 0 0 0 2px rgba(108, 99, 255, 0.25);
+    }
+    body.dark-mode .editor-container .input-stdin {
+        background-color: #2a2a4a;
+        color: #e0e0e0;
+        border-color: #3a3a5a;
+    }
+</style>
+
+{% endblock %}

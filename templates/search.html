@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% block content %}
+<h2><i class="bi bi-search"></i> Advanced Search</h2>
+<form method="GET" action="{{ url_for('advanced_search') }}" class="mb-4">
+    <div class="row g-2">
+        <div class="col-md-6">
+            <input type="text" name="q" class="form-control" placeholder="Search..." value="{{ query }}">
+        </div>
+        <div class="col-md-3">
+            <select name="type" class="form-select">
+                <option value="all" {% if search_type == 'all' %}selected{% endif %}>All</option>
+                <option value="notes" {% if search_type == 'notes' %}selected{% endif %}>Notes</option>
+                <option value="discussions" {% if search_type == 'discussions' %}selected{% endif %}>Discussions</option>
+                <option value="assignments" {% if search_type == 'assignments' %}selected{% endif %}>Assignments</option>
+            </select>
+        </div>
+        <div class="col-md-3">
+            <button type="submit" class="btn btn-primary w-100">Search</button>
+        </div>
+    </div>
+</form>
+
+{% if query %}
+    {% if results.notes or results.discussions or results.assignments %}
+        {% if results.notes %}
+        <h5>Notes</h5>
+        <ul class="list-group mb-3">
+            {% for note in results.notes %}
+            <li class="list-group-item">
+                <a href="{{ url_for('note_detail', note_id=note.id) }}">{{ note.title }}</a>
+                <small class="text-muted ms-2">{{ note.course_name }}</small>
+                <p>{{ note.content[:200] }}...</p>
+            </li>
+            {% endfor %}
+        </ul>
+        {% endif %}
+
+        {% if results.discussions %}
+        <h5>Discussions</h5>
+        <ul class="list-group mb-3">
+            {% for disc in results.discussions %}
+            <li class="list-group-item">
+                <a href="{{ url_for('note_detail', note_id=disc.id) }}#discussions">{{ disc.context }}</a>
+                <small class="text-muted ms-2">by {{ disc.author }}</small>
+                <p>{{ disc.title[:200] }}...</p>
+            </li>
+            {% endfor %}
+        </ul>
+        {% endif %}
+
+        {% if results.assignments %}
+        <h5>Assignments</h5>
+        <ul class="list-group mb-3">
+            {% for ass in results.assignments %}
+            <li class="list-group-item">
+                <a href="{{ url_for('assignments') }}#assignment-{{ ass.id }}">{{ ass.title }}</a>
+                <small class="text-muted ms-2">{{ ass.course_name }}</small>
+                <p>{{ ass.description[:200] }}...</p>
+            </li>
+            {% endfor %}
+        </ul>
+        {% endif %}
+    {% else %}
+        <div class="alert alert-info">No results found.</div>
+    {% endif %}
+{% endif %}
+<a href="{{ url_for('dashboard') }}" class="btn btn-secondary">Back</a>
+{% endblock %}

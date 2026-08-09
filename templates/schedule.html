@@ -1,0 +1,471 @@
+{% extends "base.html" %}
+
+{% block content %}
+<style>
+    /* ============================================================
+       SCHEDULE — NAVY + ELECTRIC BLUE THEME (PREMIUM)
+       ============================================================ */
+
+    /* ---------- ANIMATIONS ---------- */
+    @keyframes fadeUp {
+        from { opacity: 0; transform: translateY(24px) scale(0.98); }
+        to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    @keyframes slideInRight {
+        from { opacity: 0; transform: translateX(-10px); }
+        to { opacity: 1; transform: translateX(0); }
+    }
+
+    .animate-card {
+        animation: fadeUp 0.55s ease forwards;
+        opacity: 0;
+    }
+    .animate-card:nth-child(1) { animation-delay: 0.04s; }
+    .animate-card:nth-child(2) { animation-delay: 0.08s; }
+    .animate-card:nth-child(3) { animation-delay: 0.12s; }
+
+    .animate-item {
+        animation: slideInRight 0.3s ease forwards;
+        opacity: 0;
+    }
+    .animate-item:nth-child(1) { animation-delay: 0.04s; }
+    .animate-item:nth-child(2) { animation-delay: 0.07s; }
+    .animate-item:nth-child(3) { animation-delay: 0.10s; }
+    .animate-item:nth-child(4) { animation-delay: 0.13s; }
+    .animate-item:nth-child(5) { animation-delay: 0.16s; }
+    .animate-item:nth-child(6) { animation-delay: 0.19s; }
+
+    /* ---------- HEADER ---------- */
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin-bottom: 28px;
+        animation: fadeUp 0.6s ease forwards;
+        opacity: 0;
+    }
+
+    .page-header h2 {
+        font-weight: 700;
+        color: var(--navy);
+        letter-spacing: -0.3px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-size: 1.8rem;
+        margin: 0;
+    }
+
+    .page-header h2 i {
+        color: var(--blue);
+        font-size: 1.8rem;
+    }
+
+    /* ---------- BUTTONS ---------- */
+    .btn-outline-secondary {
+        border: 1.5px solid #CBD5E1;
+        color: var(--text-light);
+        background: transparent;
+        font-weight: 500;
+        border-radius: 50px;
+        padding: 8px 20px;
+        transition: var(--transition);
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        text-decoration: none;
+        font-size: 0.85rem;
+    }
+
+    .btn-outline-secondary:hover {
+        border-color: var(--blue);
+        color: var(--blue);
+        background: rgba(37, 99, 235, 0.04);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(37, 99, 235, 0.08);
+    }
+
+    /* ---------- GLASS CARDS ---------- */
+    .glass-card {
+        background: rgba(255, 255, 255, 0.88);
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+        border: 1px solid rgba(37, 99, 235, 0.06);
+        border-radius: var(--radius);
+        box-shadow: var(--shadow-md);
+        transition: var(--transition);
+        padding: 24px 28px;
+        margin-bottom: 24px;
+    }
+
+    .glass-card:hover {
+        box-shadow: var(--shadow-lg), 0 0 0 1px rgba(37, 99, 235, 0.06);
+        transform: translateY(-3px);
+    }
+
+    .glass-card .card-header {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-weight: 700;
+        color: var(--navy);
+        font-size: 1.1rem;
+        margin-bottom: 16px;
+        border-bottom: 1px solid rgba(37, 99, 235, 0.04);
+        padding-bottom: 10px;
+    }
+
+    .glass-card .card-header i {
+        color: var(--blue);
+        font-size: 1.3rem;
+    }
+
+    .glass-card .card-header .count-badge {
+        margin-left: auto;
+        background: rgba(37, 99, 235, 0.08);
+        color: var(--navy);
+        padding: 2px 12px;
+        border-radius: 50px;
+        font-size: 0.7rem;
+        font-weight: 600;
+        border: 1px solid rgba(37, 99, 235, 0.06);
+    }
+
+    /* ---------- LIST ITEMS ---------- */
+    .schedule-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .schedule-list .list-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px 12px;
+        border-bottom: 1px solid rgba(37, 99, 235, 0.04);
+        transition: var(--transition);
+        border-radius: var(--radius-sm);
+        gap: 12px;
+        flex-wrap: wrap;
+    }
+
+    .schedule-list .list-item:last-child {
+        border-bottom: none;
+    }
+
+    .schedule-list .list-item:hover {
+        background: rgba(37, 99, 235, 0.04);
+        transform: translateX(4px);
+    }
+
+    .schedule-list .list-item .item-title {
+        font-weight: 500;
+        color: var(--text);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .schedule-list .list-item .item-title i {
+        color: var(--blue);
+        font-size: 1rem;
+    }
+
+    .schedule-list .list-item .item-meta {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex-shrink: 0;
+    }
+
+    /* ----- Badge styles ----- */
+    .badge-due {
+        background: #F59E0B;
+        color: #78350F;
+        font-weight: 600;
+        padding: 3px 12px;
+        border-radius: 50px;
+        font-size: 0.7rem;
+        text-transform: uppercase;
+        letter-spacing: 0.03em;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+    }
+
+    .badge-scheduled {
+        background: var(--blue);
+        color: white;
+        font-weight: 600;
+        padding: 3px 12px;
+        border-radius: 50px;
+        font-size: 0.7rem;
+        text-transform: uppercase;
+        letter-spacing: 0.03em;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+    }
+
+    .badge-quiz {
+        background: rgba(37, 99, 235, 0.10);
+        color: var(--blue);
+        font-weight: 600;
+        padding: 3px 12px;
+        border-radius: 50px;
+        font-size: 0.7rem;
+        text-transform: uppercase;
+        letter-spacing: 0.03em;
+        border: 1px solid rgba(37, 99, 235, 0.06);
+    }
+
+    /* ---------- EMPTY STATE ---------- */
+    .empty-state {
+        text-align: center;
+        padding: 30px 20px;
+        color: var(--text-light);
+        font-size: 0.95rem;
+        background: rgba(255, 255, 255, 0.3);
+        border-radius: var(--radius-sm);
+        border: 1px dashed rgba(37, 99, 235, 0.10);
+    }
+    .empty-state i {
+        font-size: 1.8rem;
+        color: var(--blue);
+        opacity: 0.3;
+        margin-bottom: 6px;
+        display: block;
+    }
+
+    /* ---------- RESPONSIVE ---------- */
+    @media (max-width: 768px) {
+        .page-header h2 {
+            font-size: 1.4rem;
+        }
+        .page-header h2 i {
+            font-size: 1.4rem;
+        }
+        .glass-card {
+            padding: 18px 16px;
+        }
+        .glass-card .card-header {
+            font-size: 1rem;
+        }
+        .schedule-list .list-item {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 6px;
+            padding: 10px 8px;
+        }
+        .schedule-list .list-item .item-meta {
+            align-self: flex-start;
+        }
+        .badge-due, .badge-scheduled, .badge-quiz {
+            font-size: 0.65rem;
+            padding: 2px 10px;
+        }
+    }
+
+    @media (max-width: 576px) {
+        .page-header {
+            flex-direction: column;
+            align-items: stretch;
+            gap: 8px;
+        }
+        .page-header h2 {
+            font-size: 1.2rem;
+        }
+        .page-header h2 i {
+            font-size: 1.2rem;
+        }
+        .glass-card {
+            padding: 14px 12px;
+        }
+        .schedule-list .list-item .item-title {
+            font-size: 0.9rem;
+        }
+        .btn-outline-secondary {
+            font-size: 0.8rem;
+            padding: 6px 14px;
+        }
+    }
+
+    /* ---------- DARK MODE ---------- */
+    body.dark-mode .page-header h2 {
+        color: #E2E8F0;
+    }
+    body.dark-mode .page-header h2 i {
+        color: var(--cyan);
+    }
+
+    body.dark-mode .glass-card {
+        background: rgba(15, 23, 42, 0.85);
+        border-color: rgba(37, 99, 235, 0.08);
+        color: #E2E8F0;
+    }
+    body.dark-mode .glass-card .card-header {
+        color: #E2E8F0;
+        border-bottom-color: rgba(37, 99, 235, 0.08);
+    }
+    body.dark-mode .glass-card .card-header .count-badge {
+        background: rgba(37, 99, 235, 0.12);
+        color: #CBD5E1;
+        border-color: rgba(37, 99, 235, 0.10);
+    }
+
+    body.dark-mode .schedule-list .list-item {
+        border-bottom-color: rgba(37, 99, 235, 0.06);
+    }
+    body.dark-mode .schedule-list .list-item:hover {
+        background: rgba(37, 99, 235, 0.08);
+    }
+    body.dark-mode .schedule-list .list-item .item-title {
+        color: #E2E8F0;
+    }
+    body.dark-mode .schedule-list .list-item .item-title i {
+        color: var(--cyan);
+    }
+
+    body.dark-mode .badge-due {
+        background: #B45309;
+        color: #FDE68A;
+    }
+    body.dark-mode .badge-scheduled {
+        background: #1D4ED8;
+        color: #E2E8F0;
+    }
+    body.dark-mode .badge-quiz {
+        background: rgba(37, 99, 235, 0.15);
+        color: var(--cyan);
+        border-color: rgba(37, 99, 235, 0.10);
+    }
+
+    body.dark-mode .empty-state {
+        border-color: rgba(37, 99, 235, 0.10);
+        background: rgba(15, 23, 42, 0.3);
+        color: #94A3B8;
+    }
+    body.dark-mode .empty-state i {
+        color: var(--cyan);
+        opacity: 0.3;
+    }
+
+    body.dark-mode .btn-outline-secondary {
+        border-color: #334155;
+        color: #94A3B8;
+    }
+    body.dark-mode .btn-outline-secondary:hover {
+        border-color: var(--blue);
+        color: var(--cyan);
+        background: rgba(37, 99, 235, 0.08);
+    }
+</style>
+
+<!-- ========== HEADER ========== -->
+<div class="page-header">
+    <h2>
+        <i class="bi bi-calendar-week"></i>
+        Your Schedule
+    </h2>
+    <a href="{{ url_for('dashboard') }}" class="btn btn-outline-secondary">
+        <i class="bi bi-arrow-left"></i> Back
+    </a>
+</div>
+
+<!-- ========== UPCOMING ASSIGNMENTS ========== -->
+<div class="glass-card animate-card">
+    <div class="card-header">
+        <i class="bi bi-list-check"></i>
+        Upcoming Assignments
+        <span class="count-badge">{{ assignments|length if assignments else 0 }}</span>
+    </div>
+    {% if assignments %}
+        <ul class="schedule-list">
+            {% for a in assignments %}
+            <li class="list-item animate-item">
+                <span class="item-title">
+                    <i class="bi bi-file-text"></i>
+                    {{ a.title }}
+                </span>
+                <span class="item-meta">
+                    <span class="badge-due">
+                        <i class="bi bi-calendar-event"></i> Due: {{ a.due_date }}
+                    </span>
+                </span>
+            </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <div class="empty-state">
+            <i class="bi bi-check-circle"></i>
+            No upcoming assignments.
+        </div>
+    {% endif %}
+</div>
+
+<!-- ========== UPCOMING NOTES ========== -->
+<div class="glass-card animate-card" style="animation-delay: 0.04s;">
+    <div class="card-header">
+        <i class="bi bi-journal-text"></i>
+        Upcoming Notes
+        <span class="count-badge">{{ notes|length if notes else 0 }}</span>
+    </div>
+    {% if notes %}
+        <ul class="schedule-list">
+            {% for n in notes %}
+            <li class="list-item animate-item">
+                <span class="item-title">
+                    <i class="bi bi-sticky"></i>
+                    {{ n.title }}
+                </span>
+                <span class="item-meta">
+                    <span class="badge-scheduled">
+                        <i class="bi bi-clock"></i> Scheduled: {{ n.publish_at }}
+                    </span>
+                </span>
+            </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <div class="empty-state">
+            <i class="bi bi-calendar-x"></i>
+            No scheduled notes.
+        </div>
+    {% endif %}
+</div>
+
+<!-- ========== QUIZZES ========== -->
+<div class="glass-card animate-card" style="animation-delay: 0.08s;">
+    <div class="card-header">
+        <i class="bi bi-question-circle"></i>
+        Quizzes
+        <span class="count-badge">{{ quizzes|length if quizzes else 0 }}</span>
+    </div>
+    {% if quizzes %}
+        <ul class="schedule-list">
+            {% for q in quizzes %}
+            <li class="list-item animate-item">
+                <span class="item-title">
+                    <i class="bi bi-question-diamond"></i>
+                    {{ q.title }}
+                </span>
+                <span class="item-meta">
+                    <span class="badge-quiz">
+                        <i class="bi bi-pencil"></i> Available
+                    </span>
+                </span>
+            </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <div class="empty-state">
+            <i class="bi bi-slash-circle"></i>
+            No quizzes available.
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

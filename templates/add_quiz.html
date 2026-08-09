@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card p-4">
+            <h4>Create New Quiz</h4>
+            <form method="POST" action="{{ url_for('add_quiz') }}">
+                <div class="mb-2">
+                    <label class="form-label">Quiz Title</label>
+                    <input type="text" name="title" class="form-control" placeholder="e.g., Python Basics Quiz" required>
+                </div>
+                <div class="mb-2">
+                    <label class="form-label">Description</label>
+                    <textarea name="description" class="form-control" rows="3" placeholder="Optional description"></textarea>
+                </div>
+                <div class="mb-2">
+                    <label class="form-label">Course</label>
+                    <select name="course_id" class="form-select" required>
+                        <option value="">Select Course</option>
+                        {% for c in courses %}
+                        <option value="{{ c.id }}">{{ c.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-primary">Create Quiz</button>
+                <a href="{{ url_for('admin_quizzes') }}" class="btn btn-secondary">Cancel</a>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

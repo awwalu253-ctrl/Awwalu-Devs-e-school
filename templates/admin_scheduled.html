@@ -1,0 +1,846 @@
+{% extends "base.html" %}
+
+{% block content %}
+<style>
+    /* ============================================================
+       SCHEDULED CONTENT — NAVY + ELECTRIC BLUE THEME
+       ============================================================ */
+
+    /* ---------- ANIMATIONS ---------- */
+    @keyframes fadeInUp {
+        from { opacity: 0; transform: translateY(30px) scale(0.96); }
+        to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    .animate-card {
+        animation: fadeInUp 0.6s ease forwards;
+        opacity: 0;
+    }
+    .animate-card:nth-child(1) { animation-delay: 0.05s; }
+    .animate-card:nth-child(2) { animation-delay: 0.10s; }
+    .animate-card:nth-child(3) { animation-delay: 0.15s; }
+    .animate-card:nth-child(4) { animation-delay: 0.20s; }
+    .animate-card:nth-child(5) { animation-delay: 0.25s; }
+
+    /* ---------- HEADER ---------- */
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin-bottom: 28px;
+        animation: fadeInUp 0.6s ease forwards;
+        opacity: 0;
+    }
+
+    .page-header h2 {
+        font-weight: 700;
+        color: var(--navy);
+        letter-spacing: -0.3px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-size: 1.8rem;
+        margin: 0;
+    }
+
+    .page-header h2 i {
+        color: var(--blue);
+        font-size: 1.8rem;
+    }
+
+    .page-header .subtitle {
+        color: var(--text-light);
+        font-size: 0.95rem;
+        margin-top: 2px;
+        width: 100%;
+    }
+
+    /* ---------- BUTTONS ---------- */
+    .btn-primary {
+        background: linear-gradient(135deg, var(--blue), #1D4ED8);
+        border: none;
+        color: white;
+        font-weight: 600;
+        padding: 8px 20px;
+        border-radius: 50px;
+        box-shadow: 0 4px 14px rgba(37, 99, 235, 0.25);
+        transition: var(--transition);
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 0.85rem;
+        cursor: pointer;
+        text-decoration: none;
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-2px) scale(1.02);
+        box-shadow: 0 8px 24px rgba(37, 99, 235, 0.35);
+        background: linear-gradient(135deg, var(--blue), var(--cyan));
+        color: white;
+    }
+
+    .btn-secondary {
+        border: 1.5px solid #CBD5E1;
+        color: var(--text-light);
+        background: transparent;
+        font-weight: 500;
+        border-radius: 50px;
+        padding: 8px 20px;
+        transition: var(--transition);
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        text-decoration: none;
+        font-size: 0.85rem;
+    }
+
+    .btn-secondary:hover {
+        border-color: var(--blue);
+        color: var(--blue);
+        background: rgba(37, 99, 235, 0.04);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(37, 99, 235, 0.08);
+    }
+
+    .btn-success {
+        background: linear-gradient(135deg, #10B981, #059669);
+        border: none;
+        color: white;
+        font-weight: 600;
+        padding: 6px 14px;
+        border-radius: 50px;
+        box-shadow: 0 4px 14px rgba(16, 185, 129, 0.20);
+        transition: var(--transition);
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 0.75rem;
+        cursor: pointer;
+        text-decoration: none;
+    }
+
+    .btn-success:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 24px rgba(16, 185, 129, 0.30);
+        background: linear-gradient(135deg, #34D399, #10B981);
+        color: white;
+    }
+
+    .btn-info {
+        background: linear-gradient(135deg, var(--blue), var(--cyan));
+        border: none;
+        color: white;
+        font-weight: 600;
+        padding: 6px 14px;
+        border-radius: 50px;
+        box-shadow: 0 4px 14px rgba(37, 99, 235, 0.20);
+        transition: var(--transition);
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 0.75rem;
+        cursor: pointer;
+        text-decoration: none;
+    }
+
+    .btn-info:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 24px rgba(37, 99, 235, 0.30);
+        background: linear-gradient(135deg, var(--blue), var(--cyan));
+        color: white;
+        opacity: 0.9;
+    }
+
+    .btn-sm {
+        padding: 4px 12px;
+        font-size: 0.7rem;
+    }
+
+    .btn-outline-secondary {
+        border: 1.5px solid #CBD5E1;
+        color: var(--text-light);
+        background: transparent;
+        font-weight: 500;
+        border-radius: 50px;
+        padding: 4px 12px;
+        transition: var(--transition);
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        font-size: 0.75rem;
+        cursor: pointer;
+        text-decoration: none;
+    }
+
+    .btn-outline-secondary:hover {
+        border-color: var(--blue);
+        color: var(--blue);
+        background: rgba(37, 99, 235, 0.04);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(37, 99, 235, 0.08);
+    }
+
+    /* ---------- CARDS ---------- */
+    .card {
+        border: none;
+        border-radius: var(--radius);
+        box-shadow: var(--shadow-md);
+        transition: var(--transition);
+        background: rgba(255, 255, 255, 0.92);
+        backdrop-filter: blur(2px);
+        border: 1px solid rgba(37, 99, 235, 0.06);
+        overflow: hidden;
+    }
+
+    .card:hover {
+        box-shadow: var(--shadow-lg), 0 0 0 1px rgba(37, 99, 235, 0.06);
+        transform: translateY(-2px);
+    }
+
+    .card-header-custom {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 16px 20px 12px 20px;
+        border-bottom: 1px solid rgba(37, 99, 235, 0.06);
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    .card-header-custom h5 {
+        font-weight: 700;
+        color: var(--navy);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 1rem;
+        margin: 0;
+    }
+
+    .card-header-custom h5 i {
+        color: var(--blue);
+    }
+
+    .card-header-custom .count-badge {
+        background: rgba(37, 99, 235, 0.08);
+        color: var(--navy);
+        padding: 2px 14px;
+        border-radius: 50px;
+        font-size: 0.7rem;
+        font-weight: 600;
+        border: 1px solid rgba(37, 99, 235, 0.06);
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+    }
+
+    .card-body-custom {
+        padding: 20px;
+    }
+
+    /* ---------- FILTER BAR ---------- */
+    .filter-bar {
+        background: rgba(255, 255, 255, 0.92);
+        backdrop-filter: blur(8px);
+        border-radius: var(--radius);
+        padding: 16px 20px;
+        border: 1px solid rgba(37, 99, 235, 0.06);
+        box-shadow: var(--shadow-sm);
+        margin-bottom: 24px;
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        flex-wrap: wrap;
+        animation: fadeInUp 0.6s ease forwards;
+        opacity: 0;
+        animation-delay: 0.05s;
+    }
+
+    .filter-bar label {
+        font-weight: 600;
+        color: var(--navy);
+        font-size: 0.8rem;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        margin: 0;
+    }
+
+    .filter-bar .form-select {
+        border: 1.5px solid #E2E8F0;
+        border-radius: var(--radius-sm);
+        padding: 8px 14px;
+        font-size: 0.85rem;
+        transition: var(--transition);
+        background: var(--bg);
+        color: var(--text);
+        min-width: 180px;
+    }
+
+    .filter-bar .form-select:focus {
+        border-color: var(--blue);
+        box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.08);
+        background: white;
+        outline: none;
+    }
+
+    /* ---------- SCHEDULE FORM ---------- */
+    .schedule-form .row {
+        --bs-gutter-x: 12px;
+        --bs-gutter-y: 12px;
+        align-items: flex-end;
+    }
+
+    .schedule-form .form-label {
+        font-weight: 600;
+        color: var(--navy);
+        font-size: 0.7rem;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        margin-bottom: 4px;
+    }
+
+    .schedule-form .form-control,
+    .schedule-form .form-select {
+        border: 1.5px solid #E2E8F0;
+        border-radius: var(--radius-sm);
+        padding: 8px 14px;
+        font-size: 0.85rem;
+        transition: var(--transition);
+        background: var(--bg);
+        color: var(--text);
+        width: 100%;
+    }
+
+    .schedule-form .form-control:focus,
+    .schedule-form .form-select:focus {
+        border-color: var(--blue);
+        box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.08);
+        background: white;
+        outline: none;
+    }
+
+    .schedule-form textarea.form-control {
+        resize: vertical;
+        min-height: 38px;
+    }
+
+    /* ---------- TABLE ---------- */
+    .table-wrap {
+        overflow-x: auto;
+    }
+
+    .table {
+        margin-bottom: 0;
+        border-collapse: separate;
+        border-spacing: 0 6px;
+        width: 100%;
+    }
+
+    .table thead th {
+        background: rgba(15, 23, 42, 0.04);
+        color: var(--navy);
+        font-weight: 600;
+        font-size: 0.7rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        padding: 10px 14px;
+        border: none;
+        white-space: nowrap;
+        border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+    }
+
+    .table tbody tr {
+        background: rgba(255, 255, 255, 0.6);
+        transition: var(--transition);
+        border-radius: var(--radius-sm);
+        box-shadow: 0 2px 8px rgba(15, 23, 42, 0.03);
+    }
+
+    .table tbody tr:hover {
+        background: rgba(37, 99, 235, 0.04);
+        transform: scale(1.01);
+        box-shadow: var(--shadow-md);
+    }
+
+    .table tbody td {
+        padding: 10px 14px;
+        border: none;
+        vertical-align: middle;
+        font-size: 0.85rem;
+        color: var(--text);
+        background: transparent;
+    }
+
+    .table tbody tr td:first-child {
+        border-radius: var(--radius-sm) 0 0 var(--radius-sm);
+    }
+
+    .table tbody tr td:last-child {
+        border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+    }
+
+    .table .course-badge {
+        display: inline-block;
+        padding: 3px 12px;
+        border-radius: 50px;
+        font-weight: 600;
+        font-size: 0.7rem;
+        color: white;
+        background: var(--blue);
+        box-shadow: 0 2px 6px rgba(37, 99, 235, 0.15);
+    }
+
+    .table .scheduled-date {
+        font-size: 0.8rem;
+        color: var(--text-light);
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+    }
+
+    .table .scheduled-date i {
+        color: var(--blue);
+    }
+
+    .table .action-group {
+        display: flex;
+        gap: 6px;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+    }
+
+    /* ---------- EMPTY STATE ---------- */
+    .empty-state {
+        text-align: center;
+        padding: 40px 20px;
+        background: rgba(255, 255, 255, 0.3);
+        border-radius: var(--radius-sm);
+        border: 1px dashed rgba(37, 99, 235, 0.10);
+    }
+
+    .empty-state .empty-icon {
+        font-size: 2rem;
+        color: var(--blue);
+        opacity: 0.3;
+        margin-bottom: 8px;
+    }
+
+    .empty-state p {
+        color: var(--text-light);
+        font-size: 0.9rem;
+        margin: 0;
+    }
+
+    /* ---------- RESPONSIVE ---------- */
+    @media (max-width: 768px) {
+        .page-header h2 {
+            font-size: 1.4rem;
+        }
+        .page-header h2 i {
+            font-size: 1.4rem;
+        }
+        .card-body-custom {
+            padding: 16px;
+        }
+        .filter-bar {
+            flex-direction: column;
+            align-items: stretch;
+            gap: 10px;
+        }
+        .filter-bar .form-select {
+            min-width: 100%;
+        }
+        .schedule-form .row > [class*="col-"] {
+            flex: 0 0 100%;
+            max-width: 100%;
+        }
+        .table thead th,
+        .table tbody td {
+            padding: 8px 10px;
+            font-size: 0.78rem;
+        }
+        .table .course-badge {
+            font-size: 0.6rem;
+            padding: 2px 10px;
+        }
+        .btn-success, .btn-info {
+            font-size: 0.65rem;
+            padding: 4px 10px;
+        }
+        .card-header-custom h5 {
+            font-size: 0.9rem;
+        }
+    }
+
+    @media (max-width: 576px) {
+        .page-header {
+            flex-direction: column;
+            align-items: stretch;
+            gap: 8px;
+        }
+        .page-header h2 {
+            font-size: 1.2rem;
+        }
+        .page-header h2 i {
+            font-size: 1.2rem;
+        }
+        .page-header .subtitle {
+            font-size: 0.85rem;
+        }
+        .card-header-custom {
+            flex-direction: column;
+            align-items: stretch;
+            gap: 6px;
+        }
+        .table thead th {
+            font-size: 0.55rem;
+            padding: 6px 8px;
+        }
+        .table tbody td {
+            font-size: 0.7rem;
+            padding: 6px 8px;
+        }
+        .table .scheduled-date {
+            font-size: 0.7rem;
+        }
+        .btn-success, .btn-info {
+            font-size: 0.6rem;
+            padding: 3px 8px;
+        }
+        .action-group {
+            gap: 4px;
+        }
+    }
+
+    /* ---------- DARK MODE ---------- */
+    body.dark-mode .page-header h2 {
+        color: #E2E8F0;
+    }
+    body.dark-mode .page-header h2 i {
+        color: var(--cyan);
+    }
+    body.dark-mode .page-header .subtitle {
+        color: #94A3B8;
+    }
+
+    body.dark-mode .card {
+        background: rgba(15, 23, 42, 0.9);
+        border-color: rgba(37, 99, 235, 0.08);
+        color: #E2E8F0;
+    }
+    body.dark-mode .card-header-custom h5 {
+        color: #E2E8F0;
+    }
+    body.dark-mode .card-header-custom .count-badge {
+        background: rgba(37, 99, 235, 0.12);
+        color: #CBD5E1;
+        border-color: rgba(37, 99, 235, 0.10);
+    }
+
+    body.dark-mode .filter-bar {
+        background: rgba(15, 23, 42, 0.8);
+        border-color: rgba(37, 99, 235, 0.08);
+    }
+    body.dark-mode .filter-bar label {
+        color: #CBD5E1;
+    }
+    body.dark-mode .filter-bar .form-select {
+        background: #1E293B;
+        color: #E2E8F0;
+        border-color: #334155;
+    }
+    body.dark-mode .filter-bar .form-select:focus {
+        background: #1E293B;
+        border-color: var(--blue);
+        box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.12);
+    }
+
+    body.dark-mode .schedule-form .form-label {
+        color: #CBD5E1;
+    }
+    body.dark-mode .schedule-form .form-control,
+    body.dark-mode .schedule-form .form-select {
+        background: #1E293B;
+        color: #E2E8F0;
+        border-color: #334155;
+    }
+    body.dark-mode .schedule-form .form-control:focus,
+    body.dark-mode .schedule-form .form-select:focus {
+        background: #1E293B;
+        border-color: var(--blue);
+        box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.12);
+    }
+
+    body.dark-mode .table thead th {
+        background: rgba(37, 99, 235, 0.08);
+        color: #CBD5E1;
+    }
+    body.dark-mode .table tbody tr {
+        background: rgba(15, 23, 42, 0.6);
+        box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    }
+    body.dark-mode .table tbody tr:hover {
+        background: rgba(37, 99, 235, 0.08);
+    }
+    body.dark-mode .table tbody td {
+        color: #E2E8F0;
+    }
+    body.dark-mode .table .course-badge {
+        background: linear-gradient(135deg, #1D4ED8, #2563EB);
+    }
+    body.dark-mode .table .scheduled-date {
+        color: #94A3B8;
+    }
+    body.dark-mode .table .scheduled-date i {
+        color: var(--cyan);
+    }
+
+    body.dark-mode .btn-secondary {
+        border-color: #334155;
+        color: #94A3B8;
+    }
+    body.dark-mode .btn-secondary:hover {
+        border-color: var(--blue);
+        color: var(--cyan);
+        background: rgba(37, 99, 235, 0.08);
+    }
+    body.dark-mode .btn-primary {
+        background: linear-gradient(135deg, #1D4ED8, #2563EB);
+    }
+    body.dark-mode .btn-primary:hover {
+        background: linear-gradient(135deg, var(--blue), var(--cyan));
+    }
+    body.dark-mode .btn-success {
+        background: linear-gradient(135deg, #059669, #047857);
+    }
+    body.dark-mode .btn-success:hover {
+        background: linear-gradient(135deg, #10B981, #059669);
+    }
+    body.dark-mode .btn-info {
+        background: linear-gradient(135deg, #1D4ED8, #0891B2);
+    }
+    body.dark-mode .btn-info:hover {
+        background: linear-gradient(135deg, #2563EB, #22D3EE);
+    }
+    body.dark-mode .btn-outline-secondary {
+        border-color: #334155;
+        color: #94A3B8;
+    }
+    body.dark-mode .btn-outline-secondary:hover {
+        border-color: var(--blue);
+        color: var(--cyan);
+        background: rgba(37, 99, 235, 0.08);
+    }
+
+    body.dark-mode .empty-state {
+        background: rgba(15, 23, 42, 0.3);
+        border-color: rgba(37, 99, 235, 0.10);
+    }
+    body.dark-mode .empty-state p {
+        color: #94A3B8;
+    }
+</style>
+
+<!-- ============================================================
+     HEADER
+     ============================================================ -->
+<div class="page-header">
+    <div>
+        <h2>
+            <i class="bi bi-clock-history"></i>
+            Scheduled Content
+        </h2>
+        <p class="subtitle">Manage notes and assignments that are scheduled for future publication.</p>
+    </div>
+    <a href="{{ url_for('admin_panel') }}" class="btn btn-secondary">
+        <i class="bi bi-arrow-left"></i> Back
+    </a>
+</div>
+
+<!-- ============================================================
+     FILTER BAR
+     ============================================================ -->
+<div class="filter-bar">
+    <label for="courseFilter"><i class="bi bi-funnel"></i> Filter:</label>
+    <form method="GET" action="{{ url_for('admin_scheduled') }}" class="d-flex align-items-center gap-2 flex-wrap" id="filterForm">
+        <select name="course_id" id="courseFilter" class="form-select" onchange="this.form.submit()">
+            <option value="all" {% if course_filter == 'all' or not course_filter %}selected{% endif %}>All Courses</option>
+            {% for c in courses %}
+            <option value="{{ c.id }}" {% if course_filter|string == c.id|string %}selected{% endif %}>
+                {{ c.name }}
+            </option>
+            {% endfor %}
+        </select>
+        <a href="{{ url_for('admin_scheduled', course_id='all') }}" class="btn btn-outline-secondary btn-sm">Reset</a>
+    </form>
+</div>
+
+<!-- ============================================================
+     SCHEDULE NEW NOTE FORM
+     ============================================================ -->
+<div class="card mb-4 animate-card">
+    <div class="card-header-custom">
+        <h5><i class="bi bi-calendar-plus"></i> Schedule a New Note</h5>
+    </div>
+    <div class="card-body-custom">
+        <form method="POST" action="{{ url_for('schedule_note') }}" class="schedule-form">
+            <div class="row g-3">
+                <div class="col-md-3">
+                    <label class="form-label">Title</label>
+                    <input type="text" name="title" class="form-control" placeholder="Note Title" required>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Content</label>
+                    <textarea name="content" class="form-control" rows="1" placeholder="Content (use ```code```)" required></textarea>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label">Publish Date & Time</label>
+                    <input type="datetime-local" name="publish_at" class="form-control" required>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label">Course</label>
+                    <select name="course_id" class="form-select" required>
+                        <option value="">Course</option>
+                        {% for c in courses %}
+                        <option value="{{ c.id }}">{{ c.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-1">
+                    <label class="form-label">&nbsp;</label>
+                    <button type="submit" class="btn btn-primary w-100">Schedule</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- ============================================================
+     SCHEDULED NOTES TABLE
+     ============================================================ -->
+<div class="card mb-4 animate-card" style="animation-delay: 0.1s;">
+    <div class="card-header-custom">
+        <h5><i class="bi bi-journal-text"></i> Scheduled Notes</h5>
+        <span class="count-badge">
+            <i class="bi bi-clock"></i> {{ scheduled_notes|length if scheduled_notes else 0 }}
+        </span>
+    </div>
+    <div class="card-body-custom">
+        {% if scheduled_notes %}
+        <div class="table-wrap">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Title</th>
+                        <th>Course</th>
+                        <th>Scheduled For</th>
+                        <th style="text-align: right;">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for note in scheduled_notes %}
+                    <tr>
+                        <td>{{ note.title }}</td>
+                        <td><span class="course-badge">{{ note.course_name }}</span></td>
+                        <td>
+                            <span class="scheduled-date">
+                                <i class="bi bi-calendar-event"></i> {{ note.publish_at }}
+                            </span>
+                        </td>
+                        <td style="text-align: right;">
+                            <div class="action-group" style="justify-content: flex-end;">
+                                <a href="{{ url_for('publish_now', note_id=note.id, course_id=course_filter) }}"
+                                   class="btn btn-success btn-sm">
+                                    <i class="bi bi-check2-circle"></i> Publish Now
+                                </a>
+                                <a href="{{ url_for('edit_note', note_id=note.id, course_id=course_filter) }}"
+                                   class="btn btn-info btn-sm">
+                                    <i class="bi bi-pencil"></i> Edit
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <div class="empty-icon"><i class="bi bi-calendar-x"></i></div>
+            <p>No notes are currently scheduled.</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- ============================================================
+     SCHEDULED ASSIGNMENTS TABLE
+     ============================================================ -->
+<div class="card mb-4 animate-card" style="animation-delay: 0.15s;">
+    <div class="card-header-custom">
+        <h5><i class="bi bi-list-task"></i> Scheduled Assignments</h5>
+        <span class="count-badge">
+            <i class="bi bi-clock"></i> {{ scheduled_assignments|length if scheduled_assignments else 0 }}
+        </span>
+    </div>
+    <div class="card-body-custom">
+        {% if scheduled_assignments %}
+        <div class="table-wrap">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Title</th>
+                        <th>Course</th>
+                        <th>Scheduled For</th>
+                        <th style="text-align: right;">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for ass in scheduled_assignments %}
+                    <tr>
+                        <td>{{ ass.title }}</td>
+                        <td><span class="course-badge">{{ ass.course_name }}</span></td>
+                        <td>
+                            <span class="scheduled-date">
+                                <i class="bi bi-calendar-event"></i> {{ ass.publish_at }}
+                            </span>
+                        </td>
+                        <td style="text-align: right;">
+                            <div class="action-group" style="justify-content: flex-end;">
+                                <a href="{{ url_for('publish_assignment_now', assignment_id=ass.id, course_id=course_filter) }}"
+                                   class="btn btn-success btn-sm">
+                                    <i class="bi bi-check2-circle"></i> Publish Now
+                                </a>
+                                <a href="{{ url_for('edit_assignment', assignment_id=ass.id, course_id=course_filter) }}"
+                                   class="btn btn-info btn-sm">
+                                    <i class="bi bi-pencil"></i> Edit
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <div class="empty-icon"><i class="bi bi-calendar-x"></i></div>
+            <p>No assignments are currently scheduled.</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- ============================================================
+     BACK BUTTON (duplicate for convenience)
+     ============================================================ -->
+<div class="mt-3" style="animation: fadeInUp 0.6s ease forwards; opacity: 0; animation-delay: 0.2s;">
+    <a href="{{ url_for('admin_panel') }}" class="btn btn-secondary">
+        <i class="bi bi-arrow-left"></i> Back to Admin
+    </a>
+</div>
+
+{% endblock %}

@@ -1,0 +1,694 @@
+{% extends "base.html" %}
+
+{% block content %}
+<style>
+    /* ============================================================
+       STUDENT MESSAGES — PREMIUM NAVY + ELECTRIC BLUE THEME
+       ============================================================ */
+
+    /* ---------- ANIMATIONS ---------- */
+    @keyframes fadeUp {
+        from { opacity: 0; transform: translateY(24px) scale(0.98); }
+        to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    @keyframes slideInRight {
+        from { opacity: 0; transform: translateX(-12px); }
+        to { opacity: 1; transform: translateX(0); }
+    }
+
+    @keyframes slideInLeft {
+        from { opacity: 0; transform: translateX(12px); }
+        to { opacity: 1; transform: translateX(0); }
+    }
+
+    .animate-card {
+        animation: fadeUp 0.55s ease forwards;
+        opacity: 0;
+    }
+    .animate-card:nth-child(1) { animation-delay: 0.04s; }
+    .animate-card:nth-child(2) { animation-delay: 0.08s; }
+
+    .animate-right {
+        animation: slideInRight 0.35s ease forwards;
+        opacity: 0;
+    }
+    .animate-left {
+        animation: slideInLeft 0.35s ease forwards;
+        opacity: 0;
+    }
+    .animate-right:nth-child(1) { animation-delay: 0.03s; }
+    .animate-right:nth-child(2) { animation-delay: 0.06s; }
+    .animate-right:nth-child(3) { animation-delay: 0.09s; }
+    .animate-right:nth-child(4) { animation-delay: 0.12s; }
+    .animate-right:nth-child(5) { animation-delay: 0.15s; }
+
+    /* ---------- HEADER ---------- */
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 16px;
+        margin-bottom: 28px;
+        animation: fadeUp 0.6s ease forwards;
+        opacity: 0;
+    }
+
+    .page-header .brand {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+    }
+
+    .page-header .brand h2 {
+        font-weight: 700;
+        color: var(--navy);
+        letter-spacing: -0.3px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-size: 1.8rem;
+        margin: 0;
+    }
+
+    .page-header .brand h2 i {
+        color: var(--blue);
+        font-size: 1.8rem;
+    }
+
+    .page-header .brand .subtitle {
+        color: var(--text-light);
+        font-size: 0.95rem;
+        margin-left: 4px;
+    }
+
+    .page-header .actions {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    /* ---------- BUTTONS ---------- */
+    .btn-outline-secondary {
+        border: 1.5px solid #CBD5E1;
+        color: var(--text-light);
+        background: transparent;
+        font-weight: 500;
+        border-radius: 50px;
+        padding: 8px 20px;
+        transition: var(--transition);
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        text-decoration: none;
+        font-size: 0.85rem;
+    }
+    .btn-outline-secondary:hover {
+        border-color: var(--blue);
+        color: var(--blue);
+        background: rgba(37, 99, 235, 0.04);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(37, 99, 235, 0.08);
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, var(--blue), #1D4ED8);
+        border: none;
+        color: white;
+        font-weight: 600;
+        padding: 10px 24px;
+        border-radius: 50px;
+        box-shadow: 0 4px 14px rgba(37, 99, 235, 0.25);
+        transition: var(--transition);
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 0.9rem;
+        cursor: pointer;
+        border: none;
+    }
+    .btn-primary:hover {
+        transform: translateY(-2px) scale(1.02);
+        box-shadow: 0 8px 24px rgba(37, 99, 235, 0.35);
+        background: linear-gradient(135deg, var(--blue), var(--cyan));
+        color: white;
+    }
+
+    /* ---------- GLASS CARD ---------- */
+    .glass-card {
+        background: rgba(255, 255, 255, 0.88);
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+        border: 1px solid rgba(37, 99, 235, 0.06);
+        border-radius: var(--radius);
+        box-shadow: var(--shadow-md);
+        transition: var(--transition);
+        overflow: hidden;
+    }
+
+    .glass-card:hover {
+        box-shadow: var(--shadow-lg), 0 0 0 1px rgba(37, 99, 235, 0.06);
+        transform: translateY(-2px);
+    }
+
+    .glass-card .card-header-custom {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 18px 24px 12px 24px;
+        border-bottom: 1px solid rgba(37, 99, 235, 0.04);
+        font-weight: 700;
+        color: var(--navy);
+        font-size: 1.05rem;
+    }
+
+    .glass-card .card-header-custom i {
+        color: var(--blue);
+        font-size: 1.2rem;
+    }
+
+    .glass-card .card-body-custom {
+        padding: 20px 24px 24px;
+    }
+
+    /* ---------- SEND MESSAGE FORM ---------- */
+    .send-form .input-group {
+        box-shadow: var(--shadow-sm);
+        border-radius: 50px;
+        overflow: hidden;
+        transition: var(--transition);
+        border: 1px solid #E2E8F0;
+    }
+    .send-form .input-group:focus-within {
+        border-color: var(--blue);
+        box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.08);
+    }
+    .send-form .form-control {
+        border: none;
+        border-radius: 0;
+        padding: 12px 20px;
+        font-size: 0.95rem;
+        transition: var(--transition);
+        background: var(--bg);
+        color: var(--text);
+        flex: 1;
+    }
+    .send-form .form-control:focus {
+        box-shadow: none;
+        background: white;
+        outline: none;
+    }
+    .send-form .form-control::placeholder {
+        color: #94A3B8;
+    }
+    .send-form .input-group .btn {
+        border-radius: 0 50px 50px 0;
+        padding: 0 24px;
+        flex-shrink: 0;
+    }
+
+    /* ---------- CONVERSATION SECTION ---------- */
+    .conversation-header {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 16px;
+        color: var(--navy);
+        font-weight: 700;
+        font-size: 1.05rem;
+    }
+
+    .conversation-header i {
+        color: var(--blue);
+        font-size: 1.2rem;
+    }
+
+    .conversation-header .count-badge {
+        margin-left: auto;
+        background: rgba(37, 99, 235, 0.08);
+        color: var(--navy);
+        padding: 2px 12px;
+        border-radius: 50px;
+        font-size: 0.7rem;
+        font-weight: 600;
+        border: 1px solid rgba(37, 99, 235, 0.06);
+    }
+
+    /* ---------- MESSAGE BUBBLES ---------- */
+    .message-bubble {
+        display: flex;
+        flex-direction: column;
+        padding: 14px 18px;
+        border-radius: var(--radius-sm);
+        margin-bottom: 10px;
+        max-width: 85%;
+        position: relative;
+        transition: var(--transition);
+        border: 1px solid rgba(37, 99, 235, 0.04);
+    }
+
+    .message-bubble.sent {
+        background: linear-gradient(135deg, var(--blue), #1D4ED8);
+        color: white;
+        align-self: flex-end;
+        border-bottom-right-radius: 4px;
+        border: none;
+        box-shadow: 0 2px 12px rgba(37, 99, 235, 0.20);
+    }
+
+    .message-bubble.sent .msg-header {
+        color: rgba(255, 255, 255, 0.7);
+    }
+
+    .message-bubble.sent .msg-header small {
+        color: rgba(255, 255, 255, 0.6);
+    }
+
+    .message-bubble.received {
+        background: rgba(255, 255, 255, 0.7);
+        color: var(--text);
+        align-self: flex-start;
+        border-bottom-left-radius: 4px;
+        border: 1px solid rgba(37, 99, 235, 0.04);
+        box-shadow: var(--shadow-sm);
+    }
+
+    .message-bubble .msg-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 2px;
+        flex-wrap: wrap;
+    }
+
+    .message-bubble .msg-header strong {
+        font-weight: 600;
+        font-size: 0.85rem;
+    }
+
+    .message-bubble .msg-header .sender-badge {
+        font-size: 0.55rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        padding: 1px 10px;
+        border-radius: 50px;
+        background: rgba(37, 99, 235, 0.12);
+        color: var(--blue);
+        border: 1px solid rgba(37, 99, 235, 0.06);
+    }
+
+    .message-bubble.sent .msg-header .sender-badge {
+        background: rgba(255, 255, 255, 0.15);
+        color: rgba(255, 255, 255, 0.8);
+        border-color: rgba(255, 255, 255, 0.10);
+    }
+
+    .message-bubble .msg-header small {
+        font-size: 0.65rem;
+        color: var(--text-light);
+        white-space: nowrap;
+    }
+
+    .message-bubble .msg-body {
+        font-size: 0.92rem;
+        line-height: 1.5;
+        word-wrap: break-word;
+    }
+
+    .message-bubble .msg-status {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        font-size: 0.6rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.03em;
+        margin-top: 4px;
+        align-self: flex-end;
+    }
+
+    .message-bubble.sent .msg-status {
+        color: rgba(255, 255, 255, 0.6);
+    }
+
+    .message-bubble.received .msg-status {
+        color: var(--text-light);
+    }
+
+    .message-bubble.received.unread {
+        border-left: 4px solid var(--blue);
+        background: rgba(37, 99, 235, 0.04);
+    }
+
+    /* ---------- EMPTY STATE ---------- */
+    .empty-state {
+        text-align: center;
+        padding: 50px 20px;
+        border: 2px dashed rgba(37, 99, 235, 0.12);
+        border-radius: var(--radius);
+        background: rgba(255, 255, 255, 0.3);
+    }
+
+    .empty-state .empty-icon {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, rgba(37, 99, 235, 0.08), rgba(34, 211, 238, 0.08));
+        color: var(--blue);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2.4rem;
+        margin: 0 auto 16px;
+        border: 2px solid rgba(37, 99, 235, 0.10);
+        transition: var(--transition);
+    }
+
+    .empty-state:hover .empty-icon {
+        transform: scale(1.06) rotate(-4deg);
+        border-color: var(--cyan);
+        box-shadow: 0 0 0 8px rgba(34, 211, 238, 0.06);
+    }
+
+    .empty-state h5 {
+        color: var(--navy);
+        font-weight: 700;
+        margin-bottom: 6px;
+    }
+
+    .empty-state p {
+        color: var(--text-light);
+        max-width: 400px;
+        margin: 0 auto;
+        font-size: 0.95rem;
+        line-height: 1.5;
+    }
+
+    /* ---------- RESPONSIVE ---------- */
+    @media (max-width: 768px) {
+        .page-header .brand h2 {
+            font-size: 1.4rem;
+        }
+        .page-header .brand h2 i {
+            font-size: 1.4rem;
+        }
+        .page-header .brand .subtitle {
+            font-size: 0.85rem;
+        }
+        .glass-card .card-body-custom {
+            padding: 16px;
+        }
+        .glass-card .card-header-custom {
+            padding: 14px 16px 10px;
+            font-size: 0.95rem;
+        }
+        .message-bubble {
+            max-width: 92%;
+            padding: 12px 14px;
+        }
+        .message-bubble .msg-body {
+            font-size: 0.88rem;
+        }
+        .send-form .form-control {
+            font-size: 0.9rem;
+            padding: 10px 16px;
+        }
+        .btn-primary {
+            padding: 8px 18px;
+            font-size: 0.85rem;
+        }
+        .btn-outline-secondary {
+            font-size: 0.8rem;
+            padding: 6px 14px;
+        }
+        .conversation-header {
+            font-size: 0.95rem;
+        }
+    }
+
+    @media (max-width: 576px) {
+        .page-header {
+            flex-direction: column;
+            align-items: stretch;
+            gap: 12px;
+        }
+        .page-header .brand h2 {
+            font-size: 1.2rem;
+        }
+        .page-header .brand h2 i {
+            font-size: 1.2rem;
+        }
+        .page-header .brand .subtitle {
+            font-size: 0.8rem;
+        }
+        .page-header .actions {
+            justify-content: flex-start;
+        }
+        .glass-card .card-body-custom {
+            padding: 12px;
+        }
+        .glass-card .card-header-custom {
+            padding: 12px 14px 8px;
+            font-size: 0.9rem;
+        }
+        .send-form .input-group {
+            border-radius: var(--radius-sm);
+        }
+        .send-form .input-group .btn {
+            border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+            padding: 0 14px;
+            font-size: 0.8rem;
+        }
+        .message-bubble {
+            max-width: 96%;
+            padding: 10px 12px;
+        }
+        .message-bubble .msg-header strong {
+            font-size: 0.8rem;
+        }
+        .message-bubble .msg-body {
+            font-size: 0.85rem;
+        }
+        .message-bubble .msg-header small {
+            font-size: 0.6rem;
+        }
+        .conversation-header {
+            font-size: 0.9rem;
+        }
+        .conversation-header .count-badge {
+            font-size: 0.6rem;
+        }
+        .empty-state {
+            padding: 30px 16px;
+        }
+        .empty-state .empty-icon {
+            width: 60px;
+            height: 60px;
+            font-size: 1.8rem;
+        }
+        .empty-state h5 {
+            font-size: 1.1rem;
+        }
+        .empty-state p {
+            font-size: 0.85rem;
+        }
+    }
+
+    /* ---------- DARK MODE ---------- */
+    body.dark-mode .page-header .brand h2 {
+        color: #E2E8F0;
+    }
+    body.dark-mode .page-header .brand h2 i {
+        color: var(--cyan);
+    }
+    body.dark-mode .page-header .brand .subtitle {
+        color: #94A3B8;
+    }
+
+    body.dark-mode .glass-card {
+        background: rgba(15, 23, 42, 0.85);
+        border-color: rgba(37, 99, 235, 0.08);
+    }
+    body.dark-mode .glass-card .card-header-custom {
+        color: #E2E8F0;
+        border-bottom-color: rgba(37, 99, 235, 0.08);
+    }
+    body.dark-mode .glass-card .card-header-custom i {
+        color: var(--cyan);
+    }
+
+    body.dark-mode .send-form .input-group {
+        border-color: #334155;
+    }
+    body.dark-mode .send-form .input-group:focus-within {
+        border-color: var(--blue);
+        box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.12);
+    }
+    body.dark-mode .send-form .form-control {
+        background: #1E293B;
+        color: #E2E8F0;
+    }
+    body.dark-mode .send-form .form-control:focus {
+        background: #1E293B;
+    }
+    body.dark-mode .send-form .form-control::placeholder {
+        color: #64748B;
+    }
+
+    body.dark-mode .message-bubble.received {
+        background: rgba(15, 23, 42, 0.5);
+        border-color: rgba(37, 99, 235, 0.06);
+        color: #E2E8F0;
+    }
+    body.dark-mode .message-bubble.received.unread {
+        border-left-color: var(--cyan);
+        background: rgba(37, 99, 235, 0.08);
+    }
+    body.dark-mode .message-bubble.sent {
+        background: linear-gradient(135deg, #1D4ED8, #2563EB);
+    }
+    body.dark-mode .message-bubble .msg-header .sender-badge {
+        background: rgba(37, 99, 235, 0.15);
+        color: var(--cyan);
+        border-color: rgba(37, 99, 235, 0.08);
+    }
+    body.dark-mode .message-bubble .msg-header strong {
+        color: #E2E8F0;
+    }
+    body.dark-mode .message-bubble .msg-header small {
+        color: #94A3B8;
+    }
+    body.dark-mode .message-bubble.received .msg-status {
+        color: #94A3B8;
+    }
+
+    body.dark-mode .conversation-header {
+        color: #E2E8F0;
+    }
+    body.dark-mode .conversation-header i {
+        color: var(--cyan);
+    }
+    body.dark-mode .conversation-header .count-badge {
+        background: rgba(37, 99, 235, 0.12);
+        color: #CBD5E1;
+        border-color: rgba(37, 99, 235, 0.08);
+    }
+
+    body.dark-mode .btn-outline-secondary {
+        border-color: #334155;
+        color: #94A3B8;
+    }
+    body.dark-mode .btn-outline-secondary:hover {
+        border-color: var(--blue);
+        color: var(--cyan);
+        background: rgba(37, 99, 235, 0.08);
+    }
+    body.dark-mode .btn-primary {
+        background: linear-gradient(135deg, #1D4ED8, #2563EB);
+    }
+    body.dark-mode .btn-primary:hover {
+        background: linear-gradient(135deg, var(--blue), var(--cyan));
+    }
+
+    body.dark-mode .empty-state {
+        border-color: rgba(37, 99, 235, 0.10);
+        background: rgba(15, 23, 42, 0.3);
+    }
+    body.dark-mode .empty-state h5 {
+        color: #E2E8F0;
+    }
+    body.dark-mode .empty-state p {
+        color: #94A3B8;
+    }
+</style>
+
+<!-- ========== HEADER ========== -->
+<div class="page-header">
+    <div class="brand">
+        <h2>
+            <i class="bi bi-envelope"></i>
+            My Messages
+        </h2>
+        <span class="subtitle"><i class="bi bi-chat-dots me-1"></i>Send a message to your instructor.</span>
+    </div>
+    <div class="actions">
+        <a href="{{ url_for('dashboard') }}" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left"></i> Back
+        </a>
+    </div>
+</div>
+
+<!-- ========== SEND MESSAGE CARD ========== -->
+<div class="glass-card animate-card">
+    <div class="card-header-custom">
+        <i class="bi bi-send"></i>
+        Send a Message to Instructor
+    </div>
+    <div class="card-body-custom">
+        <form method="POST" action="{{ url_for('student_send_message') }}" class="send-form">
+            <input type="hidden" name="receiver_id" value="{{ get_admin_id() }}">
+            <div class="input-group">
+                <input type="text" name="message" class="form-control" placeholder="Type your message..." required>
+                <button type="submit" class="btn btn-primary">
+                    <i class="bi bi-send"></i> Send
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- ========== CONVERSATION HISTORY ========== -->
+<div class="conversation-header animate-card" style="animation-delay: 0.06s;">
+    <i class="bi bi-chat-dots"></i>
+    Your Conversation
+    {% if messages %}
+    <span class="count-badge">{{ messages|length }} messages</span>
+    {% endif %}
+</div>
+
+{% if messages %}
+<div class="animate-card" style="animation-delay: 0.10s;">
+    {% for msg in messages %}
+    {% set is_sent = msg.sender_id == session.user_id %}
+    <div class="message-bubble {% if is_sent %}sent{% else %}received{% endif %} {% if not is_sent and not msg.is_read %}unread{% endif %}
+                {% if is_sent %}animate-right{% else %}animate-left{% endif %}">
+        <div class="msg-header">
+            <strong>
+                {{ msg.sender_name }}
+                {% if msg.sender_id == session.user_id %}
+                    <span class="sender-badge">You</span>
+                {% else %}
+                    <span class="sender-badge">Instructor</span>
+                {% endif %}
+            </strong>
+            <small>{{ msg.created_at }}</small>
+        </div>
+        <div class="msg-body">{{ msg.message }}</div>
+        <div class="msg-status">
+            {% if is_sent %}
+                <i class="bi bi-check2-circle"></i> Sent
+            {% else %}
+                {% if not msg.is_read %}
+                    <i class="bi bi-dot" style="color: var(--blue);"></i> New
+                {% else %}
+                    <i class="bi bi-check2"></i> Read
+                {% endif %}
+            {% endif %}
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<!-- ========== EMPTY STATE ========== -->
+<div class="empty-state animate-card" style="animation-delay: 0.10s;">
+    <div class="empty-icon">
+        <i class="bi bi-chat-square-heart"></i>
+    </div>
+    <h5>No conversation yet</h5>
+    <p>Once you send your instructor a message, your back-and-forth will show up here — stuck on something? Just say hi above.</p>
+</div>
+{% endif %}
+{% endblock %}

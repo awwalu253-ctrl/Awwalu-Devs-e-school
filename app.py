@@ -96,13 +96,29 @@ def send_email(to_email, subject, body):
 # --- Database Setup (Supports both SQLite and PostgreSQL) ---
 DATABASE_URL = os.getenv('DATABASE_URL')
 if not DATABASE_URL:
-    # Fallback to SQLite for local development
     DATABASE_URL = 'sqlite:///portal.db'
     connect_args = {"check_same_thread": False}
 else:
     connect_args = {}
+    # For PostgreSQL, use connection pooling with SSL
+    if 'postgres' in DATABASE_URL:
+        connect_args = {
+            'sslmode': 'require',
+        }
 
-engine = create_engine(DATABASE_URL, connect_args=connect_args)
+engine = create_engine(DATABASE_URL, connect_args=connect_args, pool_pre_ping=True)
+
+def get_new_id(conn, table_name=None):
+    """Get the last inserted ID (works for SQLite and PostgreSQL)."""
+    if 'sqlite' in DATABASE_URL:
+        result = conn.execute(text("SELECT last_insert_rowid() as id"))
+        row = result.fetchone()
+        return row[0] if row else None
+    else:
+        # For PostgreSQL, use lastval()
+        result = conn.execute(text("SELECT lastval() as id"))
+        row = result.fetchone()
+        return row[0] if row else None
 
 def get_db():
     if 'db' not in g:
@@ -1371,17 +1387,47 @@ def add_note():
     course_id = request.form['course_id']
     status = request.form.get('status', 'draft')
     cohort = request.form.get('cohort') or None
+
     max_order = execute_query("SELECT MAX(sort_order) as max_order FROM notes WHERE course_id = :cid",
                               {"cid": course_id}, fetch_one=True)
     sort_order = (max_order['max_order'] or 0) + 1
-    execute_query("""
-        INSERT INTO notes (title, content, course_id, status, sort_order, cohort)
-        VALUES (:t, :c, :cid, :s, :so, :coh)
-    """, {"t": title, "c": content, "cid": course_id, "s": status, "so": sort_order, "coh": cohort}, commit=True)
-    new_id = execute_query("SELECT last_insert_rowid() as id", fetch_one=True)['id']
+
+    # Get the database connection
+    conn = get_db()
+    new_id = get_new_id(conn)
+
+    # Insert note with RETURNING id for PostgreSQL
+    try:
+        if 'sqlite' in DATABASE_URL:
+            # SQLite: insert and then get last_insert_rowid
+            execute_query("""
+                INSERT INTO notes (title, content, course_id, status, sort_order, cohort)
+                VALUES (:t, :c, :cid, :s, :so, :coh)
+            """, {"t": title, "c": content, "cid": course_id, "s": status, "so": sort_order, "coh": cohort}, commit=True)
+            
+            new_id_row = execute_query("SELECT last_insert_rowid() as id", fetch_one=True)
+            new_id = new_id_row['id'] if new_id_row else None
+        else:
+            # PostgreSQL: use RETURNING id
+            result = conn.execute(text("""
+                INSERT INTO notes (title, content, course_id, status, sort_order, cohort)
+                VALUES (:t, :c, :cid, :s, :so, :coh)
+                RETURNING id
+            """), {"t": title, "c": content, "cid": course_id, "s": status, "so": sort_order, "coh": cohort})
+            conn.commit()
+            row = result.fetchone()
+            new_id = row[0] if row else None
+    except Exception as e:
+        conn.rollback()
+        flash(f'Error creating note: {str(e)}', 'danger')
+        return redirect(url_for('admin_panel', course_id=course_id))
+
+    # Handle tags if present
     tag_ids = request.form.getlist('tags')
     if tag_ids:
         sync_note_tags(new_id, tag_ids)
+
+    # Send email if status is 'published'
     if status == 'published':
         course = execute_query("SELECT name FROM courses WHERE id = :id", {"id": course_id}, fetch_one=True)
         subject = f"📝 New Note: {title}"
@@ -1390,6 +1436,7 @@ def add_note():
         flash('Note published and email sent to students!', 'success')
     else:
         flash('Note saved as draft.', 'info')
+
     return redirect(url_for('admin_panel', course_id=course_id))
 
 @app.route('/admin/edit_note/<int:note_id>', methods=['GET', 'POST'])
@@ -1793,13 +1840,47 @@ def add_assignment():
     course_id = request.form['course_id']
     publish_at = request.form.get('publish_at')
     cohort = request.form.get('cohort') or None
-    execute_query("""
-        INSERT INTO assignments (title, description, due_date, publish_at, course_id, cohort)
-        VALUES (:t, :d, :due, :pa, :cid, :coh)
-    """, {"t": title, "d": description, "due": due_date, "pa": publish_at if publish_at else None,
-          "cid": course_id, "coh": cohort}, commit=True)
+
+    conn = get_db()
+    if 'sqlite' in DATABASE_URL:
+        execute_query("""
+            INSERT INTO assignments (title, description, due_date, publish_at, course_id, cohort)
+            VALUES (:t, :d, :due, :pa, :cid, :coh)
+        """, {"t": title, "d": description, "due": due_date, "pa": publish_at if publish_at else None,
+              "cid": course_id, "coh": cohort}, commit=True)
+    else:
+        conn.execute(text("""
+            INSERT INTO assignments (title, description, due_date, publish_at, course_id, cohort)
+            VALUES (:t, :d, :due, :pa, :cid, :coh)
+        """), {"t": title, "d": description, "due": due_date, "pa": publish_at if publish_at else None,
+              "cid": course_id, "coh": cohort})
+        conn.commit()
+
     flash('Assignment created!', 'success')
     return redirect(url_for('admin_panel', course_id=course_id))
+
+def insert_and_get_id(table, columns, values, returning_col='id'):
+    """
+    Insert a row and return the new ID.
+    Works with both SQLite and PostgreSQL.
+    """
+    conn = get_db()
+    placeholders = ', '.join([f":{col}" for col in columns])
+    columns_str = ', '.join(columns)
+    
+    if 'sqlite' in DATABASE_URL:
+        # SQLite: insert and then get last_insert_rowid
+        query = f"INSERT INTO {table} ({columns_str}) VALUES ({placeholders})"
+        execute_query(query, values, commit=True)
+        result = execute_query("SELECT last_insert_rowid() as id", fetch_one=True)
+        return result['id'] if result else None
+    else:
+        # PostgreSQL: use RETURNING
+        query = f"INSERT INTO {table} ({columns_str}) VALUES ({placeholders}) RETURNING {returning_col}"
+        result = conn.execute(text(query), values)
+        conn.commit()
+        row = result.fetchone()
+        return row[0] if row else None
 
 @app.route('/admin/edit_assignment/<int:assignment_id>', methods=['GET', 'POST'])
 @login_required

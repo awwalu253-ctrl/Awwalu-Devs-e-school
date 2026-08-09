@@ -8,8 +8,8 @@ engine = create_engine(DATABASE_URL, connect_args={"check_same_thread": False} i
 
 def init_db():
     with engine.connect() as conn:
-        # Drop tables in correct order (cascade for PostgreSQL)
         print("Dropping existing tables...")
+        # Use CASCADE for PostgreSQL, ignore for SQLite
         conn.execute(text("DROP TABLE IF EXISTS note_tags CASCADE"))
         conn.execute(text("DROP TABLE IF EXISTS tags CASCADE"))
         conn.execute(text("DROP TABLE IF EXISTS student_notes CASCADE"))

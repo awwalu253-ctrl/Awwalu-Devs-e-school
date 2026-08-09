@@ -97,7 +97,7 @@ APP_BASE_URL = os.getenv('APP_BASE_URL', 'http://localhost:5000')
 def send_email(to_email, subject, body):
     # Read from environment variables
     mail_server = os.getenv('MAIL_SERVER', 'smtp.gmail.com')
-    mail_port = int(os.getenv('MAIL_PORT', 587))
+    mail_port = int(os.getenv('MAIL_PORT', 465))  # SSL port
     mail_username = os.getenv('MAIL_USERNAME', '')
     mail_password = os.getenv('MAIL_PASSWORD', '')
     mail_default_sender = os.getenv('MAIL_DEFAULT_SENDER', 'noreply@awwaludevs.com')
@@ -112,8 +112,9 @@ def send_email(to_email, subject, body):
         msg['To'] = to_email
         msg['Subject'] = subject
         msg.attach(MIMEText(body, 'plain'))
-        server = smtplib.SMTP(mail_server, mail_port)
-        server.starttls()
+        
+        # Use SSL instead of STARTTLS (port 465)
+        server = smtplib.SMTP_SSL(mail_server, mail_port)
         server.login(mail_username, mail_password)
         server.send_message(msg)
         server.quit()

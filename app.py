@@ -28,10 +28,12 @@ import io
 # --- Load environment variables from .env file ---
 from dotenv import load_dotenv
 load_dotenv()
+
 # Debug: print email settings (remove after testing)
 print("MAIL_USERNAME =", os.getenv('MAIL_USERNAME'))
 print("MAIL_PASSWORD =", os.getenv('MAIL_PASSWORD'))
 print("MAIL_SERVER =", os.getenv('MAIL_SERVER'))
+
 app = Flask(__name__)
 app.secret_key = os.getenv('SECRET_KEY', 'awwalu-devs-super-secret-key-change-in-production')
 
@@ -439,14 +441,17 @@ def forgot_password():
             if not email:
                 flash('Please enter your email address.', 'danger')
                 return redirect(url_for('forgot_password'))
+            
             user = execute_query("SELECT * FROM users WHERE LOWER(email) = LOWER(:email)", {"email": email}, fetch_one=True)
             if not user:
                 flash('No account found with that email address.', 'danger')
                 return redirect(url_for('forgot_password'))
+            
             token = secrets.token_urlsafe(32)
             expiry = datetime.utcnow() + timedelta(hours=24)
             execute_query("UPDATE users SET reset_token = :t, reset_token_expiry = :e WHERE id = :id",
                           {"t": token, "e": expiry.isoformat(), "id": user['id']}, commit=True)
+            
             reset_link = f"{APP_BASE_URL}/reset_password/{token}"
             body = f"""Hello {user['full_name']},
 
@@ -465,33 +470,18 @@ Awwalu Devs Team
                 flash('Password reset link sent to your email!', 'success')
             else:
                 flash(f'Email could not be sent. Use this link to reset your password: <a href="{reset_link}" target="_blank">{reset_link}</a>', 'warning')
+                print("\n" + "=" * 60)
+                print("🔑 RESET LINK (copy this):")
+                print(reset_link)
+                print("=" * 60 + "\n")
+            
             return redirect(url_for('login'))
+            
         except Exception as e:
             print(f"❌ Forgot password error: {e}")
             flash('An error occurred. Please try again.', 'danger')
             return redirect(url_for('forgot_password'))
-    return render_template('forgot_password.html')
-
-You requested to reset your password for your Awwalu Devs account.
-
-Click the link below to reset your password (valid for 24 hours):
-{reset_link}
-
-If you did not request this, please ignore this email.
-
-Regards,
-Awwalu Devs Team
-"""
-        success = send_email(user['email'], "Password Reset Request", body)
-        if success:
-            flash('Password reset link sent to your email!', 'success')
-        else:
-            flash(f'Email could not be sent. Use this link to reset your password: <a href="{reset_link}" target="_blank">{reset_link}</a>', 'warning')
-            print("\n" + "=" * 60)
-            print("🔑 RESET LINK (copy this):")
-            print(reset_link)
-            print("=" * 60 + "\n")
-        return redirect(url_for('login'))
+    
     return render_template('forgot_password.html')
 
 @app.route('/reset_password/<token>', methods=['GET', 'POST'])

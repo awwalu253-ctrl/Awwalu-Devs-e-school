@@ -28,7 +28,10 @@ import io
 # --- Load environment variables from .env file ---
 from dotenv import load_dotenv
 load_dotenv()
-
+# Debug: print email settings (remove after testing)
+print("MAIL_USERNAME =", os.getenv('MAIL_USERNAME'))
+print("MAIL_PASSWORD =", os.getenv('MAIL_PASSWORD'))
+print("MAIL_SERVER =", os.getenv('MAIL_SERVER'))
 app = Flask(__name__)
 app.secret_key = os.getenv('SECRET_KEY', 'awwalu-devs-super-secret-key-change-in-production')
 
@@ -90,18 +93,25 @@ MAIL_DEFAULT_SENDER = os.getenv('MAIL_DEFAULT_SENDER', 'noreply@awwaludevs.com')
 APP_BASE_URL = os.getenv('APP_BASE_URL', 'http://localhost:5000')
 
 def send_email(to_email, subject, body):
-    if not MAIL_USERNAME or not MAIL_PASSWORD:
-        print("⚠️ Email credentials not set. Check your .env file.")
+    # Read from environment variables
+    mail_server = os.getenv('MAIL_SERVER', 'smtp.gmail.com')
+    mail_port = int(os.getenv('MAIL_PORT', 587))
+    mail_username = os.getenv('MAIL_USERNAME', '')
+    mail_password = os.getenv('MAIL_PASSWORD', '')
+    mail_default_sender = os.getenv('MAIL_DEFAULT_SENDER', 'noreply@awwaludevs.com')
+
+    if not mail_username or not mail_password:
+        print("⚠️ Email credentials not set. Check your environment variables.")
         return False
     try:
         msg = MIMEMultipart()
-        msg['From'] = MAIL_DEFAULT_SENDER
+        msg['From'] = mail_default_sender
         msg['To'] = to_email
         msg['Subject'] = subject
         msg.attach(MIMEText(body, 'plain'))
-        server = smtplib.SMTP(MAIL_SERVER, MAIL_PORT)
+        server = smtplib.SMTP(mail_server, mail_port)
         server.starttls()
-        server.login(MAIL_USERNAME, MAIL_PASSWORD)
+        server.login(mail_username, mail_password)
         server.send_message(msg)
         server.quit()
         return True

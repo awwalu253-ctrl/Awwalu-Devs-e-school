@@ -3,3 +3,7 @@ Werkzeug
 sqlalchemy
 psycopg2-binary
 reportlab
+markdown2
+python-dotenv
+requests
+gunicorn

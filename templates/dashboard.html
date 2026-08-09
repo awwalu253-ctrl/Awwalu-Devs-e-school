@@ -845,7 +845,7 @@
         <div class="announcement-item">
             <div class="title">
                 {{ a.title }}
-                <span class="date">{{ a.created_at.split(' ')[0] }}</span>
+                <span class="date">{{ a.created_at.strftime('%Y-%m-%d') }}</span>
             </div>
             <div class="content">{{ a.content }}</div>
         </div>

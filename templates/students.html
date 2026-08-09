@@ -719,7 +719,7 @@
                             <td>
                                 <span class="date-text">
                                     <i class="bi bi-calendar3 me-1"></i>
-                                    {{ student.created_at.split(' ')[0] if student.created_at else 'N/A' }}
+                                    {{ student.created_at.strftime('%Y-%m-%d') if student.created_at else 'N/A' }}
                                 </span>
                             </td>
                             <td style="text-align: right;">

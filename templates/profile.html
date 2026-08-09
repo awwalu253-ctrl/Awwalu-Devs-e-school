@@ -701,7 +701,7 @@
                     <div class="cert-info">
                         <span class="name">{{ cert.course_name }}</span>
                         <span class="code">{{ cert.certificate_code }}</span>
-                        <span class="date">Issued: {{ cert.issued_at.split(' ')[0] }}</span>
+                        <span class="date">Issued: {{ cert.issued_at.strftime('%Y-%m-%d') }}</span>
                     </div>
                     <a href="{{ url_for('download_certificate', certificate_id=cert.id) }}" class="btn btn-success btn-sm">
                         <i class="bi bi-download"></i> Download

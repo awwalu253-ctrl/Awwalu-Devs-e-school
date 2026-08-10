@@ -450,21 +450,25 @@ def register():
 
         hashed = generate_password_hash(password)
 
-        # Insert user and get ID
+        # Insert user and get ID - FIXED: use actual column names as keys
         user_id = insert_and_get_id(
             'users',
             ['username', 'password', 'full_name', 'email', 'course_id', 'phone', 'dob', 'bio'],
             {
-                "u": username,
-                "p": hashed,
-                "f": full_name,
-                "e": email if email else None,
-                "cid": course_id,
-                "ph": phone if phone else None,
-                "d": dob if dob else None,
-                "b": bio if bio else None
+                "username": username,
+                "password": hashed,
+                "full_name": full_name,
+                "email": email if email else None,
+                "course_id": course_id,
+                "phone": phone if phone else None,
+                "dob": dob if dob else None,
+                "bio": bio if bio else None
             }
         )
+
+        if not user_id:
+            flash('Error creating user account. Please try again.', 'danger')
+            return redirect(url_for('register'))
 
         user = execute_query("SELECT * FROM users WHERE id = :id", {"id": user_id}, fetch_one=True)
 

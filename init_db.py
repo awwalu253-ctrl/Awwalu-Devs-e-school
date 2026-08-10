@@ -429,11 +429,20 @@ def init_db():
             INSERT INTO users (username, password, full_name, email, is_admin, course_id)
             VALUES (:u, :p, :f, :e, :a, NULL)
         """), {"u": "admin", "p": admin_pass, "f": "Head Instructor", "e": "admin@awwaludevs.com", "a": 1})
+        
         student_pass = generate_password_hash('student123')
         conn.execute(text("""
             INSERT INTO users (username, password, full_name, email, is_admin, course_id)
             VALUES (:u, :p, :f, :e, :a, :cid)
         """), {"u": "alice", "p": student_pass, "f": "Alice Student", "e": "alice@example.com", "a": 0, "cid": python_id})
+        
+        # Add a second student for testing
+        student2_pass = generate_password_hash('student123')
+        conn.execute(text("""
+            INSERT INTO users (username, password, full_name, email, is_admin, course_id)
+            VALUES (:u, :p, :f, :e, :a, :cid)
+        """), {"u": "bob", "p": student2_pass, "f": "Bob Student", "e": "bob@example.com", "a": 0, "cid": js_id})
+        
         conn.commit()
 
         # --- Sample template and announcement ---
@@ -463,7 +472,8 @@ def init_db():
         print("   - Notes & Assignments: cohort column")
         print("=" * 70)
         print("👤 Admin: admin | Pass: admin123")
-        print("👤 Student: alice | Pass: student123 (enrolled in Python 101)")
+        print("👤 Student 1: alice | Pass: student123 (enrolled in Python 101)")
+        print("👤 Student 2: bob | Pass: student123 (enrolled in JavaScript)")
         print("=" * 70)
 
 if __name__ == "__main__":

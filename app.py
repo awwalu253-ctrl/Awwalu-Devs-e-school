@@ -108,18 +108,6 @@ else:
 
 engine = create_engine(DATABASE_URL, connect_args=connect_args, pool_pre_ping=True)
 
-def get_new_id(conn, table_name=None):
-    """Get the last inserted ID (works for SQLite and PostgreSQL)."""
-    if 'sqlite' in DATABASE_URL:
-        result = conn.execute(text("SELECT last_insert_rowid() as id"))
-        row = result.fetchone()
-        return row[0] if row else None
-    else:
-        # For PostgreSQL, use lastval()
-        result = conn.execute(text("SELECT lastval() as id"))
-        row = result.fetchone()
-        return row[0] if row else None
-
 def get_db():
     if 'db' not in g:
         g.db = engine.connect()
@@ -141,7 +129,8 @@ def execute_query(query, params=None, fetch_one=False, fetch_all=False, commit=F
             return [dict(row._mapping) for row in rows]
         return None
     except Exception as e:
-        conn.rollback()
+        if commit:
+            conn.rollback()
         raise e
 
 @app.teardown_appcontext
@@ -151,6 +140,53 @@ def close_db(exception):
         db.close()
 
 # ========================
+# HELPER FUNCTIONS
+# ========================
+def get_last_insert_id():
+    """Get the last inserted ID (works for SQLite and PostgreSQL)."""
+    try:
+        if 'sqlite' in DATABASE_URL:
+            result = execute_query("SELECT last_insert_rowid() as id", fetch_one=True)
+            return result['id'] if result else None
+        else:
+            # PostgreSQL: use lastval()
+            result = execute_query("SELECT lastval() as id", fetch_one=True)
+            return result['id'] if result else None
+    except Exception as e:
+        print(f"⚠️ Error getting last insert ID: {e}")
+        # Try an alternative method for PostgreSQL
+        if 'postgres' in DATABASE_URL:
+            try:
+                result = execute_query("SELECT currval(pg_get_serial_sequence('users', 'id')) as id", fetch_one=True)
+                return result['id'] if result else None
+            except:
+                pass
+        return None
+
+def insert_and_get_id(table, columns, values, returning_col='id'):
+    """
+    Insert a row and return the new ID.
+    Works with both SQLite and PostgreSQL.
+    """
+    conn = get_db()
+    placeholders = ', '.join([f":{col}" for col in columns])
+    columns_str = ', '.join(columns)
+    
+    if 'sqlite' in DATABASE_URL:
+        # SQLite: insert and then get last_insert_rowid
+        query = f"INSERT INTO {table} ({columns_str}) VALUES ({placeholders})"
+        execute_query(query, values, commit=True)
+        result = execute_query("SELECT last_insert_rowid() as id", fetch_one=True)
+        return result['id'] if result else None
+    else:
+        # PostgreSQL: use RETURNING
+        query = f"INSERT INTO {table} ({columns_str}) VALUES ({placeholders}) RETURNING {returning_col}"
+        result = conn.execute(text(query), values)
+        conn.commit()
+        row = result.fetchone()
+        return row[0] if row else None
+
+# ========================
 # AUTO-INITIALIZE DATABASE ON FIRST RUN
 # ========================
 def init_db_if_needed():
@@ -158,9 +194,17 @@ def init_db_if_needed():
     try:
         from sqlalchemy import text
         conn = get_db()
-        # Check if users table exists
-        result = conn.execute(text("SELECT name FROM sqlite_master WHERE type='table' AND name='users'"))
-        if not result.fetchone():
+        
+        # Check if users table exists - works for both SQLite and PostgreSQL
+        if 'sqlite' in DATABASE_URL:
+            result = conn.execute(text("SELECT name FROM sqlite_master WHERE type='table' AND name='users'"))
+            table_exists = result.fetchone() is not None
+        else:
+            # PostgreSQL: use information_schema
+            result = conn.execute(text("SELECT EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name = 'users')"))
+            table_exists = result.fetchone()[0]
+        
+        if not table_exists:
             print("⚠️ Database not found. Creating tables...")
             import init_db
             init_db.init_db()
@@ -406,21 +450,23 @@ def register():
 
         hashed = generate_password_hash(password)
 
-        execute_query("""
-            INSERT INTO users (username, password, full_name, email, course_id, phone, dob, bio)
-            VALUES (:u, :p, :f, :e, :cid, :ph, :d, :b)
-        """, {
-            "u": username,
-            "p": hashed,
-            "f": full_name,
-            "e": email if email else None,
-            "cid": course_id,
-            "ph": phone if phone else None,
-            "d": dob if dob else None,
-            "b": bio if bio else None
-        }, commit=True)
+        # Insert user and get ID
+        user_id = insert_and_get_id(
+            'users',
+            ['username', 'password', 'full_name', 'email', 'course_id', 'phone', 'dob', 'bio'],
+            {
+                "u": username,
+                "p": hashed,
+                "f": full_name,
+                "e": email if email else None,
+                "cid": course_id,
+                "ph": phone if phone else None,
+                "d": dob if dob else None,
+                "b": bio if bio else None
+            }
+        )
 
-        user = execute_query("SELECT * FROM users WHERE username = :u", {"u": username}, fetch_one=True)
+        user = execute_query("SELECT * FROM users WHERE id = :id", {"id": user_id}, fetch_one=True)
 
         # Avatar upload
         if 'avatar' in request.files:
@@ -1129,13 +1175,17 @@ def note_add_comment(note_id):
     if not note or note['course_id'] != session.get('course_id'):
         flash('Invalid note.', 'danger')
         return redirect(url_for('dashboard'))
-    execute_query("INSERT INTO discussions (note_id, user_id, message) VALUES (:nid, :uid, :msg)",
-                  {"nid": note_id, "uid": session['user_id'], "msg": message}, commit=True)
-    new_id_row = execute_query("SELECT last_insert_rowid() as id", fetch_one=True)
-    new_id = new_id_row['id'] if new_id_row else None
+    
+    # Insert comment and get ID
+    comment_id = insert_and_get_id(
+        'discussions',
+        ['note_id', 'user_id', 'message'],
+        {"nid": note_id, "uid": session['user_id'], "msg": message}
+    )
+    
     log_activity(session['user_id'], 'note_add_comment', f'Comment on note {note_id}')
     flash('Comment posted!', 'success')
-    return redirect(url_for('note_detail', note_id=note_id, new_comment=new_id, _t=datetime.now().timestamp()) + '#comment-' + str(new_id))
+    return redirect(url_for('note_detail', note_id=note_id, new_comment=comment_id, _t=datetime.now().timestamp()) + '#comment-' + str(comment_id))
 
 @app.route('/note/reply/<int:parent_id>', methods=['POST'])
 @login_required
@@ -1156,16 +1206,20 @@ def note_add_reply(parent_id):
     if not note or note['course_id'] != session.get('course_id'):
         flash('Invalid reply target.', 'danger')
         return redirect(url_for('dashboard'))
-    execute_query("INSERT INTO discussions (note_id, user_id, parent_id, message) VALUES (:nid, :uid, :pid, :msg)",
-                  {"nid": note_id, "uid": session['user_id'], "pid": parent_id, "msg": message}, commit=True)
-    new_id_row = execute_query("SELECT last_insert_rowid() as id", fetch_one=True)
-    new_id = new_id_row['id'] if new_id_row else None
+    
+    # Insert reply and get ID
+    reply_id = insert_and_get_id(
+        'discussions',
+        ['note_id', 'user_id', 'parent_id', 'message'],
+        {"nid": note_id, "uid": session['user_id'], "pid": parent_id, "msg": message}
+    )
+    
     parent_comment = execute_query("SELECT user_id FROM discussions WHERE id = :pid", {"pid": parent_id}, fetch_one=True)
     if parent_comment and parent_comment['user_id'] != session['user_id']:
         user = execute_query("SELECT full_name FROM users WHERE id = :id", {"id": session['user_id']}, fetch_one=True)
         notif_msg = f"{user['full_name']} replied to your comment: {message[:50]}{'...' if len(message) > 50 else ''}"
         create_user_notification(parent_comment['user_id'], notif_msg,
-                                 url_for('note_detail', note_id=note_id, new_reply=new_id) + '#comment-' + str(parent_id))
+                                 url_for('note_detail', note_id=note_id, new_reply=reply_id) + '#comment-' + str(parent_id))
         parent_user = execute_query("SELECT id, email, email_notifications FROM users WHERE id = :id", {"id": parent_comment['user_id']}, fetch_one=True)
         if parent_user and parent_user['email_notifications'] == 1:
             send_user_email(parent_user['id'],
@@ -1174,7 +1228,7 @@ def note_add_reply(parent_id):
     log_activity(session['user_id'], 'note_add_reply', f'Reply to discussion {parent_id} on note {note_id}')
     flash('Reply posted!', 'success')
     return redirect(url_for('note_detail', note_id=note_id,
-                            new_reply=new_id,
+                            new_reply=reply_id,
                             _t=datetime.now().timestamp()) + '#comment-' + str(parent_id))
 
 @app.route('/notifications')
@@ -1392,34 +1446,15 @@ def add_note():
                               {"cid": course_id}, fetch_one=True)
     sort_order = (max_order['max_order'] or 0) + 1
 
-    # Get the database connection
-    conn = get_db()
-    new_id = get_new_id(conn)
+    # Insert note and get ID
+    new_id = insert_and_get_id(
+        'notes',
+        ['title', 'content', 'course_id', 'status', 'sort_order', 'cohort'],
+        {"t": title, "c": content, "cid": course_id, "s": status, "so": sort_order, "coh": cohort}
+    )
 
-    # Insert note with RETURNING id for PostgreSQL
-    try:
-        if 'sqlite' in DATABASE_URL:
-            # SQLite: insert and then get last_insert_rowid
-            execute_query("""
-                INSERT INTO notes (title, content, course_id, status, sort_order, cohort)
-                VALUES (:t, :c, :cid, :s, :so, :coh)
-            """, {"t": title, "c": content, "cid": course_id, "s": status, "so": sort_order, "coh": cohort}, commit=True)
-            
-            new_id_row = execute_query("SELECT last_insert_rowid() as id", fetch_one=True)
-            new_id = new_id_row['id'] if new_id_row else None
-        else:
-            # PostgreSQL: use RETURNING id
-            result = conn.execute(text("""
-                INSERT INTO notes (title, content, course_id, status, sort_order, cohort)
-                VALUES (:t, :c, :cid, :s, :so, :coh)
-                RETURNING id
-            """), {"t": title, "c": content, "cid": course_id, "s": status, "so": sort_order, "coh": cohort})
-            conn.commit()
-            row = result.fetchone()
-            new_id = row[0] if row else None
-    except Exception as e:
-        conn.rollback()
-        flash(f'Error creating note: {str(e)}', 'danger')
+    if not new_id:
+        flash('Error creating note.', 'danger')
         return redirect(url_for('admin_panel', course_id=course_id))
 
     # Handle tags if present
@@ -1578,10 +1613,13 @@ def schedule_note():
     content = request.form['content']
     course_id = request.form['course_id']
     publish_at = request.form['publish_at']
-    execute_query("""
-        INSERT INTO notes (title, content, course_id, status, publish_at)
-        VALUES (:t, :c, :cid, 'scheduled', :pa)
-    """, {"t": title, "c": content, "cid": course_id, "pa": publish_at}, commit=True)
+    
+    insert_and_get_id(
+        'notes',
+        ['title', 'content', 'course_id', 'status', 'publish_at'],
+        {"t": title, "c": content, "cid": course_id, "s": 'scheduled', "pa": publish_at}
+    )
+    
     flash('Note scheduled!', 'success')
     return redirect(url_for('admin_scheduled', course_id=course_id))
 
@@ -1841,46 +1879,15 @@ def add_assignment():
     publish_at = request.form.get('publish_at')
     cohort = request.form.get('cohort') or None
 
-    conn = get_db()
-    if 'sqlite' in DATABASE_URL:
-        execute_query("""
-            INSERT INTO assignments (title, description, due_date, publish_at, course_id, cohort)
-            VALUES (:t, :d, :due, :pa, :cid, :coh)
-        """, {"t": title, "d": description, "due": due_date, "pa": publish_at if publish_at else None,
-              "cid": course_id, "coh": cohort}, commit=True)
-    else:
-        conn.execute(text("""
-            INSERT INTO assignments (title, description, due_date, publish_at, course_id, cohort)
-            VALUES (:t, :d, :due, :pa, :cid, :coh)
-        """), {"t": title, "d": description, "due": due_date, "pa": publish_at if publish_at else None,
-              "cid": course_id, "coh": cohort})
-        conn.commit()
+    insert_and_get_id(
+        'assignments',
+        ['title', 'description', 'due_date', 'publish_at', 'course_id', 'cohort'],
+        {"t": title, "d": description, "due": due_date, "pa": publish_at if publish_at else None,
+         "cid": course_id, "coh": cohort}
+    )
 
     flash('Assignment created!', 'success')
     return redirect(url_for('admin_panel', course_id=course_id))
-
-def insert_and_get_id(table, columns, values, returning_col='id'):
-    """
-    Insert a row and return the new ID.
-    Works with both SQLite and PostgreSQL.
-    """
-    conn = get_db()
-    placeholders = ', '.join([f":{col}" for col in columns])
-    columns_str = ', '.join(columns)
-    
-    if 'sqlite' in DATABASE_URL:
-        # SQLite: insert and then get last_insert_rowid
-        query = f"INSERT INTO {table} ({columns_str}) VALUES ({placeholders})"
-        execute_query(query, values, commit=True)
-        result = execute_query("SELECT last_insert_rowid() as id", fetch_one=True)
-        return result['id'] if result else None
-    else:
-        # PostgreSQL: use RETURNING
-        query = f"INSERT INTO {table} ({columns_str}) VALUES ({placeholders}) RETURNING {returning_col}"
-        result = conn.execute(text(query), values)
-        conn.commit()
-        row = result.fetchone()
-        return row[0] if row else None
 
 @app.route('/admin/edit_assignment/<int:assignment_id>', methods=['GET', 'POST'])
 @login_required
@@ -1962,8 +1969,13 @@ def add_announcement():
     course_id = request.form.get('course_id')
     if not course_id or course_id == '':
         course_id = None
-    execute_query("INSERT INTO announcements (title, content, course_id) VALUES (:t, :c, :cid)",
-                  {"t": title, "c": content, "cid": course_id}, commit=True)
+    
+    insert_and_get_id(
+        'announcements',
+        ['title', 'content', 'course_id'],
+        {"t": title, "c": content, "cid": course_id}
+    )
+    
     send_announcement_emails(course_id, title, content, exclude_user=session['username'])
     flash('Announcement posted! Emails sent to students.', 'success')
     return redirect(url_for('admin_panel', course_id=request.args.get('course_id')))
@@ -2013,12 +2025,16 @@ def add_quiz():
         title = request.form['title']
         description = request.form['description']
         course_id = request.form['course_id']
-        execute_query("INSERT INTO quizzes (title, description, course_id) VALUES (:t, :d, :cid)",
-                      {"t": title, "d": description, "cid": course_id}, commit=True)
-        result = execute_query("SELECT last_insert_rowid() as id", fetch_one=True)
-        if result and result['id']:
+        
+        quiz_id = insert_and_get_id(
+            'quizzes',
+            ['title', 'description', 'course_id'],
+            {"t": title, "d": description, "cid": course_id}
+        )
+        
+        if quiz_id:
             flash('Quiz created! Now add questions.', 'success')
-            return redirect(url_for('edit_quiz', quiz_id=result['id']))
+            return redirect(url_for('edit_quiz', quiz_id=quiz_id))
         else:
             flash('Error creating quiz.', 'danger')
             return redirect(url_for('admin_quizzes'))
@@ -2063,15 +2079,13 @@ def add_question(quiz_id):
     if correct_index < 0 or correct_index >= len(options):
         flash(f'Correct answer index must be between 0 and {len(options)-1}.', 'danger')
         return redirect(url_for('edit_quiz', quiz_id=quiz_id))
-    execute_query("""
-        INSERT INTO quiz_questions (quiz_id, question_text, options, correct_answer)
-        VALUES (:qid, :qt, :opts, :corr)
-    """, {
-        "qid": quiz_id,
-        "qt": question_text,
-        "opts": json.dumps(options),
-        "corr": correct_index
-    }, commit=True)
+    
+    insert_and_get_id(
+        'quiz_questions',
+        ['quiz_id', 'question_text', 'options', 'correct_answer'],
+        {"qid": quiz_id, "qt": question_text, "opts": json.dumps(options), "corr": correct_index}
+    )
+    
     flash('Question added!', 'success')
     return redirect(url_for('edit_quiz', quiz_id=quiz_id))
 
@@ -2135,10 +2149,14 @@ def issue_certificate(student_id, course_id):
         flash('Student has not completed all lessons.', 'warning')
         return redirect(url_for('admin_certificates'))
     code = ''.join(random.choices(string.ascii_uppercase + string.digits, k=16))
-    execute_query("INSERT INTO certificates (student_id, course_id, certificate_code) VALUES (:sid, :cid, :code)",
-                  {"sid": student_id, "cid": course_id, "code": code}, commit=True)
-    cert = execute_query("SELECT id FROM certificates WHERE student_id = :sid AND course_id = :cid",
-                         {"sid": student_id, "cid": course_id}, fetch_one=True)
+    
+    cert_id = insert_and_get_id(
+        'certificates',
+        ['student_id', 'course_id', 'certificate_code'],
+        {"sid": student_id, "cid": course_id, "code": code}
+    )
+    
+    cert = execute_query("SELECT id FROM certificates WHERE id = :id", {"id": cert_id}, fetch_one=True)
     student = execute_query("SELECT full_name, username FROM users WHERE id = :id", {"id": student_id}, fetch_one=True)
     create_notification(f"🎓 Certificate issued for {student['full_name']} (Course ID: {course_id})",
                         url_for('download_certificate', certificate_id=cert['id']) if cert else None)
@@ -2246,10 +2264,13 @@ def admin_reply_discussion(discussion_id):
         flash('Invalid discussion.', 'danger')
         return redirect(url_for('admin_discussions'))
     note_id = parent['note_id']
-    execute_query("""
-        INSERT INTO discussions (note_id, user_id, parent_id, message)
-        VALUES (:nid, :uid, :pid, :msg)
-    """, {"nid": note_id, "uid": session['user_id'], "pid": discussion_id, "msg": message}, commit=True)
+    
+    insert_and_get_id(
+        'discussions',
+        ['note_id', 'user_id', 'parent_id', 'message'],
+        {"nid": note_id, "uid": session['user_id'], "pid": discussion_id, "msg": message}
+    )
+    
     parent_comment = execute_query("SELECT user_id FROM discussions WHERE id = :pid", {"pid": discussion_id}, fetch_one=True)
     if parent_comment and parent_comment['user_id'] != session['user_id']:
         notif_msg = f"Instructor replied to your comment: {message[:50]}{'...' if len(message) > 50 else ''}"
@@ -2274,7 +2295,6 @@ def clear_discussions(note_id):
     try:
         count_before = execute_query("SELECT COUNT(*) as cnt FROM discussions WHERE note_id = :nid", {"nid": note_id}, fetch_one=True)
         execute_query("DELETE FROM discussions WHERE note_id = :nid", {"nid": note_id}, commit=True)
-        count_after = execute_query("SELECT COUNT(*) as cnt FROM discussions WHERE note_id = :nid", {"nid": note_id}, fetch_one=True)
         flash(f'Discussions cleared. ({count_before["cnt"]} comments removed)', 'success')
         print(f"✅ Cleared {count_before['cnt']} discussions for note {note_id}")
     except Exception as e:
@@ -2292,8 +2312,13 @@ def add_template():
     if not name or not title or not content:
         flash('All fields are required.', 'danger')
         return redirect(url_for('admin_panel'))
-    execute_query("INSERT INTO note_templates (name, title, content) VALUES (:n, :t, :c)",
-                  {"n": name, "t": title, "c": content}, commit=True)
+    
+    insert_and_get_id(
+        'note_templates',
+        ['name', 'title', 'content'],
+        {"n": name, "t": title, "c": content}
+    )
+    
     flash('Template saved!', 'success')
     return redirect(url_for('admin_panel'))
 

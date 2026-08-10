@@ -93,6 +93,21 @@ def send_email(to_email, subject, body):
         print(f"❌ Email send error: {e}")
         return False
 
+# --- Helper function for database-specific date functions ---
+def now_sql():
+    """Return the correct NOW() function for the current database."""
+    if 'sqlite' in DATABASE_URL:
+        return "datetime('now')"
+    else:
+        return "NOW()"
+
+def date_sql():
+    """Return the correct CURRENT_DATE function for the current database."""
+    if 'sqlite' in DATABASE_URL:
+        return "date('now')"
+    else:
+        return "CURRENT_DATE"
+
 # --- Database Setup (Supports both SQLite and PostgreSQL) ---
 DATABASE_URL = os.getenv('DATABASE_URL')
 if not DATABASE_URL:
@@ -450,7 +465,7 @@ def register():
 
         hashed = generate_password_hash(password)
 
-        # Insert user and get ID - FIXED: use actual column names as keys
+        # Insert user and get ID
         user_id = insert_and_get_id(
             'users',
             ['username', 'password', 'full_name', 'email', 'course_id', 'phone', 'dob', 'bio'],
@@ -641,21 +656,24 @@ def dashboard():
     all_tags = execute_query("SELECT * FROM tags ORDER BY name", fetch_all=True)
     tag_filter = request.args.get('tag')
     search_query = request.args.get('q', '').strip()
+    
+    # Get notes with database-specific date function
     if tag_filter:
-        notes = execute_query("""
+        notes = execute_query(f"""
             SELECT n.* FROM notes n
             JOIN note_tags nt ON n.id = nt.note_id
             WHERE nt.tag_id = :tid AND n.course_id = :cid AND n.status = 'published'
-            AND (n.publish_at IS NULL OR n.publish_at <= datetime('now'))
+            AND (n.publish_at IS NULL OR n.publish_at <= {now_sql()})
             ORDER BY n.sort_order ASC, n.id ASC
         """, {"tid": tag_filter, "cid": course_id}, fetch_all=True)
     else:
-        notes = execute_query("""
+        notes = execute_query(f"""
             SELECT * FROM notes
             WHERE course_id = :id AND status = 'published'
-            AND (publish_at IS NULL OR publish_at <= datetime('now'))
+            AND (publish_at IS NULL OR publish_at <= {now_sql()})
             ORDER BY sort_order ASC, id ASC
         """, {"id": course_id}, fetch_all=True)
+    
     read_notes = execute_query("SELECT note_id FROM read_notes WHERE user_id = :uid",
                                {"uid": session['user_id']}, fetch_all=True)
     read_ids = [r['note_id'] for r in read_notes] if read_notes else []
@@ -798,10 +816,10 @@ def download_notes_pdf():
         flash('Please select a course first.', 'warning')
         return redirect(url_for('select_course'))
     course = execute_query("SELECT * FROM courses WHERE id = :id", {"id": course_id}, fetch_one=True)
-    notes = execute_query("""
+    notes = execute_query(f"""
         SELECT * FROM notes
         WHERE course_id = :id AND status = 'published'
-        AND (publish_at IS NULL OR publish_at <= datetime('now'))
+        AND (publish_at IS NULL OR publish_at <= {now_sql()})
         ORDER BY sort_order ASC, id ASC
     """, {"id": course_id}, fetch_all=True)
     if not notes:
@@ -855,7 +873,7 @@ def download_selected_notes_pdf():
         WHERE id IN ({placeholders})
         AND course_id = ?
         AND status = 'published'
-        AND (publish_at IS NULL OR publish_at <= datetime('now'))
+        AND (publish_at IS NULL OR publish_at <= {now_sql()})
         ORDER BY sort_order ASC, id ASC
     """, tuple(note_ids) + (course_id,), fetch_all=True)
     if not notes:
@@ -987,10 +1005,10 @@ def assignments():
     if not course_id:
         return redirect(url_for('select_course'))
     course = execute_query("SELECT * FROM courses WHERE id = :id", {"id": course_id}, fetch_one=True)
-    all_assignments = execute_query("""
+    all_assignments = execute_query(f"""
         SELECT * FROM assignments
         WHERE course_id = :id
-        AND (publish_at IS NULL OR publish_at <= datetime('now'))
+        AND (publish_at IS NULL OR publish_at <= {now_sql()})
         ORDER BY due_date ASC
     """, {"id": course_id}, fetch_all=True)
     submissions = execute_query("SELECT assignment_id, file_path, grade, feedback FROM submissions WHERE student_id = :sid",
@@ -1112,10 +1130,10 @@ def note_detail(note_id):
     course_id = session.get('course_id')
     if not course_id:
         return redirect(url_for('select_course'))
-    note = execute_query("""
+    note = execute_query(f"""
         SELECT * FROM notes
         WHERE id = :id AND status = 'published' AND course_id = :cid
-        AND (publish_at IS NULL OR publish_at <= datetime('now'))
+        AND (publish_at IS NULL OR publish_at <= {now_sql()})
     """, {"id": note_id, "cid": course_id}, fetch_one=True)
     if not note:
         flash('Note not found.', 'danger')
@@ -1555,11 +1573,11 @@ def admin_scheduled():
         JOIN courses ON notes.course_id = courses.id
         WHERE notes.status = 'scheduled'
     """
-    assignments_query = """
+    assignments_query = f"""
         SELECT assignments.*, courses.name as course_name
         FROM assignments
         JOIN courses ON assignments.course_id = courses.id
-        WHERE assignments.publish_at IS NOT NULL AND assignments.publish_at > datetime('now')
+        WHERE assignments.publish_at IS NOT NULL AND assignments.publish_at > {now_sql()}
     """
     if filter_course and filter_course != 'all':
         notes_query += " AND notes.course_id = :cid"
@@ -2643,9 +2661,9 @@ def schedule():
     course_id = session.get('course_id')
     if not course_id:
         return redirect(url_for('select_course'))
-    assignments = execute_query("""
+    assignments = execute_query(f"""
         SELECT * FROM assignments
-        WHERE course_id = :cid AND due_date >= date('now')
+        WHERE course_id = :cid AND due_date >= {date_sql()}
         AND (cohort IS NULL OR cohort = (SELECT cohort FROM users WHERE id = :uid))
         ORDER BY due_date ASC
     """, {"cid": course_id, "uid": session['user_id']}, fetch_all=True)
@@ -2654,9 +2672,9 @@ def schedule():
         WHERE course_id = :cid
         ORDER BY created_at DESC
     """, {"cid": course_id}, fetch_all=True)
-    notes = execute_query("""
+    notes = execute_query(f"""
         SELECT * FROM notes
-        WHERE course_id = :cid AND publish_at > datetime('now') AND status = 'scheduled'
+        WHERE course_id = :cid AND publish_at > {now_sql()} AND status = 'scheduled'
         AND (cohort IS NULL OR cohort = (SELECT cohort FROM users WHERE id = :uid))
         ORDER BY publish_at ASC
     """, {"cid": course_id, "uid": session['user_id']}, fetch_all=True)
@@ -2675,10 +2693,10 @@ def send_digest():
         read_count = execute_query("SELECT COUNT(*) as cnt FROM read_notes WHERE user_id = :uid", {"uid": s['id']}, fetch_one=True)
         total_notes = execute_query("SELECT COUNT(*) as cnt FROM notes WHERE course_id = (SELECT course_id FROM users WHERE id = :uid) AND status = 'published'", {"uid": s['id']}, fetch_one=True)
         progress = int((read_count['cnt'] / total_notes['cnt']) * 100) if total_notes['cnt'] > 0 else 0
-        upcoming = execute_query("""
+        upcoming = execute_query(f"""
             SELECT title, due_date FROM assignments
             WHERE course_id = (SELECT course_id FROM users WHERE id = :uid)
-            AND due_date >= date('now')
+            AND due_date >= {date_sql()}
             AND (cohort IS NULL OR cohort = (SELECT cohort FROM users WHERE id = :uid))
             ORDER BY due_date ASC
             LIMIT 3

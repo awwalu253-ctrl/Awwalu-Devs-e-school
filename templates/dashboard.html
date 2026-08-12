@@ -1294,239 +1294,302 @@
 <script src="https://cdn.jsdelivr.net/npm/driver.js@1.0.1/dist/driver.js"></script>
 
 <!-- ========== SCRIPTS ========== -->
+<!-- ========== DRIVER.JS CDN (LOADED RELIABLY) ========== -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/driver.js@1.0.1/dist/driver.css" />
+
+<!-- ========== SCRIPTS ========== -->
 <script>
+    // ---------- LOAD DRIVER.JS DYNAMICALLY ----------
+    function loadDriverJS() {
+        return new Promise(function(resolve, reject) {
+            // Check if already loaded
+            if (typeof window.driver !== 'undefined' && typeof window.driver.js !== 'undefined') {
+                resolve();
+                return;
+            }
+
+            // Create script element
+            var script = document.createElement('script');
+            script.src = 'https://cdn.jsdelivr.net/npm/driver.js@1.0.1/dist/driver.js';
+            script.onload = function() {
+                // Wait a moment for it to initialize
+                setTimeout(function() {
+                    if (typeof window.driver !== 'undefined' && typeof window.driver.js !== 'undefined') {
+                        resolve();
+                    } else {
+                        reject(new Error('Driver.js failed to initialize'));
+                    }
+                }, 300);
+            };
+            script.onerror = function() {
+                reject(new Error('Failed to load Driver.js script'));
+            };
+            document.head.appendChild(script);
+        });
+    }
+
     // ---------- ONBOARDING TOUR ----------
-    // Check if Driver.js is loaded
-    function isDriverLoaded() {
-        return typeof window.driver !== 'undefined' && typeof window.driver.js !== 'undefined';
-    }
-
-    // Wait for Driver.js to load
-    function waitForDriver(callback, attempts) {
-        attempts = attempts || 0;
-        if (isDriverLoaded()) {
-            callback();
-            return;
-        }
-        if (attempts > 20) {
-            console.error('Driver.js failed to load after 20 attempts');
-            alert('The tour could not load. Please refresh the page and try again.');
-            return;
-        }
-        setTimeout(function() {
-            waitForDriver(callback, attempts + 1);
-        }, 200);
-    }
-
     // Start tour function
     window.startOnboardingTour = function() {
         console.log('Starting tour...');
-        waitForDriver(function() {
-            try {
-                console.log('Driver.js loaded, starting tour...');
+        
+        // Show loading indicator
+        var btn = document.querySelector('.btn-start-tour');
+        var originalText = btn ? btn.innerHTML : '';
+        if (btn) {
+            btn.innerHTML = '<i class="bi bi-hourglass-split"></i> Loading...';
+            btn.disabled = true;
+        }
+
+        loadDriverJS()
+            .then(function() {
+                console.log('Driver.js loaded successfully!');
+                if (btn) {
+                    btn.innerHTML = originalText;
+                    btn.disabled = false;
+                }
                 startTour();
-            } catch (e) {
-                console.error('Error starting tour:', e);
-                alert('There was an error starting the tour. Please refresh the page and try again.');
-            }
-        });
+            })
+            .catch(function(error) {
+                console.error('Error loading Driver.js:', error);
+                if (btn) {
+                    btn.innerHTML = originalText;
+                    btn.disabled = false;
+                }
+                // Try a fallback method - load with a different CDN
+                loadDriverJSFallback();
+            });
     };
 
-    function startTour() {
-        const driver = window.driver.js.driver({
-            showProgress: true,
-            progressText: 'Step {{current}} of {{total}}',
-            nextBtnText: 'Next →',
-            prevBtnText: '← Back',
-            doneBtnText: '🚀 Let\'s Go!',
-            onDestroyStarted: function() {
-                localStorage.setItem('tour_seen', 'true');
-                console.log('Tour completed!');
-            }
-        });
-
-        const steps = [];
-
-        // Step 1: Welcome
-        steps.push({
-            popover: {
-                title: '🎉 Welcome to Awwalu Devs!',
-                description: 'Let\'s take a quick tour of your learning dashboard. You\'ll learn about each feature and how to use them.',
-                side: 'center',
-                align: 'center'
-            }
-        });
-
-        // Step 2: Course Header
-        const courseHeader = document.querySelector('.dashboard-header .brand');
-        if (courseHeader) {
-            steps.push({
-                element: courseHeader,
-                popover: {
-                    title: '📚 Your Course',
-                    description: 'This is your current course. All your learning materials, notes, and quizzes are organized here.',
-                    side: 'bottom',
-                    align: 'start'
+    // Fallback loading method
+    function loadDriverJSFallback() {
+        console.log('Trying fallback loading method...');
+        
+        // Try loading from a different CDN
+        var script = document.createElement('script');
+        script.src = 'https://unpkg.com/driver.js@1.0.1/dist/driver.js';
+        script.onload = function() {
+            setTimeout(function() {
+                if (typeof window.driver !== 'undefined' && typeof window.driver.js !== 'undefined') {
+                    console.log('Driver.js loaded via fallback!');
+                    startTour();
+                } else {
+                    alert('The tour could not load. Please refresh the page and try again, or click "Start Tour" again.');
                 }
-            });
-        }
-
-        // Step 3: Progress Section
-        const progressSection = document.querySelector('.progress-container');
-        if (progressSection) {
-            steps.push({
-                element: progressSection,
-                popover: {
-                    title: '📊 Your Progress',
-                    description: 'This shows how much of the course you\'ve completed. The more notes you read, the higher your progress!',
-                    side: 'bottom',
-                    align: 'start'
-                }
-            });
-        }
-
-        // Step 4: Notes Section
-        const notesSection = document.querySelector('.note-grid');
-        if (notesSection) {
-            steps.push({
-                element: notesSection,
-                popover: {
-                    title: '📖 Course Notes',
-                    description: 'These are your learning materials. Click on any note to read it. Mark notes as "Read" to track your progress.',
-                    side: 'bottom',
-                    align: 'start'
-                }
-            });
-        }
-
-        // Step 5: Individual Note (first note)
-        const firstNote = document.querySelector('.note-card');
-        if (firstNote) {
-            steps.push({
-                element: firstNote,
-                popover: {
-                    title: '📄 Note Card',
-                    description: 'Each note has a title and status. Click "Mark as Read" when you finish reading. You can also download notes as PDF.',
-                    side: 'bottom',
-                    align: 'start'
-                }
-            });
-        }
-
-        // Step 6: Announcements
-        const announcements = document.querySelector('.glass-card .card-header .bi-megaphone-fill')?.closest('.glass-card');
-        if (announcements) {
-            steps.push({
-                element: announcements,
-                popover: {
-                    title: '📢 Announcements',
-                    description: 'Your instructor posts important updates here. Check this regularly for news and reminders.',
-                    side: 'bottom',
-                    align: 'start'
-                }
-            });
-        }
-
-        // Step 7: Quizzes
-        const quizzes = document.querySelector('.glass-card .card-header .bi-question-circle')?.closest('.glass-card');
-        if (quizzes) {
-            steps.push({
-                element: quizzes,
-                popover: {
-                    title: '📝 Quizzes',
-                    description: 'Test your knowledge with quizzes. Each quiz tracks your score. Try to get 100%!',
-                    side: 'bottom',
-                    align: 'start'
-                }
-            });
-        }
-
-        // Step 8: Badges
-        const badges = document.querySelector('.glass-card .card-header .bi-award')?.closest('.glass-card');
-        if (badges) {
-            steps.push({
-                element: badges,
-                popover: {
-                    title: '🏅 Badges & Achievements',
-                    description: 'Earn badges as you complete courses and quizzes. Collect them all!',
-                    side: 'bottom',
-                    align: 'start'
-                }
-            });
-        }
-
-        // Step 9: Certificate (if exists)
-        const certificate = document.querySelector('.certificate-block');
-        if (certificate) {
-            steps.push({
-                element: certificate,
-                popover: {
-                    title: '🎓 Certificate',
-                    description: 'When you complete all notes, you\'ll earn a certificate! Download it and share it.',
-                    side: 'bottom',
-                    align: 'start'
-                }
-            });
-        }
-
-        // Step 10: Search Bar
-        const searchBar = document.querySelector('.search-bar');
-        if (searchBar) {
-            steps.push({
-                element: searchBar,
-                popover: {
-                    title: '🔍 Search Notes',
-                    description: 'Search through your course notes to find specific topics quickly.',
-                    side: 'bottom',
-                    align: 'start'
-                }
-            });
-        }
-
-        // Step 11: Download Selected
-        const downloadBtn = document.querySelector('.btn-outline-info');
-        if (downloadBtn) {
-            steps.push({
-                element: downloadBtn,
-                popover: {
-                    title: '📥 Download Notes',
-                    description: 'Select multiple notes using the checkboxes, then click this button to download them as a PDF.',
-                    side: 'top',
-                    align: 'start'
-                }
-            });
-        }
-
-        // Step 12: Navigation (More dropdown)
-        const moreBtn = document.getElementById('customDropdownBtn');
-        if (moreBtn) {
-            steps.push({
-                element: moreBtn,
-                popover: {
-                    title: '🧭 More Options',
-                    description: 'Access additional features like your portfolio, schedule, and profile settings from this menu.',
-                    side: 'bottom',
-                    align: 'start'
-                }
-            });
-        }
-
-        // Step 13: Finish
-        steps.push({
-            popover: {
-                title: '🎯 You\'re All Set!',
-                description: 'You\'re ready to start learning! Click "Let\'s Go!" to begin your journey.',
-                side: 'center',
-                align: 'center'
-            }
-        });
-
-        driver.defineSteps(steps);
-        driver.drive();
-        console.log('Tour started successfully!');
+            }, 300);
+        };
+        script.onerror = function() {
+            alert('The tour could not load. Please refresh the page and try again.');
+        };
+        document.head.appendChild(script);
     }
 
-    // Auto-start tour for new users
+    function startTour() {
+        try {
+            // Make sure driver is available
+            if (typeof window.driver === 'undefined' || typeof window.driver.js === 'undefined') {
+                alert('Driver.js is not available. Please refresh the page and try again.');
+                return;
+            }
+
+            const driver = window.driver.js.driver({
+                showProgress: true,
+                progressText: 'Step {{current}} of {{total}}',
+                nextBtnText: 'Next →',
+                prevBtnText: '← Back',
+                doneBtnText: '🚀 Let\'s Go!',
+                onDestroyStarted: function() {
+                    localStorage.setItem('tour_seen', 'true');
+                    console.log('Tour completed!');
+                }
+            });
+
+            const steps = [];
+
+            // Step 1: Welcome
+            steps.push({
+                popover: {
+                    title: '🎉 Welcome to Awwalu Devs!',
+                    description: 'Let\'s take a quick tour of your learning dashboard. You\'ll learn about each feature and how to use them.',
+                    side: 'center',
+                    align: 'center'
+                }
+            });
+
+            // Step 2: Course Header
+            const courseHeader = document.querySelector('.dashboard-header .brand');
+            if (courseHeader) {
+                steps.push({
+                    element: courseHeader,
+                    popover: {
+                        title: '📚 Your Course',
+                        description: 'This is your current course. All your learning materials, notes, and quizzes are organized here.',
+                        side: 'bottom',
+                        align: 'start'
+                    }
+                });
+            }
+
+            // Step 3: Progress Section
+            const progressSection = document.querySelector('.progress-container');
+            if (progressSection) {
+                steps.push({
+                    element: progressSection,
+                    popover: {
+                        title: '📊 Your Progress',
+                        description: 'This shows how much of the course you\'ve completed. The more notes you read, the higher your progress!',
+                        side: 'bottom',
+                        align: 'start'
+                    }
+                });
+            }
+
+            // Step 4: Notes Section
+            const notesSection = document.querySelector('.note-grid');
+            if (notesSection) {
+                steps.push({
+                    element: notesSection,
+                    popover: {
+                        title: '📖 Course Notes',
+                        description: 'These are your learning materials. Click on any note to read it. Mark notes as "Read" to track your progress.',
+                        side: 'bottom',
+                        align: 'start'
+                    }
+                });
+            }
+
+            // Step 5: Individual Note (first note)
+            const firstNote = document.querySelector('.note-card');
+            if (firstNote) {
+                steps.push({
+                    element: firstNote,
+                    popover: {
+                        title: '📄 Note Card',
+                        description: 'Each note has a title and status. Click "Mark as Read" when you finish reading. You can also download notes as PDF.',
+                        side: 'bottom',
+                        align: 'start'
+                    }
+                });
+            }
+
+            // Step 6: Announcements
+            const announcements = document.querySelector('.glass-card .card-header .bi-megaphone-fill')?.closest('.glass-card');
+            if (announcements) {
+                steps.push({
+                    element: announcements,
+                    popover: {
+                        title: '📢 Announcements',
+                        description: 'Your instructor posts important updates here. Check this regularly for news and reminders.',
+                        side: 'bottom',
+                        align: 'start'
+                    }
+                });
+            }
+
+            // Step 7: Quizzes
+            const quizzes = document.querySelector('.glass-card .card-header .bi-question-circle')?.closest('.glass-card');
+            if (quizzes) {
+                steps.push({
+                    element: quizzes,
+                    popover: {
+                        title: '📝 Quizzes',
+                        description: 'Test your knowledge with quizzes. Each quiz tracks your score. Try to get 100%!',
+                        side: 'bottom',
+                        align: 'start'
+                    }
+                });
+            }
+
+            // Step 8: Badges
+            const badges = document.querySelector('.glass-card .card-header .bi-award')?.closest('.glass-card');
+            if (badges) {
+                steps.push({
+                    element: badges,
+                    popover: {
+                        title: '🏅 Badges & Achievements',
+                        description: 'Earn badges as you complete courses and quizzes. Collect them all!',
+                        side: 'bottom',
+                        align: 'start'
+                    }
+                });
+            }
+
+            // Step 9: Certificate (if exists)
+            const certificate = document.querySelector('.certificate-block');
+            if (certificate) {
+                steps.push({
+                    element: certificate,
+                    popover: {
+                        title: '🎓 Certificate',
+                        description: 'When you complete all notes, you\'ll earn a certificate! Download it and share it.',
+                        side: 'bottom',
+                        align: 'start'
+                    }
+                });
+            }
+
+            // Step 10: Search Bar
+            const searchBar = document.querySelector('.search-bar');
+            if (searchBar) {
+                steps.push({
+                    element: searchBar,
+                    popover: {
+                        title: '🔍 Search Notes',
+                        description: 'Search through your course notes to find specific topics quickly.',
+                        side: 'bottom',
+                        align: 'start'
+                    }
+                });
+            }
+
+            // Step 11: Download Selected
+            const downloadBtn = document.querySelector('.btn-outline-info');
+            if (downloadBtn) {
+                steps.push({
+                    element: downloadBtn,
+                    popover: {
+                        title: '📥 Download Notes',
+                        description: 'Select multiple notes using the checkboxes, then click this button to download them as a PDF.',
+                        side: 'top',
+                        align: 'start'
+                    }
+                });
+            }
+
+            // Step 12: Navigation (More dropdown)
+            const moreBtn = document.getElementById('customDropdownBtn');
+            if (moreBtn) {
+                steps.push({
+                    element: moreBtn,
+                    popover: {
+                        title: '🧭 More Options',
+                        description: 'Access additional features like your portfolio, schedule, and profile settings from this menu.',
+                        side: 'bottom',
+                        align: 'start'
+                    }
+                });
+            }
+
+            // Step 13: Finish
+            steps.push({
+                popover: {
+                    title: '🎯 You\'re All Set!',
+                    description: 'You\'re ready to start learning! Click "Let\'s Go!" to begin your journey.',
+                    side: 'center',
+                    align: 'center'
+                }
+            });
+
+            driver.defineSteps(steps);
+            driver.drive();
+            console.log('Tour started successfully!');
+        } catch (error) {
+            console.error('Error in startTour:', error);
+            alert('There was an error starting the tour. Please refresh the page and try again.');
+        }
+    }
+
+    // ---------- AUTO-START FOR NEW USERS ----------
     document.addEventListener('DOMContentLoaded', function() {
         console.log('Dashboard loaded, checking for new user...');
         console.log('isNewUser:', {{ is_new_user|tojson }});
@@ -1538,11 +1601,18 @@
 
         if (isNewUser && !hasSeenTour) {
             console.log('New user detected, waiting to start tour...');
-            // Wait for page to fully render and Driver.js to load
+            // Pre-load Driver.js so it's ready when user clicks
+            loadDriverJS().then(function() {
+                console.log('Driver.js pre-loaded successfully!');
+            }).catch(function(err) {
+                console.warn('Pre-load failed, will try on click:', err);
+            });
+            
+            // Wait a moment then show a subtle hint
             setTimeout(function() {
-                console.log('Attempting to start auto-tour...');
-                window.startOnboardingTour();
-            }, 1500);
+                // The welcome banner is already visible, just ensure the button works
+                console.log('Ready for tour!');
+            }, 1000);
         }
     });
 

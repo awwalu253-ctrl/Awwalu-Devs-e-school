@@ -66,7 +66,7 @@ MAIL_DEFAULT_SENDER = os.getenv('MAIL_DEFAULT_SENDER', 'noreply@awwaludevs.com')
 APP_BASE_URL = os.getenv('APP_BASE_URL', 'http://localhost:5000')
 
 def send_email(to_email, subject, body):
-    """Send email with timeout and error handling."""
+    """Send email with multiple fallback methods."""
     mail_server = os.getenv('MAIL_SERVER', 'smtp.gmail.com')
     mail_port = int(os.getenv('MAIL_PORT', 465))
     mail_username = os.getenv('MAIL_USERNAME', '')
@@ -81,34 +81,51 @@ def send_email(to_email, subject, body):
         print(f"⚠️ Invalid email: {to_email}")
         return False
     
-    try:
-        timeout = 15  # 15 seconds timeout
-        
-        msg = MIMEMultipart()
-        msg['From'] = mail_default_sender
-        msg['To'] = to_email
-        msg['Subject'] = subject
-        msg.attach(MIMEText(body, 'plain'))
-        
-        # Connect with timeout
-        server = smtplib.SMTP_SSL(mail_server, mail_port, timeout=timeout)
-        server.login(mail_username, mail_password)
-        server.send_message(msg)
-        server.quit()
-        print(f"✅ Email sent to {to_email}")
-        return True
-    except socket.timeout:
-        print(f"⚠️ Timeout sending to {to_email}")
-        return False
-    except smtplib.SMTPAuthenticationError:
-        print(f"❌ Auth error - check Gmail app password")
-        return False
-    except smtplib.SMTPServerDisconnected:
-        print(f"⚠️ SMTP server disconnected for {to_email}")
-        return False
-    except Exception as e:
-        print(f"❌ Email error to {to_email}: {str(e)[:100]}")
-        return False
+    # Try multiple methods
+    methods = [
+        ('SSL', smtplib.SMTP_SSL, 465),
+        ('TLS', smtplib.SMTP, 587),
+    ]
+    
+    for method_name, smtp_class, port in methods:
+        try:
+            print(f"📧 Attempting {method_name} connection to {mail_server}:{port}")
+            timeout = 20
+            
+            if method_name == 'SSL':
+                server = smtp_class(mail_server, port, timeout=timeout)
+            else:
+                server = smtp_class(mail_server, port, timeout=timeout)
+                server.starttls()
+            
+            server.login(mail_username, mail_password)
+            
+            msg = MIMEMultipart()
+            msg['From'] = mail_default_sender
+            msg['To'] = to_email
+            msg['Subject'] = subject
+            msg.attach(MIMEText(body, 'plain'))
+            
+            server.send_message(msg)
+            server.quit()
+            print(f"✅ Email sent to {to_email} via {method_name}")
+            return True
+            
+        except socket.timeout:
+            print(f"⚠️ Timeout with {method_name} to {to_email}")
+            continue
+        except smtplib.SMTPAuthenticationError:
+            print(f"❌ Auth error with {method_name} - check Gmail app password")
+            continue
+        except smtplib.SMTPServerDisconnected:
+            print(f"⚠️ Server disconnected with {method_name}")
+            continue
+        except Exception as e:
+            print(f"❌ {method_name} error: {str(e)[:100]}")
+            continue
+    
+    print(f"❌ All email methods failed for {to_email}")
+    return False
 
 def send_email_async(to_email, subject, body):
     """Send email in background thread to avoid blocking."""

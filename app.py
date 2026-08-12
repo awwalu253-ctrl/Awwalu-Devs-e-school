@@ -124,6 +124,33 @@ def send_email_async(to_email, subject, body):
     thread.daemon = True
     thread.start()
 
+def send_welcome_email(user):
+    """Send welcome email to new user."""
+    subject = "🎉 Welcome to Awwalu Devs!"
+    body = f"""Hello {user['full_name']},
+
+Welcome to Awwalu Devs! 🎉
+
+Your account has been successfully created. You're now part of a community of developers learning and growing together.
+
+Here's what you can do next:
+✅ Complete your profile
+✅ Enroll in courses
+✅ Start learning with interactive notes
+✅ Take quizzes and earn certificates
+✅ Connect with fellow students
+
+Log in here: {APP_BASE_URL}/login
+
+If you have any questions, feel free to reply to this email.
+
+Happy learning! 🚀
+
+Regards,
+Awwalu Devs Team
+"""
+    send_email_async(user['email'], subject, body)
+
 # --- Helper function for database-specific date functions ---
 def now_sql():
     """Return the correct NOW() function for the current database."""
@@ -558,6 +585,9 @@ def register():
             subject = "📝 New Student Registration"
             body = f"A new student, {full_name} ({username}), has registered.\n\nLog in to view students: {APP_BASE_URL}/admin/students"
             send_email_async(admin_email, subject, body)
+
+        # Send welcome email to new user
+        send_welcome_email(user)
 
         flash(f'Welcome to Awwalu Devs, {full_name}!', 'success')
         return redirect(url_for('dashboard'))

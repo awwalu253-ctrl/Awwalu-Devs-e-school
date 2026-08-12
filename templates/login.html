@@ -73,7 +73,7 @@
         border-left: 1px solid rgba(34, 211, 238, 0.08);
     }
 
-    /* ---------- TYPEWRITER (NEW) ---------- */
+    /* ---------- TYPEWRITER ---------- */
     .typewriter-container {
         margin-bottom: 28px;
         text-align: center;
@@ -227,6 +227,24 @@
         text-decoration: underline;
     }
 
+    .auth-form-simple .forgot-password {
+        text-align: right;
+        margin-top: -10px;
+        margin-bottom: 15px;
+    }
+
+    .auth-form-simple .forgot-password a {
+        color: #94A3B8;
+        font-size: 0.85rem;
+        text-decoration: none;
+        transition: color 0.2s ease;
+    }
+
+    .auth-form-simple .forgot-password a:hover {
+        color: var(--cyan);
+        text-decoration: underline;
+    }
+
     /* ---------- RESPONSIVE ---------- */
     @media (max-width: 768px) {
         .split-auth {
@@ -327,6 +345,9 @@
             <div class="form-group">
                 <label class="form-label">Password</label>
                 <input type="password" name="password" class="form-control" placeholder="Enter your password" required>
+            </div>
+            <div class="forgot-password">
+                <a href="{{ url_for('forgot_password') }}">Forgot Password?</a>
             </div>
             <button type="submit" class="btn-login">Log In</button>
             <div class="auth-links">

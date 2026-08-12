@@ -17,6 +17,12 @@
         to { opacity: 1; transform: translateY(0); }
     }
 
+    @keyframes glowPulse {
+        0% { box-shadow: 0 0 0 4px rgba(34, 211, 238, 0.3), 0 0 20px rgba(34, 211, 238, 0.1); }
+        50% { box-shadow: 0 0 0 6px rgba(34, 211, 238, 0.6), 0 0 40px rgba(34, 211, 238, 0.3); }
+        100% { box-shadow: 0 0 0 4px rgba(34, 211, 238, 0.3), 0 0 20px rgba(34, 211, 238, 0.1); }
+    }
+
     .animate-card {
         animation: fadeUp 0.55s ease forwards;
         opacity: 0;
@@ -644,14 +650,15 @@
     }
     .tour-popup {
         background: #0F172A;
-        border: 1px solid rgba(34, 211, 238, 0.2);
+        border: 1px solid rgba(34, 211, 238, 0.25);
         border-radius: 16px;
         padding: 30px 35px;
         max-width: 420px;
         width: 90%;
-        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
         color: #F1F5F9;
         position: relative;
+        z-index: 1000000;
     }
     .tour-popup .tour-title {
         font-size: 1.2rem;
@@ -722,13 +729,59 @@
     .tour-popup .tour-close:hover {
         color: #F1F5F9;
     }
+
+    /* ---------- TOUR HIGHLIGHT EFFECT ---------- */
     .tour-highlight {
         position: relative;
-        z-index: 999998;
-        box-shadow: 0 0 0 4px rgba(34, 211, 238, 0.5);
-        border-radius: 12px;
-        background: rgba(34, 211, 238, 0.05);
-        transition: all 0.3s ease;
+        z-index: 999998 !important;
+        border-radius: 12px !important;
+        animation: glowPulse 1.5s ease-in-out infinite !important;
+        transition: all 0.3s ease !important;
+        border: 2px solid rgba(34, 211, 238, 0.6) !important;
+        background: rgba(34, 211, 238, 0.08) !important;
+        transform: scale(1.02) !important;
+    }
+
+    /* Highlight for specific elements */
+    .tour-highlight.glass-card {
+        background: rgba(34, 211, 238, 0.12) !important;
+        border-color: rgba(34, 211, 238, 0.7) !important;
+    }
+    .tour-highlight.note-card {
+        background: rgba(34, 211, 238, 0.15) !important;
+        border-color: rgba(34, 211, 238, 0.7) !important;
+        transform: scale(1.03) !important;
+    }
+    .tour-highlight .search-bar {
+        border-color: rgba(34, 211, 238, 0.7) !important;
+        box-shadow: 0 0 0 4px rgba(34, 211, 238, 0.2) !important;
+    }
+    .tour-highlight .course-badge {
+        transform: scale(1.05) !important;
+        box-shadow: 0 0 30px rgba(34, 211, 238, 0.3) !important;
+    }
+    .tour-highlight .btn-outline-info {
+        background: rgba(34, 211, 238, 0.15) !important;
+        border-color: rgba(34, 211, 238, 0.7) !important;
+        color: #22D3EE !important;
+        transform: scale(1.05) !important;
+    }
+    .tour-highlight .progress-container {
+        padding: 8px !important;
+        border-radius: 12px !important;
+        background: rgba(34, 211, 238, 0.05) !important;
+    }
+    .tour-highlight .quiz-card {
+        background: rgba(34, 211, 238, 0.12) !important;
+        border-color: rgba(34, 211, 238, 0.7) !important;
+    }
+    .tour-highlight .badge-pill {
+        transform: scale(1.1) !important;
+        box-shadow: 0 0 20px rgba(34, 211, 238, 0.2) !important;
+    }
+    .tour-highlight .announcement-item {
+        background: rgba(34, 211, 238, 0.08) !important;
+        border-left-color: #22D3EE !important;
     }
 
     /* ---------- RESPONSIVE ---------- */
@@ -939,6 +992,23 @@
         background: rgba(34, 211, 238, 0.05) !important;
         border-color: rgba(34, 211, 238, 0.15) !important;
     }
+
+    /* Dark mode tour highlight overrides */
+    body.dark-mode .tour-highlight {
+        background: rgba(34, 211, 238, 0.15) !important;
+    }
+    body.dark-mode .tour-highlight.glass-card {
+        background: rgba(34, 211, 238, 0.12) !important;
+    }
+    body.dark-mode .tour-highlight.note-card {
+        background: rgba(34, 211, 238, 0.18) !important;
+    }
+    body.dark-mode .tour-highlight .search-bar {
+        background: rgba(34, 211, 238, 0.1) !important;
+    }
+    body.dark-mode .tour-highlight .course-badge {
+        box-shadow: 0 0 40px rgba(34, 211, 238, 0.4) !important;
+    }
 </style>
 
 <div class="dashboard-wrapper">
@@ -964,7 +1034,7 @@
 
     <!-- ========== HEADER ========== -->
     <div class="dashboard-header animate-card">
-        <div class="brand">
+        <div class="brand" id="tour-course">
             <span class="course-badge">{{ course.name }}</span>
             <span class="subtitle"><i class="bi bi-book"></i> Your lessons</span>
         </div>
@@ -1153,7 +1223,7 @@
         <div class="tour-title" id="tourTitle">🎉 Welcome to Awwalu Devs!</div>
         <div class="tour-description" id="tourDescription">Let's take a quick tour of your learning dashboard.</div>
         <div class="tour-footer">
-            <span class="tour-progress" id="tourProgress">Step 1 of 10</span>
+            <span class="tour-progress" id="tourProgress">Step 1 of 11</span>
             <div>
                 <button class="tour-btn tour-btn-prev" id="tourPrevBtn" onclick="prevTourStep()" style="display:none;">← Back</button>
                 <button class="tour-btn tour-btn-next" id="tourNextBtn" onclick="nextTourStep()">Next →</button>
@@ -1169,67 +1239,77 @@
     var tourSteps = [];
     var currentStep = 0;
     var isTourActive = false;
-    var originalStyles = {};
 
-    // Define tour steps
+    // Define tour steps with element IDs
     function initTourSteps() {
         tourSteps = [
             {
                 title: '🎉 Welcome to Awwalu Devs!',
                 description: 'Let\'s take a quick tour of your learning dashboard. You\'ll learn about each feature and how to use them.',
-                element: null
+                elementId: null
             },
             {
                 title: '📚 Your Course',
                 description: 'This is your current course. All your learning materials, notes, and quizzes are organized here.',
-                element: document.querySelector('.dashboard-header .brand')
+                elementId: 'tour-course'
             },
             {
                 title: '📊 Your Progress',
                 description: 'This shows how much of the course you\'ve completed. The more notes you read, the higher your progress!',
-                element: document.getElementById('tour-progress')
+                elementId: 'tour-progress'
             },
             {
                 title: '📖 Course Notes',
                 description: 'These are your learning materials. Click on any note to read it. Mark notes as "Read" to track your progress.',
-                element: document.getElementById('tour-notes')
+                elementId: 'tour-notes'
             },
             {
                 title: '📄 Note Card',
-                description: 'Each note has a title and status. Click "Mark as Read" when you finish reading. You can also download notes as PDF.',
-                element: document.querySelector('.note-card')
+                description: 'Each note has a title and status. Click "Mark as Read" when you finish reading.',
+                elementId: null, // Will use first note card
+                dynamicElement: '.note-card'
             },
             {
                 title: '📢 Announcements',
                 description: 'Your instructor posts important updates here. Check this regularly for news and reminders.',
-                element: document.getElementById('tour-announcements')
+                elementId: 'tour-announcements'
             },
             {
                 title: '📝 Quizzes',
                 description: 'Test your knowledge with quizzes. Each quiz tracks your score. Try to get 100%!',
-                element: document.getElementById('tour-quizzes')
+                elementId: 'tour-quizzes'
             },
             {
                 title: '🏅 Badges & Achievements',
                 description: 'Earn badges as you complete courses and quizzes. Collect them all!',
-                element: document.getElementById('tour-badges')
+                elementId: 'tour-badges'
             },
             {
                 title: '🔍 Search Notes',
                 description: 'Search through your course notes to find specific topics quickly.',
-                element: document.getElementById('tour-search')
+                elementId: 'tour-search'
             },
             {
                 title: '📥 Download Notes',
                 description: 'Select multiple notes using the checkboxes, then click this button to download them as a PDF.',
-                element: document.getElementById('tour-download')
+                elementId: 'tour-download'
             },
             {
                 title: '🎯 You\'re All Set!',
                 description: 'You\'re ready to start learning! Click "Let\'s Go!" to begin your journey.',
-                element: null
+                elementId: null
             }
         ];
+    }
+
+    function getElement(step) {
+        if (step.elementId) {
+            return document.getElementById(step.elementId);
+        }
+        if (step.dynamicElement) {
+            return document.querySelector(step.dynamicElement);
+        }
+        return null;
     }
 
     function startTour() {
@@ -1267,21 +1347,15 @@
         // Clear previous highlight
         document.querySelectorAll('.tour-highlight').forEach(function(el) {
             el.classList.remove('tour-highlight');
-            if (el.dataset.originalStyle) {
-                el.style.cssText = el.dataset.originalStyle;
-                delete el.dataset.originalStyle;
-            }
         });
 
         // Highlight element if exists
-        if (step.element && step.element !== null) {
-            // Save original style
-            step.element.dataset.originalStyle = step.element.style.cssText;
-            // Add highlight
-            step.element.classList.add('tour-highlight');
+        var element = getElement(step);
+        if (element) {
+            element.classList.add('tour-highlight');
             
             // Scroll element into view if needed
-            step.element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            element.scrollIntoView({ behavior: 'smooth', block: 'center' });
         }
 
         currentStep = index;
@@ -1306,10 +1380,6 @@
         // Clear highlights
         document.querySelectorAll('.tour-highlight').forEach(function(el) {
             el.classList.remove('tour-highlight');
-            if (el.dataset.originalStyle) {
-                el.style.cssText = el.dataset.originalStyle;
-                delete el.dataset.originalStyle;
-            }
         });
     }
 
@@ -1326,13 +1396,9 @@
         var hasSeenTour = localStorage.getItem('tour_seen') === 'true';
 
         if (isNewUser && !hasSeenTour) {
-            // Wait for page to render
-            setTimeout(function() {
-                // Don't auto-start, let user click the button
-                // But pre-initialize the tour steps
-                initTourSteps();
-                console.log('Tour ready for new user!');
-            }, 500);
+            // Pre-initialize the tour steps
+            initTourSteps();
+            console.log('Tour ready for new user!');
         }
     });
 

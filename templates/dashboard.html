@@ -1097,9 +1097,6 @@
                     <button class="btn btn-start-tour" onclick="startOnboardingTour()">
                         <i class="bi bi-play-circle"></i> Start Tour
                     </button>
-                    <a href="{{ url_for('getting_started') }}" class="btn btn-outline-guide">
-                        <i class="bi bi-book"></i> Getting Started Guide
-                    </a>
                 </div>
             </div>
         </div>
@@ -1299,21 +1296,52 @@
 <!-- ========== SCRIPTS ========== -->
 <script>
     // ---------- ONBOARDING TOUR ----------
-    var isNewUser = {{ is_new_user| tojson }};
-    var hasSeenTour = localStorage.getItem('tour_seen') === 'true';
+    // Check if Driver.js is loaded
+    function isDriverLoaded() {
+        return typeof window.driver !== 'undefined' && typeof window.driver.js !== 'undefined';
+    }
 
-    // Expose function globally for the welcome banner button
-    window.startOnboardingTour = startOnboardingTour;
+    // Wait for Driver.js to load
+    function waitForDriver(callback, attempts) {
+        attempts = attempts || 0;
+        if (isDriverLoaded()) {
+            callback();
+            return;
+        }
+        if (attempts > 20) {
+            console.error('Driver.js failed to load after 20 attempts');
+            alert('The tour could not load. Please refresh the page and try again.');
+            return;
+        }
+        setTimeout(function() {
+            waitForDriver(callback, attempts + 1);
+        }, 200);
+    }
 
-    function startOnboardingTour() {
+    // Start tour function
+    window.startOnboardingTour = function() {
+        console.log('Starting tour...');
+        waitForDriver(function() {
+            try {
+                console.log('Driver.js loaded, starting tour...');
+                startTour();
+            } catch (e) {
+                console.error('Error starting tour:', e);
+                alert('There was an error starting the tour. Please refresh the page and try again.');
+            }
+        });
+    };
+
+    function startTour() {
         const driver = window.driver.js.driver({
             showProgress: true,
             progressText: 'Step {{current}} of {{total}}',
             nextBtnText: 'Next →',
             prevBtnText: '← Back',
             doneBtnText: '🚀 Let\'s Go!',
-            onDestroyStarted: function () {
+            onDestroyStarted: function() {
                 localStorage.setItem('tour_seen', 'true');
+                console.log('Tour completed!');
             }
         });
 
@@ -1487,7 +1515,7 @@
         steps.push({
             popover: {
                 title: '🎯 You\'re All Set!',
-                description: 'You\'re ready to start learning! If you ever need help, check the Getting Started guide from the More menu.',
+                description: 'You\'re ready to start learning! Click "Let\'s Go!" to begin your journey.',
                 side: 'center',
                 align: 'center'
             }
@@ -1495,20 +1523,31 @@
 
         driver.defineSteps(steps);
         driver.drive();
+        console.log('Tour started successfully!');
     }
 
     // Auto-start tour for new users
-    document.addEventListener('DOMContentLoaded', function () {
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('Dashboard loaded, checking for new user...');
+        console.log('isNewUser:', {{ is_new_user|tojson }});
+
+        var isNewUser = {{ is_new_user|tojson }};
+        var hasSeenTour = localStorage.getItem('tour_seen') === 'true';
+
+        console.log('hasSeenTour:', hasSeenTour);
+
         if (isNewUser && !hasSeenTour) {
-            // Wait a moment for page to fully render
-            setTimeout(function () {
-                startOnboardingTour();
-            }, 1200);
+            console.log('New user detected, waiting to start tour...');
+            // Wait for page to fully render and Driver.js to load
+            setTimeout(function() {
+                console.log('Attempting to start auto-tour...');
+                window.startOnboardingTour();
+            }, 1500);
         }
     });
 
     // ---------- CUSTOM DROPDOWN (FIXED) ----------
-    (function () {
+    (function() {
         var menu = document.createElement('div');
         menu.className = 'custom-dropdown-menu';
         menu.id = 'customDropdownMenu';
@@ -1558,7 +1597,7 @@
 
         toggleBtn.addEventListener('click', toggleDropdown);
 
-        document.addEventListener('click', function (e) {
+        document.addEventListener('click', function(e) {
             if (!e.target.closest('#customDropdownContainer') && !e.target.closest('#customDropdownMenu')) {
                 if (isOpen) {
                     menu.classList.remove('show');
@@ -1568,7 +1607,7 @@
             }
         });
 
-        document.addEventListener('keydown', function (e) {
+        document.addEventListener('keydown', function(e) {
             if (e.key === 'Escape' && isOpen) {
                 menu.classList.remove('show');
                 toggleBtn.setAttribute('aria-expanded', 'false');
@@ -1581,7 +1620,7 @@
         }
         window.addEventListener('scroll', repositionIfOpen);
         window.addEventListener('resize', repositionIfOpen);
-        window.addEventListener('orientationchange', function () {
+        window.addEventListener('orientationchange', function() {
             if (isOpen) setTimeout(positionMenu, 300);
         });
     })();
@@ -1596,7 +1635,7 @@
         var form = document.getElementById('downloadSelectedForm');
         var container = document.getElementById('selectedNotesInputs');
         container.innerHTML = '';
-        checkboxes.forEach(function (cb) {
+        checkboxes.forEach(function(cb) {
             var input = document.createElement('input');
             input.type = 'hidden';
             input.name = 'selected_notes';
@@ -1607,12 +1646,12 @@
     }
 
     // ---------- Animate progress bar ----------
-    document.addEventListener('DOMContentLoaded', function () {
+    document.addEventListener('DOMContentLoaded', function() {
         var fill = document.querySelector('.progress-fill');
         if (fill) {
             var width = fill.style.width;
             fill.style.width = '0%';
-            setTimeout(function () {
+            setTimeout(function() {
                 fill.style.width = width;
             }, 200);
         }

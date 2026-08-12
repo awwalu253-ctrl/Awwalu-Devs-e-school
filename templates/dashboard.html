@@ -732,7 +732,7 @@
 
     /* ---------- TOUR HIGHLIGHT EFFECT ---------- */
     .tour-highlight {
-        position: relative;
+        position: relative !important;
         z-index: 999998 !important;
         border-radius: 12px !important;
         animation: glowPulse 1.5s ease-in-out infinite !important;
@@ -742,7 +742,6 @@
         transform: scale(1.02) !important;
     }
 
-    /* Highlight for specific elements */
     .tour-highlight.glass-card {
         background: rgba(34, 211, 238, 0.12) !important;
         border-color: rgba(34, 211, 238, 0.7) !important;
@@ -1239,6 +1238,7 @@
     var tourSteps = [];
     var currentStep = 0;
     var isTourActive = false;
+    var currentHighlightedElement = null;
 
     // Define tour steps with element IDs
     function initTourSteps() {
@@ -1266,8 +1266,8 @@
             {
                 title: '📄 Note Card',
                 description: 'Each note has a title and status. Click "Mark as Read" when you finish reading.',
-                elementId: null, // Will use first note card
-                dynamicElement: '.note-card'
+                elementId: null,
+                dynamicSelector: '.note-card'
             },
             {
                 title: '📢 Announcements',
@@ -1306,10 +1306,36 @@
         if (step.elementId) {
             return document.getElementById(step.elementId);
         }
-        if (step.dynamicElement) {
-            return document.querySelector(step.dynamicElement);
+        if (step.dynamicSelector) {
+            return document.querySelector(step.dynamicSelector);
         }
         return null;
+    }
+
+    // Remove highlight from previous element
+    function clearHighlight() {
+        if (currentHighlightedElement) {
+            currentHighlightedElement.classList.remove('tour-highlight');
+            currentHighlightedElement = null;
+        }
+        // Also clear any other highlighted elements just in case
+        document.querySelectorAll('.tour-highlight').forEach(function(el) {
+            el.classList.remove('tour-highlight');
+        });
+    }
+
+    // Add highlight to new element
+    function setHighlight(element) {
+        if (element) {
+            // Small delay to ensure clean transition
+            setTimeout(function() {
+                element.classList.add('tour-highlight');
+                currentHighlightedElement = element;
+                
+                // Scroll element into view if needed
+                element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }, 100);
+        }
     }
 
     function startTour() {
@@ -1332,6 +1358,9 @@
         var step = tourSteps[index];
         if (!step) return;
 
+        // Clear previous highlight immediately
+        clearHighlight();
+
         // Update popup content
         document.getElementById('tourTitle').textContent = step.title;
         document.getElementById('tourDescription').textContent = step.description;
@@ -1344,18 +1373,10 @@
         document.getElementById('tourNextBtn').style.display = isLast ? 'none' : 'inline-block';
         document.getElementById('tourDoneBtn').style.display = isLast ? 'inline-block' : 'none';
 
-        // Clear previous highlight
-        document.querySelectorAll('.tour-highlight').forEach(function(el) {
-            el.classList.remove('tour-highlight');
-        });
-
         // Highlight element if exists
         var element = getElement(step);
         if (element) {
-            element.classList.add('tour-highlight');
-            
-            // Scroll element into view if needed
-            element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            setHighlight(element);
         }
 
         currentStep = index;
@@ -1363,12 +1384,16 @@
 
     function nextTourStep() {
         if (currentStep < tourSteps.length - 1) {
+            // Clear highlight before moving to next
+            clearHighlight();
             showTourStep(currentStep + 1);
         }
     }
 
     function prevTourStep() {
         if (currentStep > 0) {
+            // Clear highlight before moving to previous
+            clearHighlight();
             showTourStep(currentStep - 1);
         }
     }
@@ -1376,11 +1401,7 @@
     function closeTour() {
         document.getElementById('tourOverlay').classList.remove('active');
         isTourActive = false;
-        
-        // Clear highlights
-        document.querySelectorAll('.tour-highlight').forEach(function(el) {
-            el.classList.remove('tour-highlight');
-        });
+        clearHighlight();
     }
 
     // Close tour with Escape key

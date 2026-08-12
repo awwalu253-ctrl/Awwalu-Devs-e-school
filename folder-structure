@@ -1,0 +1,69 @@
+awwalu-devs/
+├── app.py                          # Main Flask application
+├── init_db.py                      # Database initialization script
+├── requirements.txt                # Python dependencies
+├── Procfile                        # Render deployment config
+├── vercel.json                     # (Optional) Vercel config
+├── .env                            # Environment variables (local, NOT committed)
+├── .env.example                    # Sample environment variables (committed)
+├── .gitignore                      # Git ignore file
+├── uploads/                        # User uploaded files (avatars, assignments)
+│   └── .gitkeep                    # Keeps folder in git
+│
+├── static/                         # Static assets
+│   ├── css/
+│   │   └── style.css               # Custom styles
+│   ├── js/
+│   │   └── main.js                 # Custom JavaScript
+│   └── images/
+│       ├── logo.png                # Your logo
+│       └── bg-image.png            # Background image (optional)
+│
+└── templates/                      # HTML templates
+    ├── base.html                   # Master layout (sidebar + navbar)
+    ├── login.html                  # Login page
+    ├── register.html               # Registration page
+    ├── forgot_password.html        # Forgot password page
+    ├── reset_password.html         # Reset password page
+    ├── select_course.html          # Course selection page
+    ├── courses.html                # All courses list
+    ├── dashboard.html              # Student dashboard
+    ├── assignments.html            # Student assignments
+    ├── assignment_history.html     # Student portfolio
+    ├── classmates.html             # Classmates gallery
+    ├── my_notes.html               # Private notes list
+    ├── note_detail.html            # Note detail with Q&A
+    ├── schedule.html               # Student schedule
+    ├── leaderboard.html            # Student leaderboard
+    ├── profile.html                # Student profile
+    ├── edit_profile.html           # Edit profile page
+    ├── public_profile.html         # Public profile view
+    ├── notifications.html          # Notifications list
+    ├── student_messages.html       # Student inbox
+    ├── admin_panel.html            # Admin dashboard
+    ├── admin_courses.html          # Manage courses
+    ├── admin_students.html         # Manage students
+    ├── admin_certificates.html     # Manage certificates
+    ├── admin_quizzes.html          # Manage quizzes
+    ├── admin_tags.html             # Manage tags
+    ├── admin_cohorts.html          # Manage cohorts
+    ├── admin_discussions.html      # Q&A moderation
+    ├── admin_scheduled.html        # Scheduled content
+    ├── admin_analytics.html        # Analytics dashboard
+    ├── admin_bulk_email.html       # Bulk email to students
+    ├── admin_progress.html         # Student progress dashboard
+    ├── admin_messages.html         # Admin inbox
+    ├── admin_templates.html        # Note templates
+    ├── admin_certificates.html     # Certificate management
+    ├── admin_discussions.html      # Discussion moderation
+    ├── submissions_list.html       # Assignment submissions
+    ├── edit_note.html              # Edit note form
+    ├── edit_assignment.html        # Edit assignment form
+    ├── add_quiz.html               # Add quiz form
+    ├── edit_quiz.html              # Edit quiz with questions
+    ├── search.html                 # Advanced search results
+    ├── notifications.html          # Notifications list
+    ├── student_messages.html       # Student inbox
+    ├── admin_messages.html         # Admin inbox
+    ├── activity_logs.html          # Activity logs
+    └── admin_bulk_delete.html      # Bulk delete confirmation

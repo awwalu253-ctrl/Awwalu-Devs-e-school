@@ -9,6 +9,8 @@ import random
 import string
 import csv
 import markdown2
+import threading
+import socket
 from io import StringIO
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
@@ -64,7 +66,7 @@ MAIL_DEFAULT_SENDER = os.getenv('MAIL_DEFAULT_SENDER', 'noreply@awwaludevs.com')
 APP_BASE_URL = os.getenv('APP_BASE_URL', 'http://localhost:5000')
 
 def send_email(to_email, subject, body):
-    # Read from environment variables
+    """Send email with timeout and error handling."""
     mail_server = os.getenv('MAIL_SERVER', 'smtp.gmail.com')
     mail_port = int(os.getenv('MAIL_PORT', 465))
     mail_username = os.getenv('MAIL_USERNAME', '')
@@ -72,26 +74,53 @@ def send_email(to_email, subject, body):
     mail_default_sender = os.getenv('MAIL_DEFAULT_SENDER', 'noreply@awwaludevs.com')
 
     if not mail_username or not mail_password:
-        print("⚠️ Email credentials not set. Check your environment variables.")
+        print("⚠️ Email credentials not set.")
+        return False
+    
+    if not to_email or '@' not in str(to_email):
+        print(f"⚠️ Invalid email: {to_email}")
         return False
     
     try:
+        timeout = 15  # 15 seconds timeout
+        
         msg = MIMEMultipart()
         msg['From'] = mail_default_sender
         msg['To'] = to_email
         msg['Subject'] = subject
         msg.attach(MIMEText(body, 'plain'))
         
-        # Use SSL for port 465
-        server = smtplib.SMTP_SSL(mail_server, mail_port)
+        # Connect with timeout
+        server = smtplib.SMTP_SSL(mail_server, mail_port, timeout=timeout)
         server.login(mail_username, mail_password)
         server.send_message(msg)
         server.quit()
         print(f"✅ Email sent to {to_email}")
         return True
-    except Exception as e:
-        print(f"❌ Email send error: {e}")
+    except socket.timeout:
+        print(f"⚠️ Timeout sending to {to_email}")
         return False
+    except smtplib.SMTPAuthenticationError:
+        print(f"❌ Auth error - check Gmail app password")
+        return False
+    except smtplib.SMTPServerDisconnected:
+        print(f"⚠️ SMTP server disconnected for {to_email}")
+        return False
+    except Exception as e:
+        print(f"❌ Email error to {to_email}: {str(e)[:100]}")
+        return False
+
+def send_email_async(to_email, subject, body):
+    """Send email in background thread to avoid blocking."""
+    def send():
+        try:
+            send_email(to_email, subject, body)
+        except Exception as e:
+            print(f"❌ Thread email error: {e}")
+    
+    thread = threading.Thread(target=send)
+    thread.daemon = True
+    thread.start()
 
 # --- Helper function for database-specific date functions ---
 def now_sql():
@@ -196,10 +225,17 @@ def insert_and_get_id(table, columns, values, returning_col='id'):
     else:
         # PostgreSQL: use RETURNING
         query = f"INSERT INTO {table} ({columns_str}) VALUES ({placeholders}) RETURNING {returning_col}"
-        result = conn.execute(text(query), values)
-        conn.commit()
-        row = result.fetchone()
-        return row[0] if row else None
+        try:
+            result = conn.execute(text(query), values)
+            conn.commit()
+            row = result.fetchone()
+            return row[0] if row else None
+        except Exception as e:
+            conn.rollback()
+            print(f"❌ Insert error: {e}")
+            print(f"Query: {query}")
+            print(f"Values: {values}")
+            raise e
 
 # ========================
 # AUTO-INITIALIZE DATABASE ON FIRST RUN
@@ -290,7 +326,8 @@ def send_user_email(user_id, subject, body):
         return False
     recipient = user['email'] if user['email'] else user['username']
     personal_body = f"Hello {user['full_name']},\n\n{body}\n\nRegards,\nAwwalu Devs Team"
-    return send_email(recipient, subject, personal_body)
+    send_email_async(recipient, subject, personal_body)
+    return True
 
 def log_activity(user_id, action, details=None):
     ip = request.remote_addr
@@ -328,12 +365,18 @@ def send_course_emails(course_id, subject, body, exclude_user=None):
         SELECT username, full_name, email FROM users
         WHERE course_id = :cid AND is_admin = 0 AND email_notifications = 1
     """, {"cid": course_id}, fetch_all=True)
+    
+    if not students:
+        print(f"⚠️ No students found for course {course_id}")
+        return
+    
+    print(f"📧 Sending {len(students)} course emails in background...")
     for s in students:
         if exclude_user and s['username'] == exclude_user:
             continue
         recipient = s['email'] if s['email'] else s['username']
         personal_body = f"Hello {s['full_name']},\n\n{body}\n\nRegards,\nAwwalu Devs Team"
-        send_email(recipient, subject, personal_body)
+        send_email_async(recipient, subject, personal_body)
 
 def send_announcement_emails(course_id, title, content, exclude_user=None):
     if course_id:
@@ -348,14 +391,21 @@ def send_announcement_emails(course_id, title, content, exclude_user=None):
             WHERE is_admin = 0 AND email_notifications = 1
         """, fetch_all=True)
         course_name = "All Courses"
+    
+    if not students:
+        print("⚠️ No students found for announcement")
+        return
+    
     subject = f"📢 New Announcement: {title}"
     body = f"A new announcement has been posted for {course_name}.\n\n{content}\n\nLog in to view: {APP_BASE_URL}/dashboard"
+    
+    print(f"📧 Sending announcement to {len(students)} students in background...")
     for s in students:
         if exclude_user and s['username'] == exclude_user:
             continue
         recipient = s['email'] if s['email'] else s['username']
         personal_body = f"Hello {s['full_name']},\n\n{body}\n\nRegards,\nAwwalu Devs Team"
-        send_email(recipient, subject, personal_body)
+        send_email_async(recipient, subject, personal_body)
 
 def sync_note_tags(note_id, tag_ids):
     execute_query("DELETE FROM note_tags WHERE note_id = :nid", {"nid": note_id}, commit=True)
@@ -513,7 +563,7 @@ def register():
         if admin_email:
             subject = "📝 New Student Registration"
             body = f"A new student, {full_name} ({username}), has registered.\n\nLog in to view students: {APP_BASE_URL}/admin/students"
-            send_email(admin_email, subject, body)
+            send_email_async(admin_email, subject, body)
 
         flash(f'Welcome to Awwalu Devs, {full_name}!', 'success')
         return redirect(url_for('dashboard'))
@@ -1049,7 +1099,7 @@ def submit_assignment(assignment_id):
         if admin_email:
             subject = f"📋 Assignment Submitted: {assignment['title']}"
             body = f"{user['full_name']} has submitted the assignment '{assignment['title']}'.\n\nView submissions: {APP_BASE_URL}/admin/submissions/{assignment_id}"
-            send_email(admin_email, subject, body)
+            send_email_async(admin_email, subject, body)
         log_activity(session['user_id'], 'submit_assignment', f'Assignment {assignment_id} submitted')
         flash('Assignment submitted successfully! 🎉', 'success')
     else:
@@ -1317,7 +1367,7 @@ def student_send_message():
     if admin_email:
         subject = f"📩 New message from {session['full_name']}"
         body = f"{session['full_name']} sent you a message:\n\n{message}\n\nReply: {APP_BASE_URL}/admin/messages"
-        send_email(admin_email, subject, body)
+        send_email_async(admin_email, subject, body)
     flash('Message sent!', 'success')
     return redirect(url_for('student_messages'))
 
@@ -2705,7 +2755,7 @@ def send_digest():
         for u in upcoming:
             body += f"- {u['title']} (due {u['due_date']})\n"
         subject = "Weekly Digest – Awwalu Devs"
-        send_email(s['email'] if s['email'] else s['username'], subject, body)
+        send_email_async(s['email'] if s['email'] else s['username'], subject, body)
         sent += 1
     flash(f'Digest sent to {sent} students.', 'success')
     return redirect(url_for('admin_panel'))

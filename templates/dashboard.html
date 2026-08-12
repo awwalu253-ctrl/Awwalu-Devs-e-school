@@ -8,36 +8,86 @@
 
     /* ---------- ANIMATIONS ---------- */
     @keyframes fadeUp {
-        from { opacity: 0; transform: translateY(24px) scale(0.98); }
-        to { opacity: 1; transform: translateY(0) scale(1); }
+        from {
+            opacity: 0;
+            transform: translateY(24px) scale(0.98);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
     }
 
     @keyframes slideDown {
-        from { opacity: 0; transform: translateY(-8px); }
-        to { opacity: 1; transform: translateY(0); }
+        from {
+            opacity: 0;
+            transform: translateY(-8px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
     }
 
     .animate-card {
         animation: fadeUp 0.55s ease forwards;
         opacity: 0;
     }
-    .animate-card:nth-child(1) { animation-delay: 0.04s; }
-    .animate-card:nth-child(2) { animation-delay: 0.08s; }
-    .animate-card:nth-child(3) { animation-delay: 0.12s; }
-    .animate-card:nth-child(4) { animation-delay: 0.16s; }
-    .animate-card:nth-child(5) { animation-delay: 0.20s; }
-    .animate-card:nth-child(6) { animation-delay: 0.24s; }
-    .animate-card:nth-child(7) { animation-delay: 0.28s; }
+
+    .animate-card:nth-child(1) {
+        animation-delay: 0.04s;
+    }
+
+    .animate-card:nth-child(2) {
+        animation-delay: 0.08s;
+    }
+
+    .animate-card:nth-child(3) {
+        animation-delay: 0.12s;
+    }
+
+    .animate-card:nth-child(4) {
+        animation-delay: 0.16s;
+    }
+
+    .animate-card:nth-child(5) {
+        animation-delay: 0.20s;
+    }
+
+    .animate-card:nth-child(6) {
+        animation-delay: 0.24s;
+    }
+
+    .animate-card:nth-child(7) {
+        animation-delay: 0.28s;
+    }
 
     .animate-item {
         animation: slideDown 0.35s ease forwards;
         opacity: 0;
     }
-    .animate-item:nth-child(1) { animation-delay: 0.05s; }
-    .animate-item:nth-child(2) { animation-delay: 0.10s; }
-    .animate-item:nth-child(3) { animation-delay: 0.15s; }
-    .animate-item:nth-child(4) { animation-delay: 0.20s; }
-    .animate-item:nth-child(5) { animation-delay: 0.25s; }
+
+    .animate-item:nth-child(1) {
+        animation-delay: 0.05s;
+    }
+
+    .animate-item:nth-child(2) {
+        animation-delay: 0.10s;
+    }
+
+    .animate-item:nth-child(3) {
+        animation-delay: 0.15s;
+    }
+
+    .animate-item:nth-child(4) {
+        animation-delay: 0.20s;
+    }
+
+    .animate-item:nth-child(5) {
+        animation-delay: 0.25s;
+    }
 
     /* ---------- GLOBAL ---------- */
     .dashboard-wrapper {
@@ -107,6 +157,7 @@
         color: white;
         box-shadow: 0 4px 14px rgba(37, 99, 235, 0.25);
     }
+
     .btn-primary:hover {
         transform: translateY(-2px) scale(1.02);
         box-shadow: 0 8px 24px rgba(37, 99, 235, 0.35);
@@ -119,6 +170,7 @@
         color: #10B981;
         background: transparent;
     }
+
     .btn-outline-success:hover {
         background: #10B981;
         color: white;
@@ -131,6 +183,7 @@
         color: var(--text-light);
         background: transparent;
     }
+
     .btn-outline-secondary:hover {
         border-color: var(--blue);
         color: var(--blue);
@@ -144,6 +197,7 @@
         color: var(--blue);
         background: transparent;
     }
+
     .btn-outline-info:hover {
         background: var(--blue);
         color: white;
@@ -156,6 +210,7 @@
         color: white;
         box-shadow: 0 4px 14px rgba(16, 185, 129, 0.25);
     }
+
     .btn-success:hover {
         transform: translateY(-2px) scale(1.02);
         box-shadow: 0 8px 24px rgba(16, 185, 129, 0.35);
@@ -180,10 +235,12 @@
         padding: 24px 28px;
         margin-bottom: 24px;
     }
+
     .glass-card:hover {
         box-shadow: var(--shadow-lg), 0 0 0 1px rgba(37, 99, 235, 0.06);
         transform: translateY(-3px);
     }
+
     .glass-card .card-header {
         display: flex;
         align-items: center;
@@ -195,6 +252,7 @@
         border-bottom: 1px solid rgba(37, 99, 235, 0.04);
         padding-bottom: 10px;
     }
+
     .glass-card .card-header i {
         color: var(--blue);
         font-size: 1.3rem;
@@ -208,6 +266,7 @@
         gap: 16px;
         flex-wrap: wrap;
     }
+
     .progress-container .info {
         display: flex;
         align-items: center;
@@ -215,9 +274,11 @@
         font-weight: 500;
         color: var(--text);
     }
+
     .progress-container .info strong {
         color: var(--navy);
     }
+
     .progress-container .badge-progress {
         background: var(--blue);
         color: white;
@@ -226,6 +287,7 @@
         font-weight: 600;
         font-size: 0.85rem;
     }
+
     .progress-track {
         width: 100%;
         height: 8px;
@@ -234,6 +296,7 @@
         overflow: hidden;
         margin-top: 10px;
     }
+
     .progress-track .progress-fill {
         height: 100%;
         border-radius: 50px;
@@ -251,10 +314,12 @@
         margin-bottom: 12px;
         transition: var(--transition);
     }
+
     .announcement-item:hover {
         background: rgba(37, 99, 235, 0.04);
         transform: translateX(4px);
     }
+
     .announcement-item .title {
         font-weight: 600;
         color: var(--navy);
@@ -262,12 +327,14 @@
         align-items: center;
         gap: 8px;
     }
+
     .announcement-item .title .date {
         font-weight: 400;
         color: var(--text-light);
         font-size: 0.75rem;
         margin-left: auto;
     }
+
     .announcement-item .content {
         color: var(--text);
         margin-top: 2px;
@@ -301,6 +368,7 @@
         padding: 16px 20px;
         border: 1px solid rgba(16, 185, 129, 0.15);
     }
+
     .certificate-block .msg {
         display: flex;
         align-items: center;
@@ -308,6 +376,7 @@
         font-weight: 500;
         color: var(--text);
     }
+
     .certificate-block .msg i {
         color: #10B981;
         font-size: 1.4rem;
@@ -319,6 +388,7 @@
         grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
         gap: 16px;
     }
+
     .quiz-card {
         background: rgba(255, 255, 255, 0.6);
         border-radius: var(--radius-sm);
@@ -329,23 +399,27 @@
         flex-direction: column;
         height: 100%;
     }
+
     .quiz-card:hover {
         transform: translateY(-4px);
         box-shadow: var(--shadow-md);
         border-color: var(--blue);
     }
+
     .quiz-card .title {
         font-weight: 700;
         color: var(--navy);
         font-size: 0.95rem;
         margin-bottom: 4px;
     }
+
     .quiz-card .desc {
         color: var(--text-light);
         font-size: 0.8rem;
         flex: 1;
         margin-bottom: 12px;
     }
+
     .quiz-card .score-badge {
         background: #10B981;
         color: white;
@@ -367,10 +441,12 @@
         border: 1px solid #E2E8F0;
         transition: var(--transition);
     }
+
     .search-bar:focus-within {
         border-color: var(--blue);
         box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.08);
     }
+
     .search-bar input {
         flex: 1;
         border: none;
@@ -380,9 +456,11 @@
         font-size: 0.95rem;
         outline: none;
     }
+
     .search-bar input::placeholder {
         color: #94A3B8;
     }
+
     .search-bar .btn {
         border-radius: 0;
         padding: 0 18px;
@@ -392,12 +470,15 @@
         transition: var(--transition);
         cursor: pointer;
     }
+
     .search-bar .btn:hover {
         color: var(--blue);
     }
+
     .search-bar .btn-clear {
         color: #EF4444;
     }
+
     .search-bar .btn-clear:hover {
         color: #DC2626;
     }
@@ -408,6 +489,7 @@
         grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
         gap: 20px;
     }
+
     .note-card {
         background: rgba(255, 255, 255, 0.7);
         border-radius: var(--radius-sm);
@@ -418,11 +500,13 @@
         flex-direction: column;
         height: 100%;
     }
+
     .note-card:hover {
         transform: translateY(-5px);
         box-shadow: var(--shadow-lg);
         border-color: rgba(37, 99, 235, 0.10);
     }
+
     .note-card .top {
         display: flex;
         align-items: flex-start;
@@ -430,12 +514,14 @@
         gap: 10px;
         margin-bottom: 6px;
     }
+
     .note-card .top .left {
         display: flex;
         align-items: center;
         gap: 8px;
         min-width: 0;
     }
+
     .note-card .top .left input[type="checkbox"] {
         flex-shrink: 0;
         width: 18px;
@@ -444,9 +530,11 @@
         cursor: pointer;
         transition: var(--transition);
     }
+
     .note-card .top .left input[type="checkbox"]:checked {
         transform: scale(1.1);
     }
+
     .note-card .top .left .title {
         font-weight: 600;
         color: var(--navy);
@@ -455,9 +543,11 @@
         font-size: 0.95rem;
         word-break: break-word;
     }
+
     .note-card .top .left .title:hover {
         color: var(--blue);
     }
+
     .note-card .top .status {
         flex-shrink: 0;
         font-size: 0.65rem;
@@ -467,14 +557,17 @@
         text-transform: uppercase;
         letter-spacing: 0.03em;
     }
+
     .status-read {
         background: rgba(16, 185, 129, 0.12);
         color: #065F46;
     }
+
     .status-new {
         background: rgba(148, 163, 184, 0.12);
         color: #475569;
     }
+
     .note-card .body {
         color: var(--text);
         font-size: 0.9rem;
@@ -486,6 +579,7 @@
         -webkit-line-clamp: 3;
         -webkit-box-orient: vertical;
     }
+
     .note-card .actions {
         display: flex;
         gap: 6px;
@@ -494,6 +588,7 @@
         padding-top: 10px;
         border-top: 1px solid rgba(37, 99, 235, 0.04);
     }
+
     .note-card .actions .btn {
         font-size: 0.7rem;
         padding: 4px 12px;
@@ -508,17 +603,20 @@
         align-items: center;
         gap: 4px;
     }
+
     .note-card .actions .btn:hover {
         border-color: var(--blue);
         color: var(--blue);
         background: rgba(37, 99, 235, 0.04);
         transform: translateY(-1px);
     }
+
     .note-card .actions .btn-success {
         background: #10B981;
         border-color: #10B981;
         color: white;
     }
+
     .note-card .actions .btn-success:hover {
         background: #059669;
         border-color: #059669;
@@ -543,11 +641,13 @@
         transform: translateY(-4px);
         transition: opacity 0.2s ease, transform 0.2s ease;
     }
+
     .custom-dropdown-menu.show {
         display: block;
         opacity: 1;
         transform: translateY(0);
     }
+
     .custom-dropdown-menu .dropdown-item {
         display: flex;
         align-items: center;
@@ -563,17 +663,20 @@
         font-weight: 500;
         gap: 6px;
     }
+
     .custom-dropdown-menu .dropdown-item i {
         width: 22px;
         margin-right: 8px;
         color: var(--blue);
         font-size: 1rem;
     }
+
     .custom-dropdown-menu .dropdown-item:hover {
         background: rgba(37, 99, 235, 0.08);
         color: var(--blue);
         border-radius: 6px;
     }
+
     .custom-dropdown-menu .dropdown-divider {
         margin: 4px 0;
         border-top: 1px solid rgba(15, 23, 42, 0.06);
@@ -587,12 +690,14 @@
         border-radius: var(--radius-sm);
         background: rgba(255, 255, 255, 0.4);
     }
+
     .empty-state i {
         font-size: 2.8rem;
         color: var(--blue);
         opacity: 0.3;
         margin-bottom: 12px;
     }
+
     .empty-state p {
         color: var(--text-light);
         font-size: 0.95rem;
@@ -608,9 +713,11 @@
         padding: 20px 30px !important;
         margin-bottom: 24px;
     }
+
     .welcome-banner .btn-close {
         filter: brightness(0) invert(1);
     }
+
     .welcome-banner .btn-start-tour {
         background: linear-gradient(90deg, #2563EB, #22D3EE);
         border: none;
@@ -620,16 +727,19 @@
         padding: 6px 18px;
         transition: var(--transition);
     }
+
     .welcome-banner .btn-start-tour:hover {
         transform: translateY(-2px);
         box-shadow: 0 8px 24px rgba(37, 99, 235, 0.3);
     }
+
     .welcome-banner .btn-outline-guide {
         color: #94A3B8;
         border-color: #475569;
         border-radius: 8px;
         padding: 6px 18px;
     }
+
     .welcome-banner .btn-outline-guide:hover {
         color: #F1F5F9;
         border-color: #64748B;
@@ -645,19 +755,23 @@
         box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5) !important;
         max-width: 400px !important;
     }
+
     .driver-popover-title {
         color: #F1F5F9 !important;
         font-weight: 700 !important;
         font-size: 1.1rem !important;
     }
+
     .driver-popover-description {
         color: #94A3B8 !important;
         font-size: 0.95rem !important;
         line-height: 1.6 !important;
     }
+
     .driver-popover-footer {
         margin-top: 16px !important;
     }
+
     .driver-popover-footer button {
         background: linear-gradient(90deg, #2563EB, #22D3EE) !important;
         border: none !important;
@@ -668,37 +782,45 @@
         font-size: 0.85rem !important;
         transition: all 0.2s ease !important;
     }
+
     .driver-popover-footer button:hover {
         transform: scale(1.02);
         box-shadow: 0 4px 16px rgba(37, 99, 235, 0.3);
     }
+
     .driver-popover-footer .driver-prev-btn {
         background: transparent !important;
         color: #94A3B8 !important;
         border: 1px solid #475569 !important;
     }
+
     .driver-popover-footer .driver-prev-btn:hover {
         background: rgba(148, 163, 184, 0.1) !important;
         transform: scale(1.02);
     }
+
     .driver-popover-progress-text {
         color: #94A3B8 !important;
         font-size: 0.8rem !important;
     }
+
     .driver-overlay {
         background: rgba(0, 0, 0, 0.75) !important;
         backdrop-filter: blur(4px) !important;
     }
+
     .driver-highlighted-element {
         box-shadow: 0 0 0 4px rgba(34, 211, 238, 0.5) !important;
         border-radius: 12px !important;
         background: rgba(34, 211, 238, 0.05) !important;
     }
+
     .driver-close-btn {
         color: #94A3B8 !important;
         font-size: 1.2rem !important;
         transition: color 0.2s ease !important;
     }
+
     .driver-close-btn:hover {
         color: #F1F5F9 !important;
     }
@@ -710,9 +832,11 @@
             align-items: stretch;
             gap: 12px;
         }
+
         .dashboard-header .actions {
             justify-content: flex-start;
         }
+
         .note-grid {
             grid-template-columns: 1fr 1fr;
         }
@@ -722,39 +846,49 @@
         .glass-card {
             padding: 18px 16px;
         }
+
         .note-grid {
             grid-template-columns: 1fr;
         }
+
         .quiz-grid {
             grid-template-columns: 1fr 1fr;
         }
+
         .dashboard-header .brand .course-badge {
             font-size: 1.3rem;
             padding: 4px 18px;
         }
+
         .dashboard-header .brand .subtitle {
             font-size: 0.85rem;
         }
+
         .btn .btn-text-mobile {
             display: none;
         }
+
         .certificate-block {
             flex-direction: column;
             align-items: stretch;
             text-align: center;
         }
+
         .progress-container {
             flex-direction: column;
             align-items: stretch;
             gap: 8px;
         }
+
         .welcome-banner {
             padding: 16px 18px !important;
         }
+
         .welcome-banner .d-flex {
             flex-direction: column;
             text-align: center;
         }
+
         .driver-popover {
             max-width: 90% !important;
             margin: 0 10px !important;
@@ -765,9 +899,11 @@
         .quiz-grid {
             grid-template-columns: 1fr;
         }
+
         .dashboard-header .brand .course-badge {
             font-size: 1.1rem;
         }
+
         .search-bar input {
             font-size: 0.85rem;
             padding: 8px 14px;
@@ -780,129 +916,164 @@
         border-color: rgba(37, 99, 235, 0.08);
         color: #E2E8F0;
     }
+
     body.dark-mode .glass-card .card-header {
         color: #E2E8F0;
         border-bottom-color: rgba(37, 99, 235, 0.08);
     }
+
     body.dark-mode .progress-track {
         background: #334155;
     }
+
     body.dark-mode .announcement-item {
         background: rgba(37, 99, 235, 0.06);
     }
+
     body.dark-mode .announcement-item:hover {
         background: rgba(37, 99, 235, 0.10);
     }
+
     body.dark-mode .announcement-item .title {
         color: #E2E8F0;
     }
+
     body.dark-mode .announcement-item .content {
         color: #CBD5E1;
     }
+
     body.dark-mode .certificate-block {
         background: rgba(16, 185, 129, 0.08);
         border-color: rgba(16, 185, 129, 0.15);
     }
+
     body.dark-mode .quiz-card {
         background: rgba(15, 23, 42, 0.4);
         border-color: rgba(37, 99, 235, 0.06);
     }
+
     body.dark-mode .quiz-card .title {
         color: #E2E8F0;
     }
+
     body.dark-mode .quiz-card .desc {
         color: #94A3B8;
     }
+
     body.dark-mode .search-bar {
         background: rgba(15, 23, 42, 0.6);
         border-color: #334155;
     }
+
     body.dark-mode .search-bar input {
         color: #E2E8F0;
     }
+
     body.dark-mode .search-bar input::placeholder {
         color: #64748B;
     }
+
     body.dark-mode .note-card {
         background: rgba(15, 23, 42, 0.5);
         border-color: rgba(37, 99, 235, 0.06);
     }
+
     body.dark-mode .note-card .top .left .title {
         color: #E2E8F0;
     }
+
     body.dark-mode .note-card .body {
         color: #CBD5E1;
     }
+
     body.dark-mode .note-card .actions .btn {
         border-color: #334155;
         color: #94A3B8;
     }
+
     body.dark-mode .note-card .actions .btn:hover {
         border-color: var(--blue);
         color: var(--cyan);
     }
+
     body.dark-mode .status-read {
         background: rgba(16, 185, 129, 0.15);
         color: #34D399;
     }
+
     body.dark-mode .status-new {
         background: rgba(148, 163, 184, 0.15);
         color: #94A3B8;
     }
+
     body.dark-mode .empty-state {
         border-color: rgba(37, 99, 235, 0.10);
         background: rgba(15, 23, 42, 0.3);
     }
+
     body.dark-mode .empty-state p {
         color: #94A3B8;
     }
+
     body.dark-mode .btn-outline-secondary {
         border-color: #334155;
         color: #94A3B8;
     }
+
     body.dark-mode .btn-outline-secondary:hover {
         border-color: var(--blue);
         color: var(--cyan);
         background: rgba(37, 99, 235, 0.08);
     }
+
     body.dark-mode .btn-outline-success {
         border-color: #059669;
         color: #10B981;
     }
+
     body.dark-mode .btn-outline-success:hover {
         background: #10B981;
         color: white;
     }
+
     body.dark-mode .btn-outline-info {
         border-color: #1D4ED8;
         color: #60A5FA;
     }
+
     body.dark-mode .btn-outline-info:hover {
         background: var(--blue);
         color: white;
     }
+
     body.dark-mode .badge-pill {
         background: linear-gradient(135deg, #B45309, #D97706);
         color: #FDE68A;
     }
+
     body.dark-mode .custom-dropdown-menu {
         background: #1E293B !important;
         border-color: rgba(37, 99, 235, 0.15);
         color: #E2E8F0;
     }
+
     body.dark-mode .custom-dropdown-menu .dropdown-item {
         color: #E2E8F0;
     }
+
     body.dark-mode .custom-dropdown-menu .dropdown-item:hover {
         background: rgba(37, 99, 235, 0.15);
         color: var(--cyan);
     }
+
     body.dark-mode .custom-dropdown-menu .dropdown-item i {
         color: var(--cyan);
     }
+
     body.dark-mode .custom-dropdown-menu .dropdown-divider {
         border-top-color: rgba(37, 99, 235, 0.10);
     }
+
     body.dark-mode .welcome-banner {
         background: rgba(34, 211, 238, 0.05) !important;
         border-color: rgba(34, 211, 238, 0.15) !important;
@@ -918,8 +1089,10 @@
         <div class="d-flex align-items-center gap-3 flex-wrap">
             <div style="font-size: 3rem;">🎉</div>
             <div style="flex: 1;">
-                <h5 style="color: #F1F5F9; font-weight: 700; margin: 0;">Welcome to Awwalu Devs, {{ session.full_name }}!</h5>
-                <p style="color: #94A3B8; margin: 4px 0 0;">Take a quick tour to learn about your dashboard. Click "Start Tour" to get started.</p>
+                <h5 style="color: #F1F5F9; font-weight: 700; margin: 0;">Welcome to Awwalu Devs, {{ session.full_name
+                    }}!</h5>
+                <p style="color: #94A3B8; margin: 4px 0 0;">Take a quick tour to learn about your dashboard. Click
+                    "Start Tour" to get started.</p>
                 <div class="mt-2 d-flex gap-2 flex-wrap">
                     <button class="btn btn-start-tour" onclick="startOnboardingTour()">
                         <i class="bi bi-play-circle"></i> Start Tour
@@ -1024,7 +1197,8 @@
                     <i class="bi bi-download"></i> Download Certificate
                 </a>
                 {% else %}
-                <span class="badge-pill" style="background: #F59E0B; color: #78350F;">⏳ Certificate pending approval</span>
+                <span class="badge-pill" style="background: #F59E0B; color: #78350F;">⏳ Certificate pending
+                    approval</span>
                 {% endif %}
             </div>
         </div>
@@ -1045,7 +1219,8 @@
                 {% if q.attempted %}
                 <span class="score-badge">Score: {{ q.score }}/{{ q.total_questions }}</span>
                 {% else %}
-                <a href="{{ url_for('take_quiz', quiz_id=q.id) }}" class="btn btn-primary btn-sm mt-2" style="align-self: flex-start;">Take Quiz</a>
+                <a href="{{ url_for('take_quiz', quiz_id=q.id) }}" class="btn btn-primary btn-sm mt-2"
+                    style="align-self: flex-start;">Take Quiz</a>
                 {% endif %}
             </div>
             {% endfor %}
@@ -1066,47 +1241,49 @@
     <form id="noteSelectionForm">
         <div class="note-grid">
             {% if notes %}
-                {% for note in notes %}
-                <div class="note-card animate-item">
-                    <div class="top">
-                        <div class="left">
-                            <input type="checkbox" class="note-checkbox" value="{{ note.id }}">
-                            <a href="{{ url_for('note_detail', note_id=note.id) }}" class="title">{{ note.title }}</a>
-                        </div>
-                        <span class="status {% if note.id in read_ids %}status-read{% else %}status-new{% endif %}">
-                            {% if note.id in read_ids %}✅ Read{% else %}📖 New{% endif %}
-                        </span>
+            {% for note in notes %}
+            <div class="note-card animate-item">
+                <div class="top">
+                    <div class="left">
+                        <input type="checkbox" class="note-checkbox" value="{{ note.id }}">
+                        <a href="{{ url_for('note_detail', note_id=note.id) }}" class="title">{{ note.title }}</a>
                     </div>
-                    <div class="body">
-                        {{ note.content|truncate(200, true)|safe }}
-                    </div>
-                    <div class="actions">
-                        {% if note.id not in read_ids %}
-                        <form method="POST" action="{{ url_for('mark_read', note_id=note.id) }}" class="d-inline">
-                            <button type="submit" class="btn btn-success"><i class="bi bi-check-circle"></i> Mark as Read</button>
-                        </form>
-                        {% else %}
-                        <span class="btn" style="border-color: #10B981; color: #10B981; cursor: default;">
-                            <i class="bi bi-check-circle-fill"></i> Completed
-                        </span>
-                        {% endif %}
-                        <a href="{{ url_for('note_detail', note_id=note.id) }}" class="btn">
-                            <i class="bi bi-chat"></i> Discuss
-                        </a>
-                    </div>
+                    <span class="status {% if note.id in read_ids %}status-read{% else %}status-new{% endif %}">
+                        {% if note.id in read_ids %}✅ Read{% else %}📖 New{% endif %}
+                    </span>
                 </div>
-                {% endfor %}
+                <div class="body">
+                    {{ note.content|truncate(200, true)|safe }}
+                </div>
+                <div class="actions">
+                    {% if note.id not in read_ids %}
+                    <form method="POST" action="{{ url_for('mark_read', note_id=note.id) }}" class="d-inline">
+                        <button type="submit" class="btn btn-success"><i class="bi bi-check-circle"></i> Mark as
+                            Read</button>
+                    </form>
+                    {% else %}
+                    <span class="btn" style="border-color: #10B981; color: #10B981; cursor: default;">
+                        <i class="bi bi-check-circle-fill"></i> Completed
+                    </span>
+                    {% endif %}
+                    <a href="{{ url_for('note_detail', note_id=note.id) }}" class="btn">
+                        <i class="bi bi-chat"></i> Discuss
+                    </a>
+                </div>
+            </div>
+            {% endfor %}
             {% else %}
-                <div class="empty-state" style="grid-column: 1 / -1;">
-                    <i class="bi bi-info-circle"></i>
-                    <p>No lessons found.</p>
-                </div>
+            <div class="empty-state" style="grid-column: 1 / -1;">
+                <i class="bi bi-info-circle"></i>
+                <p>No lessons found.</p>
+            </div>
             {% endif %}
         </div>
     </form>
 
     <!-- ========== DOWNLOAD SELECTED ========== -->
-    <form method="POST" action="{{ url_for('download_selected_notes_pdf') }}" id="downloadSelectedForm" style="display:inline;">
+    <form method="POST" action="{{ url_for('download_selected_notes_pdf') }}" id="downloadSelectedForm"
+        style="display:inline;">
         <div id="selectedNotesInputs"></div>
         <button type="button" class="btn btn-outline-info mt-3 animate-card" onclick="downloadSelected()">
             <i class="bi bi-file-earmark-pdf"></i> Download Selected
@@ -1116,13 +1293,13 @@
 </div>
 
 <!-- ========== DRIVER.JS CDN ========== -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/driver.js@1.0.1/dist/driver.css"/>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/driver.js@1.0.1/dist/driver.css" />
 <script src="https://cdn.jsdelivr.net/npm/driver.js@1.0.1/dist/driver.js"></script>
 
 <!-- ========== SCRIPTS ========== -->
 <script>
     // ---------- ONBOARDING TOUR ----------
-    var isNewUser = {{ is_new_user|tojson }};
+    var isNewUser = {{ is_new_user| tojson }};
     var hasSeenTour = localStorage.getItem('tour_seen') === 'true';
 
     // Expose function globally for the welcome banner button
@@ -1135,7 +1312,7 @@
             nextBtnText: 'Next →',
             prevBtnText: '← Back',
             doneBtnText: '🚀 Let\'s Go!',
-            onDestroyStarted: function() {
+            onDestroyStarted: function () {
                 localStorage.setItem('tour_seen', 'true');
             }
         });
@@ -1321,29 +1498,28 @@
     }
 
     // Auto-start tour for new users
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', function () {
         if (isNewUser && !hasSeenTour) {
             // Wait a moment for page to fully render
-            setTimeout(function() {
+            setTimeout(function () {
                 startOnboardingTour();
             }, 1200);
         }
     });
 
     // ---------- CUSTOM DROPDOWN (FIXED) ----------
-    (function() {
+    (function () {
         var menu = document.createElement('div');
         menu.className = 'custom-dropdown-menu';
         menu.id = 'customDropdownMenu';
         menu.innerHTML = `
-            <a class="dropdown-item" href="{{ url_for('download_notes_pdf') }}"><i class="bi bi-file-earmark-pdf"></i> Download notes</a>
-            <a class="dropdown-item" href="{{ url_for('assignment_history') }}"><i class="bi bi-archive"></i> My portfolio</a>
-            <a class="dropdown-item" href="{{ url_for('schedule') }}"><i class="bi bi-calendar"></i> Schedule</a>
-            <div class="dropdown-divider"></div>
-            <a class="dropdown-item" href="{{ url_for('public_profile', username=session.username) }}"><i class="bi bi-person-badge"></i> My public profile</a>
-            <a class="dropdown-item" href="{{ url_for('profile') }}"><i class="bi bi-person"></i> Profile settings</a>
-            <a class="dropdown-item" href="{{ url_for('getting_started') }}"><i class="bi bi-book"></i> Getting Started Guide</a>
-        `;
+    <a class="dropdown-item" href="{{ url_for('download_notes_pdf') }}"><i class="bi bi-file-earmark-pdf"></i> Download notes</a>
+    <a class="dropdown-item" href="{{ url_for('assignment_history') }}"><i class="bi bi-archive"></i> My portfolio</a>
+    <a class="dropdown-item" href="{{ url_for('schedule') }}"><i class="bi bi-calendar"></i> Schedule</a>
+    <div class="dropdown-divider"></div>
+    <a class="dropdown-item" href="{{ url_for('public_profile', username=session.username) }}"><i class="bi bi-person-badge"></i> My public profile</a>
+    <a class="dropdown-item" href="{{ url_for('profile') }}"><i class="bi bi-person"></i> Profile settings</a>
+`;
         document.body.appendChild(menu);
 
         var toggleBtn = document.getElementById('customDropdownBtn');
@@ -1382,7 +1558,7 @@
 
         toggleBtn.addEventListener('click', toggleDropdown);
 
-        document.addEventListener('click', function(e) {
+        document.addEventListener('click', function (e) {
             if (!e.target.closest('#customDropdownContainer') && !e.target.closest('#customDropdownMenu')) {
                 if (isOpen) {
                     menu.classList.remove('show');
@@ -1392,7 +1568,7 @@
             }
         });
 
-        document.addEventListener('keydown', function(e) {
+        document.addEventListener('keydown', function (e) {
             if (e.key === 'Escape' && isOpen) {
                 menu.classList.remove('show');
                 toggleBtn.setAttribute('aria-expanded', 'false');
@@ -1405,7 +1581,7 @@
         }
         window.addEventListener('scroll', repositionIfOpen);
         window.addEventListener('resize', repositionIfOpen);
-        window.addEventListener('orientationchange', function() {
+        window.addEventListener('orientationchange', function () {
             if (isOpen) setTimeout(positionMenu, 300);
         });
     })();
@@ -1420,7 +1596,7 @@
         var form = document.getElementById('downloadSelectedForm');
         var container = document.getElementById('selectedNotesInputs');
         container.innerHTML = '';
-        checkboxes.forEach(function(cb) {
+        checkboxes.forEach(function (cb) {
             var input = document.createElement('input');
             input.type = 'hidden';
             input.name = 'selected_notes';
@@ -1431,12 +1607,12 @@
     }
 
     // ---------- Animate progress bar ----------
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', function () {
         var fill = document.querySelector('.progress-fill');
         if (fill) {
             var width = fill.style.width;
             fill.style.width = '0%';
-            setTimeout(function() {
+            setTimeout(function () {
                 fill.style.width = width;
             }, 200);
         }

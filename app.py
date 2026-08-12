@@ -2884,6 +2884,12 @@ def edit_profile():
     
     return render_template('edit_profile.html', user=user)
 
+@app.route('/getting-started')
+@login_required
+def getting_started():
+    """Getting started guide for new users."""
+    return render_template('getting_started.html')
+
 # ========================
 # LOGOUT
 # ========================

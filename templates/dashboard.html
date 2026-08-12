@@ -599,6 +599,110 @@
         margin: 0;
     }
 
+    /* ---------- ONBOARDING WELCOME BANNER ---------- */
+    .welcome-banner {
+        background: rgba(34, 211, 238, 0.08) !important;
+        border: 1px solid rgba(34, 211, 238, 0.2) !important;
+        border-radius: 16px !important;
+        color: #F1F5F9 !important;
+        padding: 20px 30px !important;
+        margin-bottom: 24px;
+    }
+    .welcome-banner .btn-close {
+        filter: brightness(0) invert(1);
+    }
+    .welcome-banner .btn-start-tour {
+        background: linear-gradient(90deg, #2563EB, #22D3EE);
+        border: none;
+        border-radius: 8px;
+        color: #0B1220;
+        font-weight: 600;
+        padding: 6px 18px;
+        transition: var(--transition);
+    }
+    .welcome-banner .btn-start-tour:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 24px rgba(37, 99, 235, 0.3);
+    }
+    .welcome-banner .btn-outline-guide {
+        color: #94A3B8;
+        border-color: #475569;
+        border-radius: 8px;
+        padding: 6px 18px;
+    }
+    .welcome-banner .btn-outline-guide:hover {
+        color: #F1F5F9;
+        border-color: #64748B;
+        background: rgba(148, 163, 184, 0.1);
+    }
+
+    /* ---------- DRIVER.JS CUSTOM STYLES ---------- */
+    .driver-popover {
+        background: #0F172A !important;
+        border: 1px solid rgba(34, 211, 238, 0.2) !important;
+        border-radius: 16px !important;
+        color: #F1F5F9 !important;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5) !important;
+        max-width: 400px !important;
+    }
+    .driver-popover-title {
+        color: #F1F5F9 !important;
+        font-weight: 700 !important;
+        font-size: 1.1rem !important;
+    }
+    .driver-popover-description {
+        color: #94A3B8 !important;
+        font-size: 0.95rem !important;
+        line-height: 1.6 !important;
+    }
+    .driver-popover-footer {
+        margin-top: 16px !important;
+    }
+    .driver-popover-footer button {
+        background: linear-gradient(90deg, #2563EB, #22D3EE) !important;
+        border: none !important;
+        border-radius: 8px !important;
+        padding: 8px 20px !important;
+        color: #0B1220 !important;
+        font-weight: 600 !important;
+        font-size: 0.85rem !important;
+        transition: all 0.2s ease !important;
+    }
+    .driver-popover-footer button:hover {
+        transform: scale(1.02);
+        box-shadow: 0 4px 16px rgba(37, 99, 235, 0.3);
+    }
+    .driver-popover-footer .driver-prev-btn {
+        background: transparent !important;
+        color: #94A3B8 !important;
+        border: 1px solid #475569 !important;
+    }
+    .driver-popover-footer .driver-prev-btn:hover {
+        background: rgba(148, 163, 184, 0.1) !important;
+        transform: scale(1.02);
+    }
+    .driver-popover-progress-text {
+        color: #94A3B8 !important;
+        font-size: 0.8rem !important;
+    }
+    .driver-overlay {
+        background: rgba(0, 0, 0, 0.75) !important;
+        backdrop-filter: blur(4px) !important;
+    }
+    .driver-highlighted-element {
+        box-shadow: 0 0 0 4px rgba(34, 211, 238, 0.5) !important;
+        border-radius: 12px !important;
+        background: rgba(34, 211, 238, 0.05) !important;
+    }
+    .driver-close-btn {
+        color: #94A3B8 !important;
+        font-size: 1.2rem !important;
+        transition: color 0.2s ease !important;
+    }
+    .driver-close-btn:hover {
+        color: #F1F5F9 !important;
+    }
+
     /* ---------- RESPONSIVE ---------- */
     @media (max-width: 992px) {
         .dashboard-header {
@@ -643,6 +747,17 @@
             flex-direction: column;
             align-items: stretch;
             gap: 8px;
+        }
+        .welcome-banner {
+            padding: 16px 18px !important;
+        }
+        .welcome-banner .d-flex {
+            flex-direction: column;
+            text-align: center;
+        }
+        .driver-popover {
+            max-width: 90% !important;
+            margin: 0 10px !important;
         }
     }
 
@@ -788,9 +903,35 @@
     body.dark-mode .custom-dropdown-menu .dropdown-divider {
         border-top-color: rgba(37, 99, 235, 0.10);
     }
+    body.dark-mode .welcome-banner {
+        background: rgba(34, 211, 238, 0.05) !important;
+        border-color: rgba(34, 211, 238, 0.15) !important;
+    }
 </style>
 
 <div class="dashboard-wrapper">
+
+    <!-- ========== WELCOME BANNER FOR NEW USERS ========== -->
+    {% if is_new_user %}
+    <div class="welcome-banner alert alert-dismissible fade show animate-card">
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert"></button>
+        <div class="d-flex align-items-center gap-3 flex-wrap">
+            <div style="font-size: 3rem;">🎉</div>
+            <div style="flex: 1;">
+                <h5 style="color: #F1F5F9; font-weight: 700; margin: 0;">Welcome to Awwalu Devs, {{ session.full_name }}!</h5>
+                <p style="color: #94A3B8; margin: 4px 0 0;">Take a quick tour to learn about your dashboard. Click "Start Tour" to get started.</p>
+                <div class="mt-2 d-flex gap-2 flex-wrap">
+                    <button class="btn btn-start-tour" onclick="startOnboardingTour()">
+                        <i class="bi bi-play-circle"></i> Start Tour
+                    </button>
+                    <a href="{{ url_for('getting_started') }}" class="btn btn-outline-guide">
+                        <i class="bi bi-book"></i> Getting Started Guide
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
 
     <!-- ========== HEADER ========== -->
     <div class="dashboard-header animate-card">
@@ -845,7 +986,7 @@
         <div class="announcement-item">
             <div class="title">
                 {{ a.title }}
-                <span class="date">{{ a.created_at.strftime('%Y-%m-%d') }}</span>
+                <span class="date">{{ a.created_at.strftime('%Y-%m-%d') if a.created_at else '' }}</span>
             </div>
             <div class="content">{{ a.content }}</div>
         </div>
@@ -974,8 +1115,221 @@
 
 </div>
 
+<!-- ========== DRIVER.JS CDN ========== -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/driver.js@1.0.1/dist/driver.css"/>
+<script src="https://cdn.jsdelivr.net/npm/driver.js@1.0.1/dist/driver.js"></script>
+
 <!-- ========== SCRIPTS ========== -->
 <script>
+    // ---------- ONBOARDING TOUR ----------
+    var isNewUser = {{ is_new_user|tojson }};
+    var hasSeenTour = localStorage.getItem('tour_seen') === 'true';
+
+    // Expose function globally for the welcome banner button
+    window.startOnboardingTour = startOnboardingTour;
+
+    function startOnboardingTour() {
+        const driver = window.driver.js.driver({
+            showProgress: true,
+            progressText: 'Step {{current}} of {{total}}',
+            nextBtnText: 'Next →',
+            prevBtnText: '← Back',
+            doneBtnText: '🚀 Let\'s Go!',
+            onDestroyStarted: function() {
+                localStorage.setItem('tour_seen', 'true');
+            }
+        });
+
+        const steps = [];
+
+        // Step 1: Welcome
+        steps.push({
+            popover: {
+                title: '🎉 Welcome to Awwalu Devs!',
+                description: 'Let\'s take a quick tour of your learning dashboard. You\'ll learn about each feature and how to use them.',
+                side: 'center',
+                align: 'center'
+            }
+        });
+
+        // Step 2: Course Header
+        const courseHeader = document.querySelector('.dashboard-header .brand');
+        if (courseHeader) {
+            steps.push({
+                element: courseHeader,
+                popover: {
+                    title: '📚 Your Course',
+                    description: 'This is your current course. All your learning materials, notes, and quizzes are organized here.',
+                    side: 'bottom',
+                    align: 'start'
+                }
+            });
+        }
+
+        // Step 3: Progress Section
+        const progressSection = document.querySelector('.progress-container');
+        if (progressSection) {
+            steps.push({
+                element: progressSection,
+                popover: {
+                    title: '📊 Your Progress',
+                    description: 'This shows how much of the course you\'ve completed. The more notes you read, the higher your progress!',
+                    side: 'bottom',
+                    align: 'start'
+                }
+            });
+        }
+
+        // Step 4: Notes Section
+        const notesSection = document.querySelector('.note-grid');
+        if (notesSection) {
+            steps.push({
+                element: notesSection,
+                popover: {
+                    title: '📖 Course Notes',
+                    description: 'These are your learning materials. Click on any note to read it. Mark notes as "Read" to track your progress.',
+                    side: 'bottom',
+                    align: 'start'
+                }
+            });
+        }
+
+        // Step 5: Individual Note (first note)
+        const firstNote = document.querySelector('.note-card');
+        if (firstNote) {
+            steps.push({
+                element: firstNote,
+                popover: {
+                    title: '📄 Note Card',
+                    description: 'Each note has a title and status. Click "Mark as Read" when you finish reading. You can also download notes as PDF.',
+                    side: 'bottom',
+                    align: 'start'
+                }
+            });
+        }
+
+        // Step 6: Announcements
+        const announcements = document.querySelector('.glass-card .card-header .bi-megaphone-fill')?.closest('.glass-card');
+        if (announcements) {
+            steps.push({
+                element: announcements,
+                popover: {
+                    title: '📢 Announcements',
+                    description: 'Your instructor posts important updates here. Check this regularly for news and reminders.',
+                    side: 'bottom',
+                    align: 'start'
+                }
+            });
+        }
+
+        // Step 7: Quizzes
+        const quizzes = document.querySelector('.glass-card .card-header .bi-question-circle')?.closest('.glass-card');
+        if (quizzes) {
+            steps.push({
+                element: quizzes,
+                popover: {
+                    title: '📝 Quizzes',
+                    description: 'Test your knowledge with quizzes. Each quiz tracks your score. Try to get 100%!',
+                    side: 'bottom',
+                    align: 'start'
+                }
+            });
+        }
+
+        // Step 8: Badges
+        const badges = document.querySelector('.glass-card .card-header .bi-award')?.closest('.glass-card');
+        if (badges) {
+            steps.push({
+                element: badges,
+                popover: {
+                    title: '🏅 Badges & Achievements',
+                    description: 'Earn badges as you complete courses and quizzes. Collect them all!',
+                    side: 'bottom',
+                    align: 'start'
+                }
+            });
+        }
+
+        // Step 9: Certificate (if exists)
+        const certificate = document.querySelector('.certificate-block');
+        if (certificate) {
+            steps.push({
+                element: certificate,
+                popover: {
+                    title: '🎓 Certificate',
+                    description: 'When you complete all notes, you\'ll earn a certificate! Download it and share it.',
+                    side: 'bottom',
+                    align: 'start'
+                }
+            });
+        }
+
+        // Step 10: Search Bar
+        const searchBar = document.querySelector('.search-bar');
+        if (searchBar) {
+            steps.push({
+                element: searchBar,
+                popover: {
+                    title: '🔍 Search Notes',
+                    description: 'Search through your course notes to find specific topics quickly.',
+                    side: 'bottom',
+                    align: 'start'
+                }
+            });
+        }
+
+        // Step 11: Download Selected
+        const downloadBtn = document.querySelector('.btn-outline-info');
+        if (downloadBtn) {
+            steps.push({
+                element: downloadBtn,
+                popover: {
+                    title: '📥 Download Notes',
+                    description: 'Select multiple notes using the checkboxes, then click this button to download them as a PDF.',
+                    side: 'top',
+                    align: 'start'
+                }
+            });
+        }
+
+        // Step 12: Navigation (More dropdown)
+        const moreBtn = document.getElementById('customDropdownBtn');
+        if (moreBtn) {
+            steps.push({
+                element: moreBtn,
+                popover: {
+                    title: '🧭 More Options',
+                    description: 'Access additional features like your portfolio, schedule, and profile settings from this menu.',
+                    side: 'bottom',
+                    align: 'start'
+                }
+            });
+        }
+
+        // Step 13: Finish
+        steps.push({
+            popover: {
+                title: '🎯 You\'re All Set!',
+                description: 'You\'re ready to start learning! If you ever need help, check the Getting Started guide from the More menu.',
+                side: 'center',
+                align: 'center'
+            }
+        });
+
+        driver.defineSteps(steps);
+        driver.drive();
+    }
+
+    // Auto-start tour for new users
+    document.addEventListener('DOMContentLoaded', function() {
+        if (isNewUser && !hasSeenTour) {
+            // Wait a moment for page to fully render
+            setTimeout(function() {
+                startOnboardingTour();
+            }, 1200);
+        }
+    });
+
     // ---------- CUSTOM DROPDOWN (FIXED) ----------
     (function() {
         var menu = document.createElement('div');
@@ -988,6 +1342,7 @@
             <div class="dropdown-divider"></div>
             <a class="dropdown-item" href="{{ url_for('public_profile', username=session.username) }}"><i class="bi bi-person-badge"></i> My public profile</a>
             <a class="dropdown-item" href="{{ url_for('profile') }}"><i class="bi bi-person"></i> Profile settings</a>
+            <a class="dropdown-item" href="{{ url_for('getting_started') }}"><i class="bi bi-book"></i> Getting Started Guide</a>
         `;
         document.body.appendChild(menu);
 
@@ -1000,15 +1355,12 @@
             var isMobile = window.innerWidth <= 768;
             var padding = 12;
 
-            // Position below the button
             menu.style.top = (rect.bottom + window.scrollY + 6) + 'px';
 
             if (isMobile) {
-                // Mobile: align to right edge of viewport
                 menu.style.left = (window.innerWidth - menuWidth - padding + window.scrollX) + 'px';
                 menu.style.minWidth = '200px';
             } else {
-                // Desktop: align to right edge of button
                 menu.style.left = (rect.right - menuWidth + window.scrollX) + 'px';
                 menu.style.minWidth = '210px';
             }
@@ -1030,7 +1382,6 @@
 
         toggleBtn.addEventListener('click', toggleDropdown);
 
-        // Close when clicking outside
         document.addEventListener('click', function(e) {
             if (!e.target.closest('#customDropdownContainer') && !e.target.closest('#customDropdownMenu')) {
                 if (isOpen) {
@@ -1041,7 +1392,6 @@
             }
         });
 
-        // Close on Escape
         document.addEventListener('keydown', function(e) {
             if (e.key === 'Escape' && isOpen) {
                 menu.classList.remove('show');
@@ -1050,7 +1400,6 @@
             }
         });
 
-        // Reposition on scroll/resize/orientation change only if open
         function repositionIfOpen() {
             if (isOpen) positionMenu();
         }

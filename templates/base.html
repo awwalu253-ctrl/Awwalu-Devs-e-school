@@ -8,6 +8,8 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
+    <!-- Driver.js CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/driver.js@1.0.1/dist/driver.css" />
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
@@ -1523,14 +1525,14 @@
         }
 
         // Close sidebar on resize to desktop
-        window.addEventListener('resize', function() {
+        window.addEventListener('resize', function () {
             if (window.innerWidth > 991) {
                 closeSidebar();
             }
         });
 
         // ---------- DARK MODE TOGGLE (persistent) ----------
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             var toggle = document.getElementById('darkModeToggle');
             if (toggle) {
                 // Restore state
@@ -1539,7 +1541,7 @@
                     toggle.innerHTML = '<i class="bi bi-sun-fill"></i><span>Light</span>';
                 }
 
-                toggle.addEventListener('click', function() {
+                toggle.addEventListener('click', function () {
                     document.body.classList.toggle('dark-mode');
                     if (document.body.classList.contains('dark-mode')) {
                         localStorage.setItem('darkMode', 'enabled');
@@ -1552,8 +1554,8 @@
             }
 
             // Auto-close flash messages after 5s
-            document.querySelectorAll('.flash-container .alert').forEach(function(el) {
-                setTimeout(function() {
+            document.querySelectorAll('.flash-container .alert').forEach(function (el) {
+                setTimeout(function () {
                     var bsAlert = new bootstrap.Alert(el);
                     bsAlert.close();
                 }, 5000);
@@ -1564,8 +1566,8 @@
             var logoutModalElement = document.getElementById('logoutModal');
             if (logoutModalElement) {
                 var logoutModal = new bootstrap.Modal(logoutModalElement);
-                logoutLinks.forEach(function(link) {
-                    link.addEventListener('click', function(e) {
+                logoutLinks.forEach(function (link) {
+                    link.addEventListener('click', function (e) {
                         e.preventDefault();
                         logoutModal.show();
                     });
@@ -1573,6 +1575,8 @@
             }
         });
     </script>
+    <!-- Driver.js JS -->
+    <script src="https://cdn.jsdelivr.net/npm/driver.js@1.0.1/dist/driver.js"></script>
 </body>
 
 </html>

@@ -590,7 +590,8 @@ def register():
         send_welcome_email(user)
 
         flash(f'Welcome to Awwalu Devs, {full_name}!', 'success')
-        return redirect(url_for('dashboard'))
+        # Redirect to dashboard with new_user flag for onboarding tour
+        return redirect(url_for('dashboard', new_user='true'))
 
     courses = execute_query("SELECT * FROM courses", fetch_all=True)
     return render_template('register.html', courses=courses)
@@ -726,11 +727,13 @@ def dashboard():
     course_id = session.get('course_id')
     if not course_id:
         return redirect(url_for('select_course'))
+    
     course = execute_query("SELECT * FROM courses WHERE id = :id", {"id": course_id}, fetch_one=True)
     all_tags = execute_query("SELECT * FROM tags ORDER BY name", fetch_all=True)
     tag_filter = request.args.get('tag')
     search_query = request.args.get('q', '').strip()
     
+    # Get notes with database-specific date function
     if tag_filter:
         notes = execute_query(f"""
             SELECT n.* FROM notes n
@@ -750,22 +753,27 @@ def dashboard():
     read_notes = execute_query("SELECT note_id FROM read_notes WHERE user_id = :uid",
                                {"uid": session['user_id']}, fetch_all=True)
     read_ids = [r['note_id'] for r in read_notes] if read_notes else []
+    
     if search_query:
         notes = [n for n in notes if search_query.lower() in n['title'].lower() or search_query.lower() in n['content'].lower()]
+    
     total = len(notes)
     read_count = sum(1 for n in notes if n['id'] in read_ids)
     progress = int((read_count / total) * 100) if total > 0 else 0
+    
     announcements = execute_query("""
         SELECT * FROM announcements
         WHERE course_id IS NULL OR course_id = :cid
         ORDER BY created_at DESC
     """, {"cid": course_id}, fetch_all=True)
+    
     certificate = None
     certificate_pending = False
     if total > 0 and read_count == total:
         certificate = execute_query("SELECT * FROM certificates WHERE student_id = :uid AND course_id = :cid",
                                     {"uid": session['user_id'], "cid": course_id}, fetch_one=True)
         certificate_pending = certificate is None
+    
     quizzes = execute_query("SELECT * FROM quizzes WHERE course_id = :cid ORDER BY created_at DESC",
                             {"cid": course_id}, fetch_all=True)
     for q in quizzes:
@@ -775,13 +783,29 @@ def dashboard():
         if attempt:
             q['score'] = attempt['score']
             q['total_questions'] = attempt['total_questions']
+    
     badges = execute_query("SELECT * FROM badges WHERE user_id = :uid", {"uid": session['user_id']}, fetch_all=True)
-    return render_template('dashboard.html', course=course, notes=notes, read_ids=read_ids,
-                           progress=progress, total=total, read_count=read_count,
-                           announcements=announcements, certificate=certificate,
-                           certificate_pending=certificate_pending, quizzes=quizzes,
-                           search_query=search_query, badges=badges,
-                           all_tags=all_tags, tag_filter=tag_filter)
+    
+    # Check if user is new (just registered)
+    is_new_user = request.args.get('new_user', 'false') == 'true'
+    
+    return render_template('dashboard.html', 
+                           course=course, 
+                           notes=notes, 
+                           read_ids=read_ids,
+                           progress=progress, 
+                           total=total, 
+                           read_count=read_count,
+                           announcements=announcements, 
+                           certificate=certificate,
+                           certificate_pending=certificate_pending, 
+                           quizzes=quizzes,
+                           search_query=search_query, 
+                           badges=badges,
+                           all_tags=all_tags, 
+                           tag_filter=tag_filter,
+                           is_new_user=is_new_user)  # ← Pass to template
+
 
 @app.route('/mark_read/<int:note_id>', methods=['POST'])
 @login_required

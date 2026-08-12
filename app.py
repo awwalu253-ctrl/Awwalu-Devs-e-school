@@ -11,6 +11,7 @@ import csv
 import markdown2
 import threading
 import socket
+import requests
 from io import StringIO
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
@@ -35,6 +36,7 @@ load_dotenv()
 print("MAIL_USERNAME =", os.getenv('MAIL_USERNAME'))
 print("MAIL_PASSWORD =", os.getenv('MAIL_PASSWORD'))
 print("MAIL_SERVER =", os.getenv('MAIL_SERVER'))
+print("RESEND_API_KEY =", os.getenv('RESEND_API_KEY', 'Not Set'))
 
 app = Flask(__name__)
 app.secret_key = os.getenv('SECRET_KEY', 'awwalu-devs-super-secret-key-change-in-production')
@@ -59,73 +61,56 @@ def allowed_file(filename):
 
 # --- Email Config ---
 MAIL_SERVER = os.getenv('MAIL_SERVER', 'smtp.gmail.com')
-MAIL_PORT = int(os.getenv('MAIL_PORT', 465))  # SSL port
+MAIL_PORT = int(os.getenv('MAIL_PORT', 465))
 MAIL_USERNAME = os.getenv('MAIL_USERNAME', '')
 MAIL_PASSWORD = os.getenv('MAIL_PASSWORD', '')
 MAIL_DEFAULT_SENDER = os.getenv('MAIL_DEFAULT_SENDER', 'noreply@awwaludevs.com')
 APP_BASE_URL = os.getenv('APP_BASE_URL', 'http://localhost:5000')
 
-def send_email(to_email, subject, body):
-    """Send email with multiple fallback methods."""
-    mail_server = os.getenv('MAIL_SERVER', 'smtp.gmail.com')
-    mail_port = int(os.getenv('MAIL_PORT', 465))
-    mail_username = os.getenv('MAIL_USERNAME', '')
-    mail_password = os.getenv('MAIL_PASSWORD', '')
-    mail_default_sender = os.getenv('MAIL_DEFAULT_SENDER', 'noreply@awwaludevs.com')
+# Resend API Key
+RESEND_API_KEY = os.getenv('RESEND_API_KEY', '')
+RESEND_FROM = os.getenv('RESEND_FROM', 'onboarding@resend.dev')
 
-    if not mail_username or not mail_password:
-        print("⚠️ Email credentials not set.")
-        return False
+def send_email(to_email, subject, body):
+    """Send email using Resend API."""
+    if not RESEND_API_KEY:
+        print("⚠️ RESEND_API_KEY not set. Logging email instead.")
+        print(f"📧 To: {to_email}")
+        print(f"📧 Subject: {subject}")
+        print(f"📧 Body: {body[:100]}...")
+        return True
     
     if not to_email or '@' not in str(to_email):
         print(f"⚠️ Invalid email: {to_email}")
         return False
     
-    # Try multiple methods
-    methods = [
-        ('SSL', smtplib.SMTP_SSL, 465),
-        ('TLS', smtplib.SMTP, 587),
-    ]
+    url = "https://api.resend.com/emails"
+    headers = {
+        "Authorization": f"Bearer {RESEND_API_KEY}",
+        "Content-Type": "application/json"
+    }
+    data = {
+        "from": RESEND_FROM,
+        "to": [to_email],
+        "subject": subject,
+        "text": body
+    }
     
-    for method_name, smtp_class, port in methods:
-        try:
-            print(f"📧 Attempting {method_name} connection to {mail_server}:{port}")
-            timeout = 20
-            
-            if method_name == 'SSL':
-                server = smtp_class(mail_server, port, timeout=timeout)
-            else:
-                server = smtp_class(mail_server, port, timeout=timeout)
-                server.starttls()
-            
-            server.login(mail_username, mail_password)
-            
-            msg = MIMEMultipart()
-            msg['From'] = mail_default_sender
-            msg['To'] = to_email
-            msg['Subject'] = subject
-            msg.attach(MIMEText(body, 'plain'))
-            
-            server.send_message(msg)
-            server.quit()
-            print(f"✅ Email sent to {to_email} via {method_name}")
+    try:
+        response = requests.post(url, json=data, headers=headers, timeout=10)
+        if response.status_code == 200:
+            print(f"✅ Email sent to {to_email}")
             return True
-            
-        except socket.timeout:
-            print(f"⚠️ Timeout with {method_name} to {to_email}")
-            continue
-        except smtplib.SMTPAuthenticationError:
-            print(f"❌ Auth error with {method_name} - check Gmail app password")
-            continue
-        except smtplib.SMTPServerDisconnected:
-            print(f"⚠️ Server disconnected with {method_name}")
-            continue
-        except Exception as e:
-            print(f"❌ {method_name} error: {str(e)[:100]}")
-            continue
-    
-    print(f"❌ All email methods failed for {to_email}")
-    return False
+        else:
+            print(f"❌ Resend error: {response.status_code}")
+            print(f"Response: {response.text}")
+            return False
+    except requests.exceptions.Timeout:
+        print(f"⚠️ Resend timeout for {to_email}")
+        return False
+    except Exception as e:
+        print(f"❌ Resend exception: {e}")
+        return False
 
 def send_email_async(to_email, subject, body):
     """Send email in background thread to avoid blocking."""
@@ -215,7 +200,6 @@ def get_last_insert_id():
             return result['id'] if result else None
     except Exception as e:
         print(f"⚠️ Error getting last insert ID: {e}")
-        # Try an alternative method for PostgreSQL
         if 'postgres' in DATABASE_URL:
             try:
                 result = execute_query("SELECT currval(pg_get_serial_sequence('users', 'id')) as id", fetch_one=True)
@@ -234,13 +218,11 @@ def insert_and_get_id(table, columns, values, returning_col='id'):
     columns_str = ', '.join(columns)
     
     if 'sqlite' in DATABASE_URL:
-        # SQLite: insert and then get last_insert_rowid
         query = f"INSERT INTO {table} ({columns_str}) VALUES ({placeholders})"
         execute_query(query, values, commit=True)
         result = execute_query("SELECT last_insert_rowid() as id", fetch_one=True)
         return result['id'] if result else None
     else:
-        # PostgreSQL: use RETURNING
         query = f"INSERT INTO {table} ({columns_str}) VALUES ({placeholders}) RETURNING {returning_col}"
         try:
             result = conn.execute(text(query), values)
@@ -263,12 +245,10 @@ def init_db_if_needed():
         from sqlalchemy import text
         conn = get_db()
         
-        # Check if users table exists - works for both SQLite and PostgreSQL
         if 'sqlite' in DATABASE_URL:
             result = conn.execute(text("SELECT name FROM sqlite_master WHERE type='table' AND name='users'"))
             table_exists = result.fetchone() is not None
         else:
-            # PostgreSQL: use information_schema
             result = conn.execute(text("SELECT EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name = 'users')"))
             table_exists = result.fetchone()[0]
         
@@ -281,7 +261,6 @@ def init_db_if_needed():
             print("✅ Database already exists.")
     except Exception as e:
         print(f"⚠️ Database check failed: {e}")
-        # Try to initialize anyway
         try:
             import init_db
             init_db.init_db()
@@ -289,13 +268,13 @@ def init_db_if_needed():
         except Exception as init_error:
             print(f"❌ Failed to create database: {init_error}")
 
-# Run initialization (after database setup)
+# Run initialization
 with app.app_context():
     init_db_if_needed()
 
 @app.route('/init_db')
 def init_db_route():
-    """Manual database initialization (for Render deployment)."""
+    """Manual database initialization."""
     try:
         import init_db
         init_db.init_db()
@@ -305,7 +284,7 @@ def init_db_route():
 
 @app.route('/test_email')
 def test_email():
-    """Test email sending (no login required for testing)."""
+    """Test email sending."""
     try:
         success = send_email("awwalu253@gmail.com", "Test Email from Awwalu Devs", "This is a test email.")
         if success:
@@ -532,7 +511,6 @@ def register():
 
         hashed = generate_password_hash(password)
 
-        # Insert user and get ID
         user_id = insert_and_get_id(
             'users',
             ['username', 'password', 'full_name', 'email', 'course_id', 'phone', 'dob', 'bio'],
@@ -554,7 +532,6 @@ def register():
 
         user = execute_query("SELECT * FROM users WHERE id = :id", {"id": user_id}, fetch_one=True)
 
-        # Avatar upload
         if 'avatar' in request.files:
             avatar_file = request.files['avatar']
             if avatar_file and avatar_file.filename != '' and allowed_file(avatar_file.filename):
@@ -724,7 +701,6 @@ def dashboard():
     tag_filter = request.args.get('tag')
     search_query = request.args.get('q', '').strip()
     
-    # Get notes with database-specific date function
     if tag_filter:
         notes = execute_query(f"""
             SELECT n.* FROM notes n
@@ -1265,7 +1241,6 @@ def note_add_comment(note_id):
         flash('Invalid note.', 'danger')
         return redirect(url_for('dashboard'))
     
-    # Insert comment and get ID
     comment_id = insert_and_get_id(
         'discussions',
         ['note_id', 'user_id', 'message'],
@@ -1296,7 +1271,6 @@ def note_add_reply(parent_id):
         flash('Invalid reply target.', 'danger')
         return redirect(url_for('dashboard'))
     
-    # Insert reply and get ID
     reply_id = insert_and_get_id(
         'discussions',
         ['note_id', 'user_id', 'parent_id', 'message'],
@@ -1535,7 +1509,6 @@ def add_note():
                               {"cid": course_id}, fetch_one=True)
     sort_order = (max_order['max_order'] or 0) + 1
 
-    # Insert note and get ID
     new_id = insert_and_get_id(
         'notes',
         ['title', 'content', 'course_id', 'status', 'sort_order', 'cohort'],
@@ -1546,12 +1519,10 @@ def add_note():
         flash('Error creating note.', 'danger')
         return redirect(url_for('admin_panel', course_id=course_id))
 
-    # Handle tags if present
     tag_ids = request.form.getlist('tags')
     if tag_ids:
         sync_note_tags(new_id, tag_ids)
 
-    # Send email if status is 'published'
     if status == 'published':
         course = execute_query("SELECT name FROM courses WHERE id = :id", {"id": course_id}, fetch_one=True)
         subject = f"📝 New Note: {title}"
@@ -2588,10 +2559,10 @@ def run_code():
         return jsonify({'error': 'Missing language or code'}), 400
     if language == 'python':
         return fallback_run_python(code, stdin_input)
-    import requests
+    import requests as req
     payload = {"language": language, "source": code, "stdin": stdin_input}
     try:
-        response = requests.post('https://emkc.org/api/v2/piston/execute', json=payload, timeout=10)
+        response = req.post('https://emkc.org/api/v2/piston/execute', json=payload, timeout=10)
         if response.status_code == 200:
             result = response.json()
             output = result.get('output', '')
@@ -2819,7 +2790,6 @@ def edit_profile():
         return redirect(url_for('logout'))
     
     if request.method == 'POST':
-        # Update profile fields
         email = request.form.get('email', '').strip()
         phone = request.form.get('phone', '').strip()
         dob = request.form.get('dob', '').strip()
@@ -2838,12 +2808,10 @@ def edit_profile():
             execute_query("UPDATE users SET bio = :b WHERE id = :id",
                           {"b": bio, "id": session['user_id']}, commit=True)
         
-        # Email notifications toggle
         email_notifications = 1 if request.form.get('email_notifications') else 0
         execute_query("UPDATE users SET email_notifications = :en WHERE id = :id",
                       {"en": email_notifications, "id": session['user_id']}, commit=True)
         
-        # Avatar upload
         if 'avatar' in request.files:
             avatar_file = request.files['avatar']
             if avatar_file and avatar_file.filename != '' and allowed_file(avatar_file.filename):
